@@ -1,0 +1,25 @@
+-- AlterTable
+ALTER TABLE "CoffeeShopSale" ADD COLUMN     "alipayAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "cardAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "cashAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "customerCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "otherAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "wechatAmount" DOUBLE PRECISION NOT NULL DEFAULT 0;
+
+-- CreateTable
+CREATE TABLE "CoffeeShopItem" (
+    "id" SERIAL NOT NULL,
+    "coffeeShopSaleId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "unitPrice" DOUBLE PRECISION NOT NULL,
+    "totalPrice" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "CoffeeShopItem_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "CoffeeShopItem" ADD CONSTRAINT "CoffeeShopItem_coffeeShopSaleId_fkey" FOREIGN KEY ("coffeeShopSaleId") REFERENCES "CoffeeShopSale"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

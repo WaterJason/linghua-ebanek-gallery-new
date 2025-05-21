@@ -1,0 +1,59 @@
+import { NextResponse } from "next/server"
+import prisma from "@/lib/db"
+
+// 删除分类
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = params.id
+
+    // 获取分类名称
+    const products = await prisma.product.findMany({
+      select: {
+        category: true,
+      },
+      where: {
+        category: {
+          not: null,
+        },
+      },
+      distinct: ['category'],
+    })
+
+    // 将分类转换为分类对象数组
+    const categories = products
+      .filter(p => p.category) // 过滤掉null值
+      .map((p, index) => ({
+        id: index + 1, // 生成虚拟ID
+        name: p.category,
+      }))
+
+    // 找到要删除的分类
+    const categoryToDelete = categories.find(c => c.id.toString() === id)
+    
+    if (!categoryToDelete) {
+      return NextResponse.json({ error: "Category not found" }, { status: 404 })
+    }
+
+    // 检查是否有产品使用此分类
+    const productsUsingCategory = await prisma.product.findMany({
+      where: {
+        category: categoryToDelete.name,
+      },
+    })
+
+    if (productsUsingCategory.length > 0) {
+      return NextResponse.json({ 
+        error: `Cannot delete category. ${productsUsingCategory.length} products are using this category.` 
+      }, { status: 400 })
+    }
+
+    // 如果没有产品使用此分类，返回成功
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Error deleting product category:", error)
+    return NextResponse.json({ error: "Failed to delete product category" }, { status: 500 })
+  }
+}

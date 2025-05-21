@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 运行 ESLint
+npm run lint
+
+# 运行 TypeScript 类型检查
+npx tsc --noEmit
+
+# 运行模型同步检查
+npm run check:model-sync
+
+# 运行测试
+npm test

@@ -1,0 +1,204 @@
+{
+  "timestamp": "2025-05-21T05:24:41.448Z",
+  "reason": "startup",
+  "version": "1.0.0",
+  "data": {
+    "employees": [
+      {
+        "id": 1,
+        "name": "梁朝伟",
+        "position": "CEO",
+        "phone": "13928882508",
+        "email": null,
+        "dailySalary": 100,
+        "status": "active",
+        "createdAt": "2025-05-21T04:21:12.060Z",
+        "updatedAt": "2025-05-21T04:21:12.060Z"
+      },
+      {
+        "id": 2,
+        "name": "龚锦华",
+        "position": "合伙人",
+        "phone": null,
+        "email": null,
+        "dailySalary": 100,
+        "status": "active",
+        "createdAt": "2025-05-21T04:21:31.541Z",
+        "updatedAt": "2025-05-21T04:21:31.541Z"
+      },
+      {
+        "id": 3,
+        "name": "伍尚明",
+        "position": "合伙人",
+        "phone": null,
+        "email": null,
+        "dailySalary": 100,
+        "status": "active",
+        "createdAt": "2025-05-21T04:21:47.579Z",
+        "updatedAt": "2025-05-21T04:21:47.579Z"
+      },
+      {
+        "id": 4,
+        "name": "莫智华",
+        "position": "合伙人",
+        "phone": null,
+        "email": null,
+        "dailySalary": 100,
+        "status": "active",
+        "createdAt": "2025-05-21T04:21:56.757Z",
+        "updatedAt": "2025-05-21T04:21:56.757Z"
+      }
+    ],
+    "products": [
+      {
+        "id": 1,
+        "name": "麒麟献瑞",
+        "price": 3800,
+        "commissionRate": 0,
+        "type": "product",
+        "createdAt": "2025-05-21T04:24:34.747Z",
+        "updatedAt": "2025-05-21T04:26:15.893Z",
+        "description": "",
+        "imageUrl": "/uploads/44783787-53fc-4fce-ba28-a0a53b227a8d.png",
+        "barcode": "8888",
+        "category": null,
+        "cost": null,
+        "sku": "",
+        "categoryId": 2,
+        "details": "",
+        "dimensions": "48*52",
+        "imageUrls": [
+          "/uploads/44783787-53fc-4fce-ba28-a0a53b227a8d.png"
+        ],
+        "inventory": 10,
+        "material": "珐琅画",
+        "unit": "套"
+      },
+      {
+        "id": 9,
+        "name": "蝴蝶",
+        "price": 268,
+        "commissionRate": 0,
+        "type": "product",
+        "createdAt": "2025-05-21T04:42:09.127Z",
+        "updatedAt": "2025-05-21T04:42:09.127Z",
+        "description": "",
+        "imageUrl": "/uploads/f5cdd507-cdfc-43ee-9874-64b5e1d6883a.png",
+        "barcode": "",
+        "category": null,
+        "cost": null,
+        "sku": "",
+        "categoryId": 4,
+        "details": null,
+        "dimensions": null,
+        "imageUrls": [
+          "/uploads/82d2306d-7481-49f5-9a87-4dc59feb4fda.png",
+          "/uploads/f5cdd507-cdfc-43ee-9874-64b5e1d6883a.png"
+        ],
+        "inventory": 100,
+        "material": "铜镀24K金",
+        "unit": "套"
+      }
+    ],
+    "pieceWorkItems": [],
+    "schedules": [
+      {
+        "id": 1,
+        "employeeId": 1,
+        "date": "2025-05-20T16:00:00.000Z",
+        "startTime": "09:00",
+        "endTime": "17:00",
+        "createdAt": "2025-05-21T04:22:26.105Z",
+        "updatedAt": "2025-05-21T04:22:26.105Z",
+        "note": null
+      },
+      {
+        "id": 2,
+        "employeeId": 3,
+        "date": "2025-05-19T16:00:00.000Z",
+        "startTime": "09:00",
+        "endTime": "17:00",
+        "createdAt": "2025-05-21T04:23:31.632Z",
+        "updatedAt": "2025-05-21T04:23:31.632Z",
+        "note": null
+      }
+    ],
+    "scheduleTemplates": [],
+    "gallerySales": [],
+    "workshops": [],
+    "pieceWorks": [],
+    "coffeeShopSales": [],
+    "systemSettings": [
+      {
+        "id": 1,
+        "companyName": "聆花掐丝珐琅馆",
+        "coffeeSalesCommissionRate": 20,
+        "gallerySalesCommissionRate": 10,
+        "teacherWorkshopFee": 200,
+        "assistantWorkshopFee": 130,
+        "enableImageUpload": true,
+        "enableNotifications": true,
+        "createdAt": "2025-05-21T04:22:18.392Z",
+        "updatedAt": "2025-05-21T04:22:18.392Z",
+        "basicWorkingDays": 22,
+        "basicWorkingHours": 8,
+        "holidayOvertimeRate": 3,
+        "overtimeRate": 1.5,
+        "socialInsuranceRate": 0,
+        "taxRate": 0,
+        "weekendOvertimeRate": 2,
+        "assistantWorkshopFeeInside": 110,
+        "assistantWorkshopFeeOutside": 130,
+        "teacherWorkshopFeeInside": 180,
+        "teacherWorkshopFeeOutside": 200
+      }
+    ],
+    "warehouses": [
+      {
+        "id": 1,
+        "name": "成品仓",
+        "type": "physical",
+        "location": null,
+        "description": null,
+        "isActive": true,
+        "createdAt": "2025-05-21T04:43:04.592Z",
+        "updatedAt": "2025-05-21T04:43:04.592Z",
+        "code": null,
+        "isDefault": false
+      },
+      {
+        "id": 2,
+        "name": "半成品仓",
+        "type": "physical",
+        "location": null,
+        "description": null,
+        "isActive": true,
+        "createdAt": "2025-05-21T04:43:18.005Z",
+        "updatedAt": "2025-05-21T04:43:18.005Z",
+        "code": null,
+        "isDefault": false
+      }
+    ],
+    "inventoryItems": [],
+    "inventoryTransactions": [],
+    "customers": [
+      {
+        "id": 1,
+        "name": "测试客户",
+        "phone": null,
+        "email": null,
+        "address": null,
+        "type": "individual",
+        "notes": null,
+        "isActive": true,
+        "createdAt": "2025-05-21T04:52:06.911Z",
+        "updatedAt": "2025-05-21T04:52:06.911Z"
+      }
+    ],
+    "orders": [],
+    "channels": [],
+    "salaryRecords": [],
+    "salaryAdjustments": [],
+    "users": []
+  }
+}

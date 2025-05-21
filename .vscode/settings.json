@@ -1,0 +1,5 @@
+{
+    "augment.nextEdit.showDiffInHover": true,
+    "augment.nextEdit.highlightSuggestionsInTheEditor": true,
+    "augment.nextEdit.enableGlobalBackgroundSuggestions": true
+}

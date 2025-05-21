@@ -1,0 +1,902 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String             @id @default(cuid())
+  name             String?
+  email            String?            @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  role             String             @default("user")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  bio              String?
+  employeeId       Int?               @unique
+  lastLogin        DateTime?
+  phone            String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  roles            Int[]              @default([])
+  employee         Employee?          @relation(fields: [employeeId], references: [id])
+  loginHistory     UserLoginHistory[]
+  userRoles        UserRole[]
+  userSettings     UserSettings?
+}
+
+model Employee {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  position           String
+  phone              String?
+  email              String?
+  dailySalary        Float
+  status             String              @default("active")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  coffeeShopShifts   CoffeeShopShift[]
+  gallerySales       GallerySale[]
+  orders             Order[]
+  pieceWorks         PieceWork[]
+  posSales           PosSale[]
+  purchaseOrders     PurchaseOrder[]
+  salaryAdjustments  SalaryAdjustment[]
+  salaryRecords      SalaryRecord[]
+  schedules          Schedule[]
+  user               User?
+  assistedWorkshops  Workshop[]          @relation("AssistantWorkshops")
+  managedWorkshops   Workshop[]          @relation("ManagerWorkshops")
+  workshops          Workshop[]          @relation("TeacherWorkshops")
+  workshopTeamMember WorkshopTeamMember?
+}
+
+model Product {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  price                 Float
+  commissionRate        Float
+  type                  String                  @default("product")
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  description           String?
+  imageUrl              String?
+  barcode               String?
+  category              String?
+  cost                  Float?
+  sku                   String?
+  categoryId            Int?
+  details               String?
+  dimensions            String?
+  imageUrls             String[]                @default([])
+  inventory             Int?
+  material              String?
+  unit                  String?
+  channelInventory      ChannelInventory[]
+  channelPrices         ChannelPrice[]
+  channelSaleItems      ChannelSaleItem[]
+  inventoryItems        InventoryItem[]
+  inventoryTransactions InventoryTransaction[]
+  orderItems            OrderItem[]
+  posSaleItems          PosSaleItem[]
+  productCategory       ProductCategory?        @relation(fields: [categoryId], references: [id])
+  productTags           ProductTagsOnProducts[]
+  purchaseOrderItems    PurchaseOrderItem[]
+  salesItems            SalesItem[]
+  workshops             Workshop[]
+  workshopActivities    WorkshopActivity[]
+  workshopServiceItems  WorkshopServiceItem[]
+}
+
+model PieceWorkItem {
+  id               Int               @id @default(autoincrement())
+  name             String
+  price            Float
+  type             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  pieceWorkDetails PieceWorkDetail[]
+}
+
+model Schedule {
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  date       DateTime
+  startTime  String
+  endTime    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  note       String?
+  employee   Employee @relation(fields: [employeeId], references: [id])
+}
+
+model ScheduleTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  startTime   String
+  endTime     String
+  weekdays    Int[]
+  employeeIds Int[]
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GallerySale {
+  id          Int            @id @default(autoincrement())
+  employeeId  Int
+  date        DateTime
+  totalAmount Float
+  notes       String?
+  imageUrl    String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  employee    Employee       @relation(fields: [employeeId], references: [id])
+  salesItems  SalesItem[]
+  files       UploadedFile[]
+}
+
+model Workshop {
+  id            Int                   @id @default(autoincrement())
+  date          DateTime
+  productId     Int?
+  teacherId     Int
+  assistantId   Int?
+  role          String
+  locationType  String
+  location      String
+  participants  Int
+  duration      Float
+  notes         String?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  activityId    Int?
+  activityType  String?
+  baseType      String?
+  channelId     Int?
+  customerId    Int?
+  depositAmount Float                 @default(0)
+  managerId     Int?
+  paymentMethod String?
+  paymentStatus String?               @default("unpaid")
+  status        String?               @default("completed")
+  totalAmount   Float                 @default(0)
+  activity      WorkshopActivity?     @relation(fields: [activityId], references: [id])
+  assistant     Employee?             @relation("AssistantWorkshops", fields: [assistantId], references: [id])
+  customer      Customer?             @relation(fields: [customerId], references: [id])
+  manager       Employee?             @relation("ManagerWorkshops", fields: [managerId], references: [id])
+  product       Product?              @relation(fields: [productId], references: [id])
+  teacher       Employee              @relation("TeacherWorkshops", fields: [teacherId], references: [id])
+  serviceItems  WorkshopServiceItem[]
+}
+
+model WorkshopActivity {
+  id              Int             @id @default(autoincrement())
+  name            String
+  description     String?
+  productId       Int
+  duration        Float
+  minParticipants Int
+  maxParticipants Int
+  price           Float
+  materialFee     Float           @default(0)
+  teacherFee      Float           @default(0)
+  assistantFee    Float           @default(0)
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  workshops       Workshop[]
+  product         Product         @relation(fields: [productId], references: [id])
+  prices          WorkshopPrice[]
+}
+
+model PieceWork {
+  id          Int               @id @default(autoincrement())
+  employeeId  Int
+  date        DateTime
+  workType    String
+  totalAmount Float
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  employee    Employee          @relation(fields: [employeeId], references: [id])
+  details     PieceWorkDetail[]
+}
+
+model CoffeeShopSale {
+  id            Int               @id @default(autoincrement())
+  date          DateTime
+  totalSales    Float
+  notes         String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  alipayAmount  Float             @default(0)
+  cardAmount    Float             @default(0)
+  cashAmount    Float             @default(0)
+  customerCount Int               @default(0)
+  otherAmount   Float             @default(0)
+  wechatAmount  Float             @default(0)
+  items         CoffeeShopItem[]
+  shifts        CoffeeShopShift[]
+}
+
+model UploadedFile {
+  id            Int          @id @default(autoincrement())
+  filename      String
+  originalName  String?
+  path          String
+  mimetype      String
+  size          Int
+  gallerySaleId Int?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  gallerySale   GallerySale? @relation(fields: [gallerySaleId], references: [id])
+}
+
+model SalesItem {
+  id            Int         @id @default(autoincrement())
+  gallerySaleId Int
+  productId     Int
+  quantity      Int
+  price         Float
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  gallerySale   GallerySale @relation(fields: [gallerySaleId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+}
+
+model PieceWorkDetail {
+  id              Int           @id @default(autoincrement())
+  pieceWorkId     Int
+  pieceWorkItemId Int
+  quantity        Int
+  price           Float
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  pieceWork       PieceWork     @relation(fields: [pieceWorkId], references: [id])
+  pieceWorkItem   PieceWorkItem @relation(fields: [pieceWorkItemId], references: [id])
+}
+
+model CoffeeShopShift {
+  id               Int            @id @default(autoincrement())
+  coffeeShopSaleId Int
+  employeeId       Int
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  coffeeShopSale   CoffeeShopSale @relation(fields: [coffeeShopSaleId], references: [id])
+  employee         Employee       @relation(fields: [employeeId], references: [id])
+}
+
+model CoffeeShopItem {
+  id               Int            @id @default(autoincrement())
+  coffeeShopSaleId Int
+  name             String
+  category         String
+  quantity         Int
+  unitPrice        Float
+  totalPrice       Float
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  coffeeShopSale   CoffeeShopSale @relation(fields: [coffeeShopSaleId], references: [id])
+}
+
+model SystemSetting {
+  id                          Int      @id @default(autoincrement())
+  companyName                 String
+  coffeeSalesCommissionRate   Float
+  gallerySalesCommissionRate  Float
+  teacherWorkshopFee          Float
+  assistantWorkshopFee        Float
+  enableImageUpload           Boolean  @default(true)
+  enableNotifications         Boolean  @default(true)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+  basicWorkingDays            Int      @default(22)
+  basicWorkingHours           Float    @default(8)
+  holidayOvertimeRate         Float    @default(3)
+  overtimeRate                Float    @default(1.5)
+  socialInsuranceRate         Float    @default(0)
+  taxRate                     Float    @default(0)
+  weekendOvertimeRate         Float    @default(2)
+  assistantWorkshopFeeInside  Float    @default(110)
+  assistantWorkshopFeeOutside Float    @default(130)
+  teacherWorkshopFeeInside    Float    @default(180)
+  teacherWorkshopFeeOutside   Float    @default(200)
+}
+
+model Warehouse {
+  id                 Int                    @id @default(autoincrement())
+  name               String
+  type               String                 @default("physical")
+  location           String?
+  description        String?
+  isActive           Boolean                @default(true)
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  code               String?
+  isDefault          Boolean                @default(false)
+  inventoryItems     InventoryItem[]        @relation("WarehouseToInventoryItem")
+  sourceTransactions InventoryTransaction[] @relation("SourceWarehouse")
+  targetTransactions InventoryTransaction[] @relation("TargetWarehouse")
+}
+
+model InventoryItem {
+  id          Int       @id @default(autoincrement())
+  warehouseId Int
+  productId   Int
+  quantity    Int
+  minQuantity Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  notes       String?
+  product     Product   @relation(fields: [productId], references: [id])
+  warehouse   Warehouse @relation("WarehouseToInventoryItem", fields: [warehouseId], references: [id])
+}
+
+model InventoryTransaction {
+  id                   Int                    @id @default(autoincrement())
+  type                 String
+  sourceWarehouseId    Int?
+  targetWarehouseId    Int?
+  productId            Int
+  quantity             Int
+  notes                String?
+  referenceId          Int?
+  referenceType        String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  attachmentUrl        String?
+  relatedTransactionId Int?
+  product              Product                @relation(fields: [productId], references: [id])
+  relatedTransaction   InventoryTransaction?  @relation("RelatedTransactions", fields: [relatedTransactionId], references: [id])
+  relatedTransactions  InventoryTransaction[] @relation("RelatedTransactions")
+  sourceWarehouse      Warehouse?             @relation("SourceWarehouse", fields: [sourceWarehouseId], references: [id])
+  targetWarehouse      Warehouse?             @relation("TargetWarehouse", fields: [targetWarehouseId], references: [id])
+}
+
+model Customer {
+  id        Int        @id @default(autoincrement())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  type      String     @default("individual")
+  notes     String?
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  orders    Order[]
+  workshops Workshop[]
+}
+
+model Order {
+  id                   Int         @id @default(autoincrement())
+  orderNumber          String      @unique
+  customerId           Int
+  employeeId           Int
+  orderDate            DateTime
+  status               String      @default("pending")
+  totalAmount          Float
+  paidAmount           Float       @default(0)
+  paymentStatus        String      @default("unpaid")
+  paymentMethod        String?
+  notes                String?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  customDesign         String?
+  customRequirements   String?
+  designApproved       Boolean?
+  designImageUrl       String?
+  designerNotes        String?
+  expectedDeliveryDate DateTime?
+  isCustom             Boolean     @default(false)
+  customer             Customer    @relation(fields: [customerId], references: [id])
+  employee             Employee    @relation(fields: [employeeId], references: [id])
+  items                OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+  discount  Float    @default(0)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Channel {
+  id               Int                   @id @default(autoincrement())
+  name             String
+  code             String                @unique
+  description      String?
+  contactName      String?
+  contactPhone     String?
+  contactEmail     String?
+  address          String?
+  isActive         Boolean               @default(true)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  bankAccount      String?
+  bankName         String?
+  cooperationStart DateTime?
+  settlementCycle  Int                   @default(1)
+  status           String                @default("active")
+  deposits         ChannelDeposit[]
+  distributions    ChannelDistribution[]
+  inventory        ChannelInventory[]
+  prices           ChannelPrice[]
+  sales            ChannelSale[]
+  settlements      ChannelSettlement[]
+  workshopPrices   WorkshopPrice[]
+}
+
+model ChannelPrice {
+  id        Int      @id @default(autoincrement())
+  channelId Int
+  productId Int
+  price     Float
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([channelId, productId])
+}
+
+model SalaryRecord {
+  id                    Int                @id @default(autoincrement())
+  employeeId            Int
+  year                  Int
+  month                 Int
+  baseSalary            Float
+  scheduleSalary        Float
+  salesCommission       Float
+  pieceWorkIncome       Float
+  workshopIncome        Float
+  coffeeShiftCommission Float
+  overtimePay           Float
+  bonus                 Float
+  deductions            Float
+  socialInsurance       Float
+  tax                   Float
+  totalIncome           Float
+  netIncome             Float
+  status                String             @default("draft")
+  paymentDate           DateTime?
+  notes                 String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  adjustments           SalaryAdjustment[]
+  employee              Employee           @relation(fields: [employeeId], references: [id])
+
+  @@unique([employeeId, year, month])
+}
+
+model SalaryAdjustment {
+  id             Int           @id @default(autoincrement())
+  employeeId     Int
+  adjustmentDate DateTime
+  oldSalary      Float
+  newSalary      Float
+  reason         String
+  approvedBy     String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  salaryRecordId Int?
+  employee       Employee      @relation(fields: [employeeId], references: [id])
+  salaryRecord   SalaryRecord? @relation(fields: [salaryRecordId], references: [id])
+}
+
+model Supplier {
+  id             Int             @id @default(autoincrement())
+  name           String
+  contactPerson  String?
+  phone          String?
+  email          String?
+  address        String?
+  description    String?
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  purchaseOrders PurchaseOrder[]
+}
+
+model PurchaseOrder {
+  id            Int                 @id @default(autoincrement())
+  orderNumber   String              @unique
+  supplierId    Int
+  employeeId    Int
+  orderDate     DateTime
+  expectedDate  DateTime?
+  status        String              @default("pending")
+  totalAmount   Float
+  paidAmount    Float               @default(0)
+  paymentStatus String              @default("unpaid")
+  paymentMethod String?
+  notes         String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  employee      Employee            @relation(fields: [employeeId], references: [id])
+  supplier      Supplier            @relation(fields: [supplierId], references: [id])
+  items         PurchaseOrderItem[]
+}
+
+model PurchaseOrderItem {
+  id               Int           @id @default(autoincrement())
+  purchaseOrderId  Int
+  productId        Int
+  quantity         Int
+  price            Float
+  receivedQuantity Int           @default(0)
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  product          Product       @relation(fields: [productId], references: [id])
+  purchaseOrder    PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+}
+
+model Role {
+  id              Int              @id @default(autoincrement())
+  name            String
+  code            String           @unique
+  description     String?
+  isSystem        Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+}
+
+model Permission {
+  id              Int              @id @default(autoincrement())
+  name            String
+  code            String           @unique
+  module          String
+  description     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rolePermissions RolePermission[]
+}
+
+model UserRole {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  roleId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  roleId       Int
+  permissionId Int
+  createdAt    DateTime   @default(now())
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserSettings {
+  id                  Int      @id @default(autoincrement())
+  userId              String   @unique
+  theme               String   @default("light")
+  language            String   @default("zh-CN")
+  enableNotifications Boolean  @default(true)
+  enableTwoFactorAuth Boolean  @default(false)
+  twoFactorAuthSecret String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserLoginHistory {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  ipAddress String
+  userAgent String
+  loginTime DateTime
+  status    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SystemLog {
+  id        Int      @id @default(autoincrement())
+  module    String
+  level     String
+  message   String
+  details   String?
+  timestamp DateTime @default(now())
+  userId    String?
+}
+
+model ProductTag {
+  id          Int                     @id @default(autoincrement())
+  name        String                  @unique
+  color       String?
+  description String?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  products    ProductTagsOnProducts[]
+}
+
+model ProductTagsOnProducts {
+  productId Int
+  tagId     Int
+  createdAt DateTime   @default(now())
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag       ProductTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+  @@index([productId])
+  @@index([tagId])
+}
+
+model ChannelInventory {
+  id                   Int                   @id @default(autoincrement())
+  channelId            Int
+  productId            Int
+  quantity             Int                   @default(0)
+  minQuantity          Int?
+  notes                String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  channelDistributions ChannelDistribution[]
+  channel              Channel               @relation(fields: [channelId], references: [id])
+  product              Product               @relation(fields: [productId], references: [id])
+  channelSaleItems     ChannelSaleItem[]
+
+  @@unique([channelId, productId])
+}
+
+model WorkshopTeamMember {
+  id                 Int      @id @default(autoincrement())
+  employeeId         Int      @unique
+  role               String
+  specialties        String[]
+  rating             Float    @default(5.0)
+  maxWorkshopsPerDay Int      @default(2)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  employee           Employee @relation(fields: [employeeId], references: [id])
+}
+
+model WorkshopServiceItem {
+  id         Int      @id @default(autoincrement())
+  workshopId Int
+  productId  Int
+  quantity   Int
+  price      Float
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  product    Product  @relation(fields: [productId], references: [id])
+  workshop   Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+}
+
+model WorkshopPrice {
+  id              Int               @id @default(autoincrement())
+  activityId      Int?
+  channelId       Int
+  basePrice       Float
+  pricePerPerson  Float
+  minParticipants Int
+  maxParticipants Int
+  materialFee     Float             @default(0)
+  teacherFee      Float             @default(0)
+  assistantFee    Float             @default(0)
+  isActive        Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  activity        WorkshopActivity? @relation(fields: [activityId], references: [id])
+  channel         Channel           @relation(fields: [channelId], references: [id])
+
+  @@unique([activityId, channelId])
+}
+
+model ProductCategory {
+  id          Int               @id @default(autoincrement())
+  name        String
+  code        String?
+  description String?
+  imageUrl    String?
+  isActive    Boolean           @default(true)
+  sortOrder   Int               @default(0)
+  parentId    Int?
+  level       Int               @default(1)
+  path        String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  products    Product[]
+  parent      ProductCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    ProductCategory[] @relation("CategoryHierarchy")
+}
+
+model PosSale {
+  id            Int           @id @default(autoincrement())
+  employeeId    Int
+  customerId    Int?
+  customerInfo  Json?
+  totalAmount   Float
+  paymentMethod String        @default("cash")
+  date          DateTime      @default(now())
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  employee      Employee      @relation(fields: [employeeId], references: [id])
+  items         PosSaleItem[]
+}
+
+model PosSaleItem {
+  id        Int      @id @default(autoincrement())
+  posSaleId Int
+  productId Int
+  quantity  Int
+  price     Float
+  discount  Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posSale   PosSale  @relation(fields: [posSaleId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model ChannelDeposit {
+  id            Int      @id @default(autoincrement())
+  channelId     Int
+  amount        Float
+  type          String
+  date          DateTime
+  paymentMethod String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  channel       Channel  @relation(fields: [channelId], references: [id])
+}
+
+model ChannelSale {
+  id           Int                @id @default(autoincrement())
+  channelId    Int
+  saleDate     DateTime
+  totalAmount  Float
+  notes        String?
+  status       String             @default("pending")
+  importSource String?
+  settlementId Int?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  channel      Channel            @relation(fields: [channelId], references: [id])
+  settlement   ChannelSettlement? @relation(fields: [settlementId], references: [id])
+  items        ChannelSaleItem[]
+}
+
+model ChannelSaleItem {
+  id                 Int              @id @default(autoincrement())
+  channelSaleId      Int
+  productId          Int
+  channelInventoryId Int
+  quantity           Int
+  price              Float
+  notes              String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  channelInventory   ChannelInventory @relation(fields: [channelInventoryId], references: [id])
+  channelSale        ChannelSale      @relation(fields: [channelSaleId], references: [id], onDelete: Cascade)
+  product            Product          @relation(fields: [productId], references: [id])
+}
+
+model ChannelSettlement {
+  id            Int              @id @default(autoincrement())
+  channelId     Int
+  settlementNo  String           @unique
+  startDate     DateTime
+  endDate       DateTime
+  totalAmount   Float
+  paidAmount    Float            @default(0)
+  status        String           @default("draft")
+  paymentDate   DateTime?
+  paymentMethod String?
+  notes         String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  invoices      ChannelInvoice[]
+  sales         ChannelSale[]
+  channel       Channel          @relation(fields: [channelId], references: [id])
+}
+
+model ChannelInvoice {
+  id           Int               @id @default(autoincrement())
+  settlementId Int
+  invoiceNo    String?
+  invoiceDate  DateTime?
+  amount       Float
+  imageUrl     String?
+  status       String            @default("pending")
+  notes        String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  settlement   ChannelSettlement @relation(fields: [settlementId], references: [id])
+}
+
+model ChannelDistribution {
+  id                 Int              @id @default(autoincrement())
+  channelId          Int
+  channelInventoryId Int
+  quantity           Int
+  distributionDate   DateTime
+  notes              String?
+  status             String           @default("pending")
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  channel            Channel          @relation(fields: [channelId], references: [id])
+  channelInventory   ChannelInventory @relation(fields: [channelInventoryId], references: [id])
+}
+
+model FinancialAccount {
+  id             Int                    @id @default(autoincrement())
+  name           String
+  accountNumber  String?
+  accountType    String
+  bankName       String?
+  initialBalance Float                  @default(0)
+  currentBalance Float                  @default(0)
+  isActive       Boolean                @default(true)
+  notes          String?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  transactions   FinancialTransaction[] @relation("AccountTransactions")
+}
+
+model FinancialCategory {
+  id           Int                    @id @default(autoincrement())
+  name         String
+  type         String
+  code         String                 @unique
+  parentId     Int?
+  description  String?
+  isSystem     Boolean                @default(false)
+  isActive     Boolean                @default(true)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  parent       FinancialCategory?     @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children     FinancialCategory[]    @relation("CategoryHierarchy")
+  transactions FinancialTransaction[] @relation("CategoryTransactions")
+}
+
+model FinancialTransaction {
+  id              Int                @id @default(autoincrement())
+  transactionDate DateTime
+  amount          Float
+  type            String
+  accountId       Int
+  categoryId      Int?
+  paymentMethod   String?
+  relatedId       Int?
+  relatedType     String?
+  counterparty    String?
+  notes           String?
+  attachmentUrl   String?
+  status          String             @default("completed")
+  createdById     String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  account         FinancialAccount   @relation("AccountTransactions", fields: [accountId], references: [id])
+  category        FinancialCategory? @relation("CategoryTransactions", fields: [categoryId], references: [id])
+}

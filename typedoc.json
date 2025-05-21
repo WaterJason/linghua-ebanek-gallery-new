@@ -1,0 +1,42 @@
+{
+  "entryPoints": [
+    "./lib/actions/*.ts",
+    "./lib/validation.ts",
+    "./lib/model-sync.ts",
+    "./lib/prisma-wrapper.ts",
+    "./types/prisma-models.ts"
+  ],
+  "out": "docs/api",
+  "name": "灵华珐琅馆 API 文档",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "readme": "README.md",
+  "plugin": ["typedoc-plugin-markdown"],
+  "theme": "markdown",
+  "entryPointStrategy": "expand",
+  "sort": ["source-order"],
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "产品管理",
+    "客户管理",
+    "员工管理",
+    "订单管理",
+    "采购管理",
+    "库存管理",
+    "工作坊管理",
+    "渠道管理",
+    "角色管理",
+    "用户管理",
+    "系统设置",
+    "排班管理",
+    "认证管理",
+    "*"
+  ],
+  "validation": {
+    "invalidLink": true,
+    "notExported": true
+  }
+}
