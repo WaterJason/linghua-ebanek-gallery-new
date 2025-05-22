@@ -1,0 +1,85 @@
+---
+description: AI rules derived by SpecStory from the project AI interaction history
+globs: *
+---
+
+## AI Coding Assistant Rules
+
+## TECH STACK
+
+- **Stagewise:** Added for AI-powered editing capabilities. Specific packages: `@stagewise/toolbar`, `@stagewise/toolbar-react`, `@stagewise/toolbar-next`, `@stagewise/toolbar-vue`.
+- **pnpm:** Added as a supported package manager. Installation may be required depending on the project setup. If `pnpm` installation fails, the assistant will attempt to install it globally using `npm install -g pnpm`. If this also fails, `npx pnpm` will be used as a fallback. User intervention may still be required to ensure `pnpm` is correctly installed and accessible in the PATH environment variable. Restarting the terminal may resolve PATH issues.  If `pnpm` is not found after global installation, manually add its installation directory to the PATH environment variable in your shell's configuration file (e.g., `~/.zshrc`, `~/.bashrc`) and source the file or restart the terminal.
+- **lucide-react:** Added as a dependency, used for icons in various components. Multiple versions detected across the project; investigate and unify. Confirmed icons `Transfer` and `Chart` are available in version 0.454.0.  Note:  `Transfer` and `Chart` icons were found to be absent in the currently used version.  `Transfer` has been replaced with `ArrowUpDown` and `Chart` with `BarChart` for consistency and availability.  Additional icons `LineChart` added as needed.
+- **Next.js App Router:** Added for improved mobile responsiveness.  Should be utilized for building device-specific layouts.
+- **Next.js Server Components:** Added for reducing client-side JS bundle size and improving mobile performance.
+- **SWR:** Already a dependency; utilized for managing API data and reducing redundant state code.  (Confirmed in new interactions)
+- **react-hook-form:** Already a dependency; utilized for simplifying form handling. (Confirmed in new interactions)
+- **Tailwind CSS:** Already in use; recommended to extend mobile media query breakpoints. (Confirmed in new interactions)
+
+
+## PROJECT DOCUMENTATION & CONTEXT SYSTEM
+
+- All interactions should be documented. Consider using a system like the one exemplified in `2025-05-21_22-43-对话总结与记忆扩展.md`, `2025-05-21_23-44-通知模块错误讨论.md`, `2025-05-22_04-01-修复财务模块的bug讨论.md`, `2025-05-22_04-42-untitled.md`, `2025-05-22_04-42-react-component-export-error-troubleshooting.md`, `2025-05-22_05-35-untitled.md`, `2025-05-22_05-35-前端优化与移动端支持.md`, and any subsequent interaction logs.  A new UI refactoring document should be created and maintained, documenting the changes and rationale behind them.  A new UI refactoring document, `聆花掐丝珐琅馆 - 前端 UI 重构文档.md`, has been created and should be referenced.  This document is now marked up with completion status for each section.
+- Version updates and changes should be documented in the relevant sections (e.g., TECH STACK, WORKFLOW & RELEASE RULES).
+
+
+## WORKFLOW & RELEASE RULES
+
+- **Development Mode Only:** The `stagewise` toolbar must only be included in development builds. It should never be included in production. Use environment variables (e.g., `process.env.NODE_ENV`) to control this.
+- **Framework-Specific Integration:** Follow the framework-specific guidelines provided in the `2025-05-21_22-43-对话总结与记忆扩展.md` document for integrating the `stagewise` toolbar.  See also the detailed integration steps within that document. For React applications, consider creating a separate React root for the toolbar to avoid interfering with the main application.  If UI inconsistencies arise (e.g., extra navigation bars), review the integration steps carefully and ensure proper component placement.
+- **Package Manager Handling:** The AI assistant will prioritize `pnpm`. If a `pnpm-lock.yaml` file is detected, it will attempt to use `pnpm`. If `pnpm` is not found, it will attempt to install it globally using `npm install -g pnpm`. If this fails, it will use `npx pnpm` as a fallback. If all attempts fail, the assistant will fall back to `npm`.  If `pnpm` is still not found after global installation, check the PATH environment variable and restart the terminal.
+- **Systematic Diagnosis:** When troubleshooting, follow these steps: 1. Redefine scope; 2. Map system structure; 3. Hypothesize root causes; 4. Investigate systematically; 5. Confirm root cause; 6. Propose solution; 7. Plan verification; 8. Execute and verify; 9. Report results.  Utilize tools like `list_dir`, `file_search`, `codebase_search`, `read_file`, `grep_search`, `edit_file`, and `run_terminal_cmd` (with `require_user_approval=true` where appropriate).  When encountering complex errors requiring a systematic re-diagnosis, refer to the steps outlined in `2025-05-21_23-44-通知模块错误讨论.md`, `2025-05-22_04-01-修复财务模块的bug讨论.md`, `2025-05-22_04-42-untitled.md`, `2025-05-22_04-42-react-component-export-error-troubleshooting.md`, `2025-05-22_05-35-untitled.md`, and `2025-05-22_05-35-前端优化与移动端支持.md`. This process should always be followed for complex errors.  The process should include:  a) Redefining the scope, forgetting previous attempts; b) Mapping the system structure using tools like `list_dir`, `file_search`, etc.; c) Generating a broad list of potential root causes; d) Prioritizing and investigating the most likely hypotheses; e) Confirming the root cause based solely on evidence; f) Proposing a precise solution; g) Planning comprehensive verification; h) Executing the solution and verification; i) Reporting the results.
+- **Large File Handling:** When dealing with large files (e.g., exceeding 250 lines), the AI assistant may need to process the file in segments.  The assistant will attempt to automatically handle this, but user assistance may be required to provide specific code sections or line numbers to aid in diagnosis and resolution.
+- **File Reading Limitations:** The AI assistant may encounter limitations when reading large files.  In such cases, the assistant will attempt to process the file in segments, but user assistance may be required to provide specific code sections or line numbers.  The assistant may not always accurately report the total number of lines in a file.
+- **Finance Module Header/Footer Removal:** The header and footer should be removed from the finance module layout.  This has been implemented.
+- **Finance Module UI Style:** The UI style of the finance module should reference the style of the channel module. Further clarification needed on specific aspects to be referenced.
+- **Mobile-First Design:**  All new frontend development should prioritize mobile-first design principles.  Existing components should be reviewed and refactored as needed to ensure mobile compatibility.  Consider using Next.js App Router for efficient layout management across devices.
+- **Component Modularization:**  Organize code by business function (e.g., `features/finance`) rather than technical role (e.g., `components/finance`). (New rule from user interaction)
+- **Atomic Design:** Adopt the atomic design pattern (Atoms, Molecules, Organisms, Templates, Pages) to improve component reusability. (New rule from user interaction)
+- **Progressive Enhancement:** Prioritize core mobile features first, then gradually replace existing components. (New rule from user interaction)
+- **Data Pagination:** Implement virtual scrolling and data pagination to reduce initial load data. (New rule from user interaction)
+- **Component Lazy Loading:** Utilize dynamic imports for non-critical components to improve load times. (New rule from user interaction)
+- **Code Splitting Refinement:** Refine code splitting by route and functional module to reduce bundle size. (New rule from user interaction)
+- **RESTful API Design:** Follow RESTful principles when restructuring API routes. (New rule from user interaction)
+
+
+## DEBUGGING
+
+- When encountering issues with `stagewise` integration, ensure the toolbar is only initialized in development mode and that it's not interfering with the main application. Consider creating a separate React root for the toolbar in React applications.  Address UI inconsistencies by carefully reviewing component placement and integration steps.
+- If `pnpm` related errors occur, check for installation and PATH environment variable issues. Restarting the terminal may resolve PATH issues. If `pnpm` is not found in the PATH, adding the installation directory to the PATH environment variable may be necessary.  If issues persist after restarting the terminal, manually add the `pnpm` installation directory to your shell's PATH environment variable (e.g., `~/.zshrc`, `~/.bashrc`) and source the file or restart the terminal.  Check browser developer console for errors related to `StagewiseToolbar`. Check the DOM structure to ensure the `StagewiseToolbar` element is present and visible. Verify the development server is started correctly (e.g., `pnpm dev`, `npm run dev`, `next dev`).
+- **API Debugging:** When dealing with API errors, check for authorization issues (e.g., ensure proper authentication).  Inspect the API response for error codes and messages.
+- **Function Import Errors:** If a `TypeError: ... is not a function` error occurs, systematically check for missing or incorrectly imported functions. Utilize tools like `grep_search` and `codebase_search` to locate the function definition and ensure correct import paths.  Check for outdated or incorrectly referenced files (e.g., `.old`, `.bak` extensions).  Always follow the systematic diagnosis steps outlined in WORKFLOW & RELEASE RULES when encountering such errors.
+- **Auth Function Errors:** If a `TypeError: ...auth... is not a function` error occurs, systematically check for missing or incorrectly imported authentication functions.  Utilize tools like `grep_search` and `codebase_search` to locate the function definition and ensure correct import paths. Check for outdated or incorrectly referenced files (e.g., `.old`, `.bak` extensions). Always follow the systematic diagnosis steps outlined in WORKFLOW & RELEASE RULES when encountering such errors.
+- **Undefined Component Errors:** If an "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined" error occurs, systematically check for missing or incorrectly imported components in the render method of the affected component.  Utilize tools like `grep_search` and `codebase_search` to locate the component definition and ensure correct import paths. Check for outdated or incorrectly referenced files. Always follow the systematic diagnosis steps outlined in WORKFLOW & RELEASE RULES when encountering such errors.  Pay close attention to default vs. named imports.  This error often indicates a missing or incorrectly imported component in the JSX rendering structure. Check the import statements for the component and ensure that the component is correctly exported from its source file. Verify that the component name is spelled correctly and that there are no typos in the import path.  This error is frequently caused by forgetting to export a component from its defining file, or by mixing up default and named imports.  Also check for missing or incorrectly imported icons, and ensure they exist in the used version of `lucide-react`.
+
+
+## CODING STANDARDS
+
+- Maintain consistent code style across the project. Adherence to linting rules is mandatory to avoid errors.
+
+
+## BEST PRACTICES
+
+- Leverage AI tools like `stagewise` to enhance development efficiency.
+- Always document code changes thoroughly.
+- Always test changes before merging into the main branch.
+- Use a consistent package manager (preferably pnpm) throughout the project.
+- Utilize systematic diagnostic approaches for troubleshooting.
+- Maintain consistent versions of `lucide-react` across the project.  Ensure that all required icons exist within the used version.
+- Replace `Transfer` and `Chart` icons with `ArrowUpDown` and `BarChart` respectively in `lucide-react` for consistency and availability. Add `LineChart` as needed.
+- Adopt mobile-first design principles for all new and refactored components.  Prioritize responsive design and ensure optimal user experience across all devices.
+- Favor composition over inheritance when building complex UIs. (New Best Practice from user interaction)
+- Create custom hooks to abstract business logic, keeping components focused on presentation. (New Best Practice from user interaction)
+- Implement centralized error handling with a unified error boundary and error handling hook. (New Best Practice from user interaction)
+- Utilize TypeScript's strict mode to enhance type safety and reduce runtime errors. (New Best Practice from user interaction)
+- Create reusable, adaptive layout primitives to minimize redundant media queries. (New Best Practice from user interaction)
+- Separate tests into unit, integration, and end-to-end tests for comprehensive coverage. (New Best Practice from user interaction)
+- Use React Testing Library to isolate component behavior during testing. (New Best Practice from user interaction)
+- Integrate performance monitoring and component debugging tools for efficient development. (New Best Practice from user interaction)
+- Create a unified API client to streamline API calls and reduce repetitive code. (New Best Practice from user interaction)
+- Derive states instead of duplicating them to avoid state synchronization issues. (New Best Practice from user interaction)
+- Adopt Atomic Design principles (Atoms, Molecules, Organisms, Templates, Pages) for improved component reusability and maintainability. (New Best Practice from user interaction)
+- Organize code by business function (e.g., `features/finance`) rather than technical role (e.g., `components/finance`). (New Best Practice from user interaction)
+- Implement data pagination and virtual scrolling for improved performance with large datasets. (New Best Practice from user interaction)
+- Implement lazy loading for non-critical components to reduce initial page load time. (New Best Practice from user interaction)
+- Implement data caching strategies to improve performance and reduce API calls. (New Best Practice from user interaction)

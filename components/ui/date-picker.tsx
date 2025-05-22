@@ -2,7 +2,9 @@
 
 import * as React from "react"
 import { format } from "date-fns"
+import { zhCN } from "date-fns/locale"
 import { Calendar as CalendarIcon } from "lucide-react"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -13,20 +15,13 @@ import {
 } from "@/components/ui/popover"
 
 interface DatePickerProps {
-  date: Date | null
-  setDate: (date: Date | null) => void
   className?: string
-  placeholder?: string
-  disabled?: boolean
+  name?: string
 }
 
-export function DatePicker({
-  date,
-  setDate,
-  className,
-  placeholder = "选择日期",
-  disabled = false
-}: DatePickerProps) {
+export function DatePicker({ className, name = "dueDate" }: DatePickerProps) {
+  const [date, setDate] = React.useState<Date>()
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -37,18 +32,19 @@ export function DatePicker({
             !date && "text-muted-foreground",
             className
           )}
-          disabled={disabled}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "yyyy-MM-dd") : <span>{placeholder}</span>}
+          {date ? format(date, "PPP", { locale: zhCN }) : <span>选择日期</span>}
+          <input type="hidden" name={name} value={date ? date.toISOString() : ""} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={date || undefined}
+          selected={date}
           onSelect={setDate}
           initialFocus
+          locale={zhCN}
         />
       </PopoverContent>
     </Popover>

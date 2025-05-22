@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import {
   MenuIcon, XIcon, ChevronDownIcon, ChevronRightIcon,
   UserIcon, SettingsIcon, LogOutIcon, ShieldIcon,
-  ShieldAlertIcon, BellIcon, MoonIcon, SunIcon
+  ShieldAlertIcon, MoonIcon, SunIcon
 } from "lucide-react"
 import { navigationGroups, NavGroup, NavItem } from "@/config/navigation"
 import { Separator } from "@/components/ui/separator"
@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOut } from "next-auth/react"
-import { getCurrentUser } from "@/lib/actions/auth-actions";
+import { getCurrentUser } from "@/lib/actions/auth-actions"
+import { NotificationTodoPopover } from "@/components/notification-todo-popover";
 
 export default function CollapsibleSidebar() {
   const pathname = usePathname()
@@ -237,6 +238,9 @@ export default function CollapsibleSidebar() {
 
           {/* 用户信息和下拉菜单 */}
           <div className="p-4 border-t dark:border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <NotificationTodoPopover />
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-md transition-colors">
@@ -301,6 +305,16 @@ export default function CollapsibleSidebar() {
                     <Link href="/settings" className="flex items-center cursor-pointer">
                       <SettingsIcon className="mr-2 h-4 w-4" />
                       <span>系统设置</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/notifications" className="flex items-center cursor-pointer">
+                      <span>通知中心</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/todos" className="flex items-center cursor-pointer">
+                      <span>待办事项</span>
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

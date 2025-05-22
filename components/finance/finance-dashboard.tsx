@@ -43,12 +43,6 @@ export function FinanceDashboard() {
 
   return (
     <Tabs defaultValue="overview" className="w-full">
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="overview">总览</TabsTrigger>
-        <TabsTrigger value="accounts">资金账户</TabsTrigger>
-        <TabsTrigger value="transactions">交易记录</TabsTrigger>
-        <TabsTrigger value="reports">财务报表</TabsTrigger>
-      </TabsList>
       <TabsContent value="overview" className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>

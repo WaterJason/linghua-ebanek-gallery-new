@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-05-21T05:31:28.016Z",
+  "timestamp": "2025-05-22T07:27:16.899Z",
   "reason": "startup",
   "version": "1.0.0",
   "data": {
@@ -121,11 +121,48 @@
         "createdAt": "2025-05-21T04:23:31.632Z",
         "updatedAt": "2025-05-21T04:23:31.632Z",
         "note": null
+      },
+      {
+        "id": 3,
+        "employeeId": 3,
+        "date": "2025-05-21T16:00:00.000Z",
+        "startTime": "09:00",
+        "endTime": "17:00",
+        "createdAt": "2025-05-22T01:07:26.115Z",
+        "updatedAt": "2025-05-22T01:07:26.115Z",
+        "note": null
       }
     ],
     "scheduleTemplates": [],
     "gallerySales": [],
-    "workshops": [],
+    "workshops": [
+      {
+        "id": 1,
+        "date": "2025-05-22T06:00:00.000Z",
+        "productId": null,
+        "teacherId": 1,
+        "assistantId": 1,
+        "role": "jewelry_workshop",
+        "locationType": "in_gallery",
+        "location": "222",
+        "participants": 10,
+        "duration": 2,
+        "notes": null,
+        "createdAt": "2025-05-21T23:49:07.938Z",
+        "updatedAt": "2025-05-21T23:49:07.938Z",
+        "activityId": null,
+        "activityType": "jewelry_enameling",
+        "baseType": "jewelry",
+        "channelId": null,
+        "customerId": 1,
+        "depositAmount": 0,
+        "managerId": 1,
+        "paymentMethod": null,
+        "paymentStatus": "unpaid",
+        "status": "pending",
+        "totalAmount": 1111
+      }
+    ],
     "pieceWorks": [],
     "coffeeShopSales": [],
     "systemSettings": [

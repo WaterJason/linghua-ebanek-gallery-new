@@ -11,6 +11,7 @@ import {
   CreditCard,
   File,
   FileText,
+  Filter,
   HelpCircle,
   Image,
   Laptop,
@@ -29,8 +30,8 @@ import {
   Menu,
   Wallet,
   History,
-  Transfer,
-  Chart,
+  BarChart,
+  LineChart,
   Minus,
 } from "lucide-react"
 
@@ -56,10 +57,11 @@ export const Icons = {
   menu: Menu,
   wallet: Wallet,
   history: History,
-  transfer: Transfer,
-  chart: Chart,
+  transfer: ArrowUpDown,
+  chart: BarChart,
   plus: Plus,
   minus: Minus,
+  filter: Filter,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

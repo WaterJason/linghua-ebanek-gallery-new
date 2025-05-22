@@ -33,3 +33,19 @@ export function formatDate(date: Date | string | number, format: string = 'YYYY-
     .replace('mm', minutes.toString().padStart(2, '0'))
     .replace('ss', seconds.toString().padStart(2, '0'))
 }
+
+/**
+ * 格式化货币
+ * @param value 数值
+ * @param currency 货币符号，默认为 '¥'
+ * @param decimals 小数位数，默认为 2
+ * @returns 格式化后的货币字符串
+ */
+export function formatCurrency(value: number, currency: string = '¥', decimals: number = 2): string {
+  if (isNaN(value)) {
+    return `${currency}0.00`;
+  }
+  
+  const formattedValue = value.toFixed(decimals);
+  return `${currency}${formattedValue}`;
+}
