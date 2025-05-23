@@ -19,7 +19,7 @@ globs: *
 
 ## PROJECT DOCUMENTATION & CONTEXT SYSTEM
 
-- All interactions should be documented. Consider using a system like the one exemplified in `2025-05-21_22-43-对话总结与记忆扩展.md`, `2025-05-21_23-44-通知模块错误讨论.md`, `2025-05-22_04-01-修复财务模块的bug讨论.md`, `2025-05-22_04-42-untitled.md`, `2025-05-22_04-42-react-component-export-error-troubleshooting.md`, `2025-05-22_05-35-untitled.md`, `2025-05-22_05-35-前端优化与移动端支持.md`, and any subsequent interaction logs.  A new UI refactoring document should be created and maintained, documenting the changes and rationale behind them.  A new UI refactoring document, `聆花掐丝珐琅馆 - 前端 UI 重构文档.md`, has been created and should be referenced.  This document is now marked up with completion status for each section.
+- All interactions should be documented. Consider using a system like the one exemplified in `2025-05-21_22-43-对话总结与记忆扩展.md`, `2025-05-21_23-44-通知模块错误讨论.md`, `2025-05-22_04-01-修复财务模块的bug讨论.md`, `2025-05-22_04-42-untitled.md`, `2025-05-22_04-42-react-component-export-error-troubleshooting.md`, `2025-05-22_05-35-untitled.md`, `2025-05-22_05-35-前端优化与移动端支持.md`, and any subsequent interaction logs.  A new UI refactoring document should be created and maintained, documenting the changes and rationale behind them.  A new UI refactoring document, `聆花掐丝珐琅馆 - 前端 UI 重构文档.md`, has been created and should be referenced.  This document is now marked up with completion status for each section.  Add documentation for GitHub repository interactions, including steps for initialization, remote repository configuration, adding files to the staging area, committing changes, setting the remote repository, and pushing code. Refer to the interaction log `2025-05-23_04-33-untitled.md` for a detailed example.
 - Version updates and changes should be documented in the relevant sections (e.g., TECH STACK, WORKFLOW & RELEASE RULES).
 
 
@@ -41,6 +41,7 @@ globs: *
 - **Component Lazy Loading:** Utilize dynamic imports for non-critical components to improve load times. (New rule from user interaction)
 - **Code Splitting Refinement:** Refine code splitting by route and functional module to reduce bundle size. (New rule from user interaction)
 - **RESTful API Design:** Follow RESTful principles when restructuring API routes. (New rule from user interaction)
+- **GitHub Integration:** Before pushing code to the remote repository, ensure the local repository is properly initialized and configured.  The assistant will follow a standard process for pushing code to GitHub, outlined in interaction log `2025-05-23_04-33-untitled.md`.  Always confirm the remote repository is empty or allows overwriting before pushing.
 
 
 ## DEBUGGING
@@ -83,3 +84,4 @@ globs: *
 - Implement data pagination and virtual scrolling for improved performance with large datasets. (New Best Practice from user interaction)
 - Implement lazy loading for non-critical components to reduce initial page load time. (New Best Practice from user interaction)
 - Implement data caching strategies to improve performance and reduce API calls. (New Best Practice from user interaction)
+- Use a consistent Git workflow for all code changes, including proper commit messages and branching strategies. (New Best Practice from user interaction)
