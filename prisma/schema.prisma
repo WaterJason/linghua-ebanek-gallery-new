@@ -26,8 +26,12 @@ model User {
   roles            Int[]              @default([])
   employee         Employee?          @relation(fields: [employeeId], references: [id])
   loginHistory     UserLoginHistory[]
+  notifications    Notification[]
   userRoles        UserRole[]
   userSettings     UserSettings?
+  passwordLastChanged DateTime?
+  failedLoginAttempts Int             @default(0)
+  lockedUntil      DateTime?
 }
 
 model Employee {
@@ -625,6 +629,120 @@ model SystemLog {
   details   String?
   timestamp DateTime @default(now())
   userId    String?
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  message     String
+  type        String    // order, inventory, schedule, workshop, system, other
+  priority    String    // high, medium, low
+  read        Boolean   @default(false)
+  link        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  expiresAt   DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id            Int      @id @default(autoincrement())
+  userId        String?
+  action        String   // create, update, delete, view, login, logout, etc.
+  entityType    String   // user, product, order, etc.
+  entityId      String
+  oldValues     String?  // JSON string of old values
+  newValues     String?  // JSON string of new values
+  ipAddress     String?
+  userAgent     String?
+  timestamp     DateTime @default(now())
+  details       String?
+}
+
+model DataDictionary {
+  id          Int                 @id @default(autoincrement())
+  code        String              @unique
+  name        String
+  description String?
+  isSystem    Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  items       DataDictionaryItem[]
+}
+
+model DataDictionaryItem {
+  id                Int            @id @default(autoincrement())
+  dictionaryId      Int
+  code              String
+  value             String
+  label             String
+  sortOrder         Int            @default(0)
+  isDefault         Boolean        @default(false)
+  isActive          Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  dictionary        DataDictionary @relation(fields: [dictionaryId], references: [id], onDelete: Cascade)
+
+  @@unique([dictionaryId, code])
+}
+
+model Workflow {
+  id              Int               @id @default(autoincrement())
+  code            String            @unique
+  name            String
+  description     String?
+  entityType      String            // order, purchase, expense, etc.
+  isActive        Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  steps           WorkflowStep[]
+  instances       WorkflowInstance[]
+}
+
+model WorkflowStep {
+  id              Int               @id @default(autoincrement())
+  workflowId      Int
+  name            String
+  description     String?
+  stepNumber      Int
+  approverType    String            // role, user, department, etc.
+  approverId      String?           // roleId or userId
+  isRequired      Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  workflow        Workflow          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  approvals       WorkflowApproval[]
+}
+
+model WorkflowInstance {
+  id              String            @id @default(cuid())
+  workflowId      Int
+  entityId        String            // ID of the entity being approved
+  status          String            @default("pending") // pending, approved, rejected, canceled
+  initiatedBy     String
+  initiatedAt     DateTime          @default(now())
+  completedAt     DateTime?
+  currentStepNumber Int?
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  workflow        Workflow          @relation(fields: [workflowId], references: [id])
+  approvals       WorkflowApproval[]
+}
+
+model WorkflowApproval {
+  id                String          @id @default(cuid())
+  workflowInstanceId String
+  workflowStepId    Int
+  approverId        String
+  status            String          @default("pending") // pending, approved, rejected
+  comments          String?
+  actionDate        DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  workflowInstance  WorkflowInstance @relation(fields: [workflowInstanceId], references: [id], onDelete: Cascade)
+  workflowStep      WorkflowStep    @relation(fields: [workflowStepId], references: [id])
 }
 
 model ProductTag {

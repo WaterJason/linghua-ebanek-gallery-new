@@ -14,7 +14,7 @@ import {
   ChevronRightIcon, BellOffIcon
 } from "lucide-react"
 import Link from "next/link"
-import { getNotifications } from "@/lib/actions/system-actions"
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "@/lib/actions/system-actions"
 import { toast } from "@/components/ui/use-toast"
 
 // 通知类型
@@ -51,65 +51,7 @@ export function NotificationCenter({
       try {
         // 从服务器获取通知
         const data = await getNotifications(limit, activeTab)
-
-        // 由于目前没有通知表，我们创建一些模拟数据
-        // 这部分代码在实际实现通知功能后应该删除
-        const mockData: Notification[] = [
-          {
-            id: '1',
-            title: '新订单通知',
-            message: '您有一个新的销售订单需要处理',
-            type: 'order',
-            priority: 'high',
-            timestamp: new Date(new Date().setMinutes(new Date().getMinutes() - 30)),
-            read: false,
-            link: '/sales'
-          },
-          {
-            id: '2',
-            title: '库存预警',
-            message: '珐琅原料A库存低于安全库存',
-            type: 'inventory',
-            priority: 'high',
-            timestamp: new Date(new Date().setHours(new Date().getHours() - 2)),
-            read: false,
-            link: '/inventory'
-          },
-          {
-            id: '3',
-            title: '排班提醒',
-            message: '明日排班已更新，请查看',
-            type: 'schedule',
-            priority: 'medium',
-            timestamp: new Date(new Date().setHours(new Date().getHours() - 5)),
-            read: true,
-            link: '/schedule'
-          },
-          {
-            id: '4',
-            title: '手作团建预约',
-            message: '收到一个新的团建活动预约',
-            type: 'workshop',
-            priority: 'medium',
-            timestamp: new Date(new Date().setHours(new Date().getHours() - 8)),
-            read: false,
-            link: '/workshop'
-          },
-          {
-            id: '5',
-            title: '系统更新',
-            message: '系统已更新到最新版本',
-            type: 'system',
-            priority: 'low',
-            timestamp: new Date(new Date().setDate(new Date().getDate() - 1)),
-            read: true,
-            link: '/settings'
-          }
-        ];
-
-        // 如果服务器返回的数据为空，使用模拟数据
-        // 这是临时解决方案，直到通知功能完全实现
-        setNotifications(data.length > 0 ? data : mockData)
+        setNotifications(data)
       } catch (error) {
         console.error("Error loading notifications:", error)
         toast({
@@ -126,15 +68,39 @@ export function NotificationCenter({
   }, [limit, activeTab])
 
   // 标记通知为已读
-  const markAsRead = (id: string) => {
-    setNotifications(notifications.map(notification =>
-      notification.id === id ? { ...notification, read: true } : notification
-    ))
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      const success = await markNotificationAsRead(id)
+      if (success) {
+        setNotifications(notifications.map(notification =>
+          notification.id === id ? { ...notification, read: true } : notification
+        ))
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error)
+      toast({
+        title: "操作失败",
+        description: "无法标记通知为已读，请稍后再试",
+        variant: "destructive",
+      })
+    }
   }
 
   // 标记所有通知为已读
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(notification => ({ ...notification, read: true })))
+  const handleMarkAllAsRead = async () => {
+    try {
+      const success = await markAllNotificationsAsRead()
+      if (success) {
+        setNotifications(notifications.map(notification => ({ ...notification, read: true })))
+      }
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error)
+      toast({
+        title: "操作失败",
+        description: "无法标记所有通知为已读，请稍后再试",
+        variant: "destructive",
+      })
+    }
   }
 
   // 根据标签筛选通知
@@ -183,7 +149,7 @@ export function NotificationCenter({
             )}
           </div>
           {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+            <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead}>
               全部标为已读
             </Button>
           )}
@@ -220,7 +186,7 @@ export function NotificationCenter({
                         ? "border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/50"
                         : "border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/50"
                     )}
-                    onClick={() => markAsRead(notification.id)}
+                    onClick={() => handleMarkAsRead(notification.id)}
                   >
                     <div className="flex-shrink-0 mt-0.5">
                       {getNotificationIcon(notification.type, notification.priority)}

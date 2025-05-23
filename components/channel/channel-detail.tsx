@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton"
 import { EditIcon } from "lucide-react"
 import { getChannel, getChannelDepositBalance } from "@/lib/actions/channel-actions"
+import { ChannelAuditLog } from "@/components/channel/channel-audit-log"
 
 export function ChannelDetail({ channelId, onEdit }) {
   const { toast } = useToast()
@@ -24,7 +25,7 @@ export function ChannelDetail({ channelId, onEdit }) {
         setIsLoading(true)
         const channelData = await getChannel(channelId)
         setChannel(channelData)
-        
+
         // 加载押金余额
         const depositData = await getChannelDepositBalance(channelId)
         setDepositBalance(depositData.balance)
@@ -38,7 +39,7 @@ export function ChannelDetail({ channelId, onEdit }) {
         setIsLoading(false)
       }
     }
-    
+
     if (channelId) {
       loadChannelDetail()
     }
@@ -94,8 +95,9 @@ export function ChannelDetail({ channelId, onEdit }) {
         <TabsList>
           <TabsTrigger value="basic">基本信息</TabsTrigger>
           <TabsTrigger value="stats">统计信息</TabsTrigger>
+          <TabsTrigger value="logs">操作日志</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="basic" className="space-y-4">
           <Card>
             <CardHeader>
@@ -120,7 +122,7 @@ export function ChannelDetail({ channelId, onEdit }) {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>结算信息</CardTitle>
@@ -146,7 +148,7 @@ export function ChannelDetail({ channelId, onEdit }) {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>合作信息</CardTitle>
@@ -155,7 +157,7 @@ export function ChannelDetail({ channelId, onEdit }) {
               <div>
                 <p className="text-sm font-medium">合作开始日期</p>
                 <p className="text-sm text-muted-foreground">
-                  {channel.cooperationStart 
+                  {channel.cooperationStart
                     ? format(new Date(channel.cooperationStart), "yyyy-MM-dd")
                     : "未设置"}
                 </p>
@@ -173,7 +175,7 @@ export function ChannelDetail({ channelId, onEdit }) {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="stats" className="space-y-4">
           <Card>
             <CardHeader>
@@ -199,6 +201,14 @@ export function ChannelDetail({ channelId, onEdit }) {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="logs" className="space-y-4">
+          <ChannelAuditLog
+            channelId={channelId}
+            showHeader={false}
+            limit={10}
+          />
         </TabsContent>
       </Tabs>
     </div>

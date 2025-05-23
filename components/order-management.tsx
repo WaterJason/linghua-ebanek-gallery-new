@@ -40,6 +40,8 @@ import { format } from "date-fns"
 import { zhCN } from "date-fns/locale"
 import { OrderForm } from "./order-form"
 import { CustomOrderForm } from "./custom-order-form"
+import { SalesOrderWorkflow } from "./sales/sales-order-workflow"
+import { EntityAuditLog } from "./audit/entity-audit-log"
 
 export function OrderManagement() {
   const [orders, setOrders] = useState([])
@@ -487,7 +489,7 @@ export function OrderManagement() {
 
       {/* 查看订单对话框 */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>订单详情</DialogTitle>
             <DialogDescription>订单编号: {selectedOrder?.orderNumber}</DialogDescription>
@@ -495,69 +497,89 @@ export function OrderManagement() {
 
           {selectedOrder && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium mb-1">客户信息</h4>
-                  <p className="text-sm">{selectedOrder.customer?.name}</p>
-                  <p className="text-sm">{selectedOrder.customer?.phone || "-"}</p>
-                  <p className="text-sm">{selectedOrder.customer?.email || "-"}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium mb-1">订单信息</h4>
-                  <p className="text-sm">销售员: {selectedOrder.employee?.name}</p>
-                  <p className="text-sm">订单日期: {formatDate(selectedOrder.orderDate)}</p>
-                  <p className="text-sm">
-                    订单状态: {getStatusBadge(selectedOrder.status)}
-                  </p>
-                  <p className="text-sm">
-                    支付状态: {getPaymentStatusBadge(selectedOrder.paymentStatus)}
-                  </p>
-                  <p className="text-sm">
-                    支付方式: {selectedOrder.paymentMethod || "-"}
-                  </p>
-                </div>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium mb-1">客户信息</h4>
+                      <p className="text-sm">{selectedOrder.customer?.name}</p>
+                      <p className="text-sm">{selectedOrder.customer?.phone || "-"}</p>
+                      <p className="text-sm">{selectedOrder.customer?.email || "-"}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium mb-1">订单信息</h4>
+                      <p className="text-sm">销售员: {selectedOrder.employee?.name}</p>
+                      <p className="text-sm">订单日期: {formatDate(selectedOrder.orderDate)}</p>
+                      <p className="text-sm">
+                        订单状态: {getStatusBadge(selectedOrder.status)}
+                      </p>
+                      <p className="text-sm">
+                        支付状态: {getPaymentStatusBadge(selectedOrder.paymentStatus)}
+                      </p>
+                      <p className="text-sm">
+                        支付方式: {selectedOrder.paymentMethod || "-"}
+                      </p>
+                    </div>
+                  </div>
 
-              <div>
-                <h4 className="text-sm font-medium mb-2">订单项目</h4>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>产品</TableHead>
-                        <TableHead className="text-right">单价</TableHead>
-                        <TableHead className="text-right">数量</TableHead>
-                        <TableHead className="text-right">折扣</TableHead>
-                        <TableHead className="text-right">小计</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {selectedOrder.items.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>{item.product?.name}</TableCell>
-                          <TableCell className="text-right">¥{item.price.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">{item.quantity}</TableCell>
-                          <TableCell className="text-right">¥{item.discount?.toFixed(2) || "0.00"}</TableCell>
-                          <TableCell className="text-right">
-                            ¥{((item.price * item.quantity) - (item.discount || 0)).toFixed(2)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">订单项目</h4>
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>产品</TableHead>
+                            <TableHead className="text-right">单价</TableHead>
+                            <TableHead className="text-right">数量</TableHead>
+                            <TableHead className="text-right">折扣</TableHead>
+                            <TableHead className="text-right">小计</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedOrder.items.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>{item.product?.name}</TableCell>
+                              <TableCell className="text-right">¥{item.price.toFixed(2)}</TableCell>
+                              <TableCell className="text-right">{item.quantity}</TableCell>
+                              <TableCell className="text-right">¥{item.discount?.toFixed(2) || "0.00"}</TableCell>
+                              <TableCell className="text-right">
+                                ¥{((item.price * item.quantity) - (item.discount || 0)).toFixed(2)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
 
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm">备注: {selectedOrder.notes || "-"}</p>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm">备注: {selectedOrder.notes || "-"}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm">总金额: ¥{selectedOrder.totalAmount.toFixed(2)}</p>
+                      <p className="text-sm">已支付: ¥{selectedOrder.paidAmount.toFixed(2)}</p>
+                      <p className="text-sm font-medium">
+                        待支付: ¥{(selectedOrder.totalAmount - selectedOrder.paidAmount).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm">总金额: ¥{selectedOrder.totalAmount.toFixed(2)}</p>
-                  <p className="text-sm">已支付: ¥{selectedOrder.paidAmount.toFixed(2)}</p>
-                  <p className="text-sm font-medium">
-                    待支付: ¥{(selectedOrder.totalAmount - selectedOrder.paidAmount).toFixed(2)}
-                  </p>
+
+                {/* 右侧边栏 */}
+                <div className="md:col-span-1 space-y-4">
+                  {/* 工作流组件 */}
+                  <SalesOrderWorkflow
+                    order={selectedOrder}
+                    onWorkflowUpdated={loadOrders}
+                  />
+
+                  {/* 审计日志组件 */}
+                  <EntityAuditLog
+                    entityType="order"
+                    entityId={selectedOrder.id.toString()}
+                    limit={5}
+                  />
                 </div>
               </div>
             </div>

@@ -29,6 +29,7 @@ import {
 import { format } from "date-fns"
 import { WorkshopOrderForm } from "@/components/workshop-order-form"
 import { getWorkshops, deleteWorkshop } from "@/lib/actions/workshop-order-actions"
+import { WorkshopAuditLog } from "@/components/workshop/workshop-audit-log"
 
 // 活动类型映射
 const activityTypeMap = {
@@ -312,7 +313,7 @@ export function WorkshopOrders() {
 
       {/* 查看团建订单详情 */}
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <ScrollableDialogContent className="max-w-3xl">
+        <ScrollableDialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>团建订单详情</DialogTitle>
             <DialogDescription>
@@ -320,7 +321,8 @@ export function WorkshopOrders() {
             </DialogDescription>
           </DialogHeader>
           {selectedWorkshop && (
-            <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">客户信息</h3>
@@ -478,6 +480,16 @@ export function WorkshopOrders() {
                 <Button onClick={() => { setShowDetails(false); handleEdit(selectedWorkshop); }}>
                   编辑订单
                 </Button>
+              </div>
+              </div>
+
+              {/* 右侧边栏 - 审计日志 */}
+              <div className="md:col-span-1">
+                <WorkshopAuditLog
+                  workshopId={selectedWorkshop.id}
+                  showHeader={true}
+                  limit={10}
+                />
               </div>
             </div>
           )}

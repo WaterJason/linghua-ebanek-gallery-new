@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聆花文化ERP系统 - 产品需求文档与高保真原型</title>
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/mermaid/8.14.0/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans SC', Tahoma, Arial, Roboto, "Droid Sans", "Helvetica Neue", "Droid Sans Fallback", "Heiti SC", "Hiragino Sans GB", Simsun, sans-self;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        .prototype-container {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #f8fafc;
+        }
+        .prototype-screen {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .prototype-screen img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.25rem;
+        }
+        .mermaid {
+            margin: 2rem 0;
+        }
+        .pain-point {
+            background-color: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.25rem;
+        }
+        .solution {
+            background-color: #DCFCE7;
+            border-left: 4px solid #10B981;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container">
+        <div class="section">
+            <h1 class="text-3xl font-bold mb-6 text-center">聆花文化ERP系统</h1>
+            <h2 class="text-2xl font-bold mb-4 text-center">产品需求文档(PRD)与高保真原型设计</h2>
+
+            <div class="table-container mt-8">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>版本</th>
+                            <th>时间</th>
+                            <th>更新人</th>
+                            <th>内容</th>
+                            <th>位置</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1.0</td>
+                            <td>2024-06-01</td>
+                            <td>产品团队</td>
+                            <td>创建文档</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="text-xl font-bold mt-8 mb-2">相关文档</h3>
+            <ul class="list-disc pl-6">
+                <li>聆花文化ERP系统技术架构文档</li>
+                <li>聆花文化ERP系统数据库设计文档</li>
+                <li>聆花文化ERP系统用户手册</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">一、需求背景</h2>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">1. 解决什么问题？</h3>
+            <p>聆花文化ERP系统旨在解决以下核心问题：</p>
+            <ul class="list-disc pl-6 mt-2">
+                <li>业务流程分散，缺乏统一管理平台，导致信息孤岛</li>
+                <li>手工记录和Excel管理方式效率低下，容易出错</li>
+                <li>库存管理不精确，难以实时掌握库存状况</li>
+                <li>销售数据分散，难以统计和分析</li>
+                <li>员工排班和薪资计算繁琐，容易出错</li>
+                <li>渠道管理混乱，难以追踪渠道销售和库存</li>
+                <li>财务数据分散，难以整合和分析</li>
+                <li>团建活动管理不规范，难以追踪和统计</li>
+            </ul>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">2. 覆盖多少用户？</h3>
+            <p>聆花文化ERP系统主要面向以下用户群体：</p>
+            <ul class="list-disc pl-6 mt-2">
+                <li><strong>管理层</strong>：企业决策者，需要全局视图和数据分析</li>
+                <li><strong>销售人员</strong>：负责产品销售和客户管理</li>
+                <li><strong>库存管理员</strong>：负责产品入库、出库和库存盘点</li>
+                <li><strong>采购人员</strong>：负责原材料和产品采购</li>
+                <li><strong>财务人员</strong>：负责财务记录和报表生成</li>
+                <li><strong>人事管理员</strong>：负责员工管理和排班</li>
+                <li><strong>渠道管理员</strong>：负责渠道商管理和渠道销售</li>
+                <li><strong>团建活动管理员</strong>：负责团建活动的组织和管理</li>
+            </ul>
+            <p class="mt-2">预计系统将覆盖聆花文化内部约20-30名员工，以及外部约50-100个渠道商。</p>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3. 上线计划？</h3>
+            <p>系统采用模块化开发和迭代上线策略：</p>
+            <ul class="list-disc pl-6 mt-2">
+                <li><strong>第一阶段（已完成）</strong>：核心框架搭建，包括用户认证、权限管理、基础UI组件</li>
+                <li><strong>第二阶段（已完成）</strong>：产品管理、库存管理、销售管理、员工管理模块上线</li>
+                <li><strong>第三阶段（进行中）</strong>：渠道管理、财务管理、团建管理模块上线</li>
+                <li><strong>第四阶段（计划中）</strong>：系统优化、移动端适配、数据分析和报表功能增强</li>
+                <li><strong>第五阶段（计划中）</strong>：API开放、第三方系统集成、高级数据分析</li>
+            </ul>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">4. 还需要准备什么？</h3>
+            <p>为确保系统顺利实施和运行，需要准备以下资源：</p>
+            <ul class="list-disc pl-6 mt-2">
+                <li><strong>硬件资源</strong>：服务器、数据库、存储空间、备份设施</li>
+                <li><strong>软件资源</strong>：开发环境、测试环境、生产环境</li>
+                <li><strong>人力资源</strong>：开发团队、测试团队、运维团队、培训团队</li>
+                <li><strong>数据资源</strong>：历史数据迁移、数据清洗、数据标准化</li>
+                <li><strong>培训资源</strong>：用户手册、培训视频、培训课程</li>
+                <li><strong>支持资源</strong>：技术支持团队、问题跟踪系统、知识库</li>
+            </ul>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">5. 需求列表</h3>
+            <div class="table-container mt-2">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>需求ID</th>
+                            <th>需求名称</th>
+                            <th>优先级</th>
+                            <th>状态</th>
+                            <th>描述</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>REQ-001</td>
+                            <td>用户认证与权限管理</td>
+                            <td>高</td>
+                            <td>已完成</td>
+                            <td>实现用户登录、角色管理、权限控制</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-002</td>
+                            <td>产品管理</td>
+                            <td>高</td>
+                            <td>已完成</td>
+                            <td>产品信息管理、分类管理、图片管理</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-003</td>
+                            <td>库存管理</td>
+                            <td>高</td>
+                            <td>已完成</td>
+                            <td>库存记录、入库出库、库存预警</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-004</td>
+                            <td>销售管理</td>
+                            <td>高</td>
+                            <td>已完成</td>
+                            <td>订单管理、POS销售、客户管理</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-005</td>
+                            <td>员工管理</td>
+                            <td>高</td>
+                            <td>已完成</td>
+                            <td>员工信息、排班管理、薪资计算</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-006</td>
+                            <td>渠道管理</td>
+                            <td>中</td>
+                            <td>进行中</td>
+                            <td>渠道商管理、渠道价格、渠道库存</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-007</td>
+                            <td>财务管理</td>
+                            <td>中</td>
+                            <td>进行中</td>
+                            <td>财务记录、账户管理、财务报表</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-008</td>
+                            <td>团建管理</td>
+                            <td>中</td>
+                            <td>进行中</td>
+                            <td>团建活动管理、团建订单、团建报表</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-009</td>
+                            <td>系统设置</td>
+                            <td>低</td>
+                            <td>计划中</td>
+                            <td>系统参数配置、数据字典、工作流管理</td>
+                        </tr>
+                        <tr>
+                            <td>REQ-010</td>
+                            <td>数据分析与报表</td>
+                            <td>低</td>
+                            <td>计划中</td>
+                            <td>数据可视化、业务分析、决策支持</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">二、方案概述</h2>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">2.1 核心业务流程</h3>
+            <p>聆花文化ERP系统围绕以下核心业务流程展开：</p>
+
+            <div class="mermaid">
+                graph TD
+                    A[产品管理] --> B[库存管理]
+                    B --> C[采购管理]
+                    B --> D[销售管理]
+                    D --> E[客户管理]
+                    D --> F[订单管理]
+                    D --> G[POS销售]
+                    B --> H[渠道管理]
+                    H --> I[渠道价格]
+                    H --> J[渠道库存]
+                    H --> K[渠道销售]
+                    L[员工管理] --> M[排班管理]
+                    L --> N[薪资管理]
+                    O[团建管理] --> P[团建活动]
+                    O --> Q[团建订单]
+                    R[财务管理] --> S[账户管理]
+                    R --> T[交易记录]
+                    R --> U[财务报表]
+                    V[系统管理] --> W[用户管理]
+                    V --> X[角色权限]
+                    V --> Y[系统设置]
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">2.2 核心功能流程示意</h3>
+            <p>以下是系统中几个关键功能的流程示意：</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">销售流程</h4>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant 销售人员
+                    participant 系统
+                    participant 库存
+                    销售人员->>系统: 创建销售订单
+                    系统->>库存: 检查库存
+                    库存-->>系统: 返回库存状态
+                    alt 库存充足
+                        系统-->>销售人员: 确认订单
+                        销售人员->>系统: 完成支付
+                        系统->>库存: 减少库存
+                        系统-->>销售人员: 生成订单凭证
+                    else 库存不足
+                        系统-->>销售人员: 提示库存不足
+                        销售人员->>系统: 调整订单或取消
+                    end
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">排班流程</h4>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant 管理员
+                    participant 系统
+                    participant 员工
+                    管理员->>系统: 创建排班计划
+                    系统->>系统: 检查员工可用性
+                    系统-->>管理员: 显示可用员工
+                    管理员->>系统: 分配班次
+                    系统->>员工: 通知排班信息
+                    员工-->>系统: 确认排班
+                    系统-->>管理员: 更新排班状态
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">渠道管理流程</h4>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant 渠道管理员
+                    participant 系统
+                    participant 库存
+                    渠道管理员->>系统: 创建渠道商
+                    渠道管理员->>系统: 设置渠道价格
+                    渠道管理员->>系统: 分配渠道库存
+                    系统->>库存: 减少主库存
+                    库存-->>系统: 更新库存状态
+                    渠道管理员->>系统: 记录渠道销售
+                    系统->>系统: 更新渠道库存
+                    系统-->>渠道管理员: 生成结算单
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">三、细节方案</h2>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.1 产品管理模块</h3>
+            <p>产品管理模块是系统的核心模块之一，负责管理所有产品的基本信息、分类、价格等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.1.1 产品信息管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>产品信息分散，难以统一管理；产品图片管理混乱；缺乏批量操作能力。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供统一的产品信息管理界面，支持添加、编辑、删除产品</li>
+                    <li>支持多图片上传（最多10张），第一张作为主图</li>
+                    <li>支持产品分类树形管理，便于组织产品</li>
+                    <li>支持产品批量导入导出，提高效率</li>
+                    <li>支持产品批量编辑，快速更新产品信息</li>
+                    <li>支持产品条码管理，便于POS销售</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.1.2 产品分类管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>产品分类混乱，难以快速定位产品；缺乏层级结构。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>实现树形分类结构，支持无限层级</li>
+                    <li>提供分类快速筛选功能，便于查找产品</li>
+                    <li>支持分类拖拽排序，灵活调整分类顺序</li>
+                    <li>支持批量移动产品到不同分类</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.2 库存管理模块</h3>
+            <p>库存管理模块负责跟踪产品库存，管理入库出库，提供库存预警等功能。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.2.1 库存跟踪</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>库存数据不准确，难以实时掌握库存状况；多仓库管理混乱。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>实现多仓库管理，支持不同仓库的库存独立管理</li>
+                    <li>提供库存实时查询功能，随时掌握库存状况</li>
+                    <li>支持库存预警设置，当库存低于阈值时自动提醒</li>
+                    <li>提供库存变动历史记录，追踪库存变化</li>
+                    <li>支持库存盘点功能，定期核对实际库存</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.2.2 库存操作</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>库存操作繁琐，容易出错；缺乏库存转移功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供入库、出库、调拨等操作界面，简化库存操作</li>
+                    <li>支持批量库存操作，提高效率</li>
+                    <li>实现库存转移功能，支持不同仓库间的库存调拨</li>
+                    <li>提供库存操作审核流程，确保操作准确性</li>
+                    <li>支持库存操作撤销功能，便于纠正错误</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.3 销售管理模块</h3>
+            <p>销售管理模块负责管理销售订单、POS销售、客户信息等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.3.1 订单管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>订单管理混乱，难以追踪订单状态；缺乏订单流程管理。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供订单创建、编辑、取消等功能</li>
+                    <li>支持订单状态跟踪，清晰显示订单进度</li>
+                    <li>实现订单审核流程，确保订单准确性</li>
+                    <li>提供订单搜索和筛选功能，快速定位订单</li>
+                    <li>支持订单导出功能，便于数据分析</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.3.2 POS销售</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>POS销售操作繁琐，效率低下；缺乏快速搜索功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供简洁高效的POS销售界面，支持触屏操作</li>
+                    <li>实现产品快速搜索功能，支持条码扫描、关键词搜索</li>
+                    <li>支持多种支付方式，灵活处理收款</li>
+                    <li>提供销售小票打印功能，便于客户确认</li>
+                    <li>支持销售退货功能，处理客户退货需求</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">三、细节方案</h2>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.1 产品管理模块</h3>
+            <p>产品管理模块是系统的核心模块之一，负责管理所有产品的基本信息、分类、价格等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.1.1 产品信息管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>产品信息分散，难以统一管理；产品图片管理混乱；缺乏批量操作能力。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供统一的产品信息管理界面，支持添加、编辑、删除产品</li>
+                    <li>支持多图片上传（最多10张），第一张作为主图</li>
+                    <li>支持产品分类树形管理，便于组织产品</li>
+                    <li>支持产品批量导入导出，提高效率</li>
+                    <li>支持产品批量编辑，快速更新产品信息</li>
+                    <li>支持产品条码管理，便于POS销售</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.1.2 产品分类管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>产品分类混乱，难以快速定位产品；缺乏层级结构。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>实现树形分类结构，支持无限层级</li>
+                    <li>提供分类快速筛选功能，便于查找产品</li>
+                    <li>支持分类拖拽排序，灵活调整分类顺序</li>
+                    <li>支持批量移动产品到不同分类</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.2 库存管理模块</h3>
+            <p>库存管理模块负责跟踪产品库存，管理入库出库，提供库存预警等功能。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.2.1 库存跟踪</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>库存数据不准确，难以实时掌握库存状况；多仓库管理混乱。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>实现多仓库管理，支持不同仓库的库存独立管理</li>
+                    <li>提供库存实时查询功能，随时掌握库存状况</li>
+                    <li>支持库存预警设置，当库存低于阈值时自动提醒</li>
+                    <li>提供库存变动历史记录，追踪库存变化</li>
+                    <li>支持库存盘点功能，定期核对实际库存</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.2.2 库存操作</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>库存操作繁琐，容易出错；缺乏库存转移功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供入库、出库、调拨等操作界面，简化库存操作</li>
+                    <li>支持批量库存操作，提高效率</li>
+                    <li>实现库存转移功能，支持不同仓库间的库存调拨</li>
+                    <li>提供库存操作审核流程，确保操作准确性</li>
+                    <li>支持库存操作撤销功能，便于纠正错误</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.3 销售管理模块</h3>
+            <p>销售管理模块负责管理销售订单、POS销售、客户信息等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.3.1 订单管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>订单管理混乱，难以追踪订单状态；缺乏订单流程管理。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供订单创建、编辑、取消等功能</li>
+                    <li>支持订单状态跟踪，清晰显示订单进度</li>
+                    <li>实现订单审核流程，确保订单准确性</li>
+                    <li>提供订单搜索和筛选功能，快速定位订单</li>
+                    <li>支持订单导出功能，便于数据分析</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.3.2 POS销售</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>POS销售操作繁琐，效率低下；缺乏快速搜索功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供简洁高效的POS销售界面，支持触屏操作</li>
+                    <li>实现产品快速搜索功能，支持条码扫描、关键词搜索</li>
+                    <li>支持多种支付方式，灵活处理收款</li>
+                    <li>提供销售小票打印功能，便于客户确认</li>
+                    <li>支持销售退货功能，处理客户退货需求</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.4 员工管理与排班模块</h3>
+            <p>员工管理与排班模块负责管理员工信息、排班计划、薪资计算等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.4.1 员工信息管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>员工信息分散，难以统一管理；缺乏员工绩效跟踪。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供员工信息管理界面，支持添加、编辑、删除员工</li>
+                    <li>记录员工基本信息、联系方式、职位、薪资等</li>
+                    <li>支持员工状态管理，如在职、离职、休假等</li>
+                    <li>提供员工绩效跟踪功能，记录销售业绩、出勤情况等</li>
+                    <li>支持员工与系统用户关联，便于权限管理</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.4.2 排班管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>排班管理繁琐，容易出错；缺乏灵活的排班模板。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供可视化排班界面，支持拖拽操作</li>
+                    <li>实现排班模板功能，快速应用常用排班方案</li>
+                    <li>支持批量排班，提高排班效率</li>
+                    <li>提供排班冲突检测，避免排班错误</li>
+                    <li>支持排班导出功能，便于打印和分发</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.4.3 薪资计算</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>薪资计算复杂，容易出错；缺乏自动化计算功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>基于排班记录自动计算基本工资（日薪 × 出勤天数）</li>
+                    <li>集成销售业绩，自动计算销售提成</li>
+                    <li>支持团建活动费用计算，区分讲师和助教角色</li>
+                    <li>提供薪资调整功能，支持奖金、扣款等操作</li>
+                    <li>生成薪资报表，便于财务核对和发放</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.5 渠道管理模块</h3>
+            <p>渠道管理模块负责管理渠道商信息、渠道价格、渠道库存、渠道销售等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.5.1 渠道商管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>渠道商信息分散，难以统一管理；缺乏渠道商绩效评估。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供渠道商信息管理界面，支持添加、编辑、删除渠道商</li>
+                    <li>记录渠道商基本信息、联系人、联系方式、地址等</li>
+                    <li>支持渠道商状态管理，如活跃、暂停、终止等</li>
+                    <li>提供渠道商绩效评估功能，记录销售业绩、回款情况等</li>
+                    <li>支持渠道商分类管理，便于差异化政策制定</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.5.2 渠道价格管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>渠道价格管理混乱，难以维护不同渠道的价格体系；缺乏价格调整历史记录。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供渠道价格管理界面，支持为不同渠道设置不同价格</li>
+                    <li>支持批量价格设置，提高效率</li>
+                    <li>记录价格调整历史，追踪价格变化</li>
+                    <li>支持价格导入导出功能，便于批量操作</li>
+                    <li>提供价格比较功能，便于分析不同渠道的价格差异</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.5.3 渠道库存管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>渠道库存难以追踪，缺乏实时监控；库存调拨流程繁琐。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>实现渠道库存独立管理，与主库存联动</li>
+                    <li>提供库存调拨功能，支持从主库存向渠道库存调拨</li>
+                    <li>支持渠道库存预警设置，当库存低于阈值时自动提醒</li>
+                    <li>提供渠道库存报表，便于分析渠道库存状况</li>
+                    <li>支持渠道库存盘点功能，定期核对实际库存</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.6 财务管理模块</h3>
+            <p>财务管理模块负责管理财务账户、交易记录、财务报表等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.6.1 账户管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>账户信息分散，难以统一管理；缺乏账户余额实时监控。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供账户管理界面，支持添加、编辑、删除账户</li>
+                    <li>支持多种账户类型，如银行账户、现金账户、支付宝、微信等</li>
+                    <li>实时显示账户余额，便于资金监控</li>
+                    <li>提供账户余额变动历史，追踪资金流向</li>
+                    <li>支持账户间资金转账功能，便于资金调度</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.6.2 交易记录</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>交易记录分散，难以统一管理；缺乏交易分类和统计功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供交易记录管理界面，支持添加、编辑、删除交易</li>
+                    <li>支持交易分类，如收入、支出、转账等</li>
+                    <li>实现交易关联功能，关联订单、采购、薪资等业务数据</li>
+                    <li>提供交易搜索和筛选功能，快速定位交易记录</li>
+                    <li>支持交易导出功能，便于数据分析和报表生成</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.6.3 财务报表</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>财务报表生成繁琐，数据来源分散；缺乏可视化展示功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供财务报表生成界面，支持多种报表类型</li>
+                    <li>实现报表自动生成功能，定期生成常用报表</li>
+                    <li>支持报表参数设置，灵活定制报表内容</li>
+                    <li>提供报表导出功能，支持Excel、PDF等格式</li>
+                    <li>实现报表可视化展示，使用图表直观展示财务数据</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.7 团建管理模块</h3>
+            <p>团建管理模块负责管理团建活动、团建订单、团建服务等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.7.1 团建活动管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>团建活动管理混乱，难以追踪活动状态；缺乏活动模板功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供团建活动管理界面，支持添加、编辑、删除活动</li>
+                    <li>实现活动模板功能，快速创建常用活动</li>
+                    <li>支持活动状态跟踪，清晰显示活动进度</li>
+                    <li>提供活动日历视图，直观展示活动安排</li>
+                    <li>支持活动资源管理，如场地、材料、人员等</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.7.2 团建订单管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>团建订单管理繁琐，难以追踪订单状态；缺乏订单与活动的关联功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供团建订单管理界面，支持添加、编辑、取消订单</li>
+                    <li>实现订单与活动关联功能，清晰展示订单对应的活动</li>
+                    <li>支持订单状态跟踪，如待确认、已确认、已完成等</li>
+                    <li>提供订单搜索和筛选功能，快速定位订单</li>
+                    <li>支持订单导出功能，便于数据分析和报表生成</li>
+                </ul>
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">3.8 系统管理模块</h3>
+            <p>系统管理模块负责管理系统用户、角色权限、系统设置等。</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.8.1 用户管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>用户管理混乱，难以控制用户权限；缺乏用户操作日志功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供用户管理界面，支持添加、编辑、禁用用户</li>
+                    <li>实现用户与员工关联功能，便于权限管理</li>
+                    <li>支持用户密码重置功能，确保账号安全</li>
+                    <li>提供用户操作日志功能，记录用户操作历史</li>
+                    <li>支持用户登录历史查看，监控账号安全</li>
+                </ul>
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">3.8.2 角色权限管理</h4>
+            <div class="pain-point">
+                <h5 class="font-bold">痛点：</h5>
+                <p>权限管理复杂，难以精细控制；缺乏角色模板功能。</p>
+            </div>
+            <div class="solution">
+                <h5 class="font-bold">解决方案：</h5>
+                <ul class="list-disc pl-6">
+                    <li>提供角色管理界面，支持添加、编辑、删除角色</li>
+                    <li>实现权限分配功能，为角色分配不同权限</li>
+                    <li>支持角色模板功能，快速创建常用角色</li>
+                    <li>提供权限继承功能，简化权限管理</li>
+                    <li>支持权限测试功能，验证权限设置是否正确</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">四、非功能性需求</h2>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">4.1 性能需求</h3>
+            <ul class="list-disc pl-6">
+                <li>页面加载时间：主要页面加载时间不超过2秒</li>
+                <li>响应时间：用户操作响应时间不超过1秒</li>
+                <li>并发用户：系统支持至少50个并发用户</li>
+                <li>数据处理：批量操作支持至少1000条记录的处理</li>
+                <li>搜索性能：搜索结果返回时间不超过3秒</li>
+            </ul>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">4.2 安全需求</h3>
+            <ul class="list-disc pl-6">
+                <li>用户认证：实现基于角色的访问控制（RBAC）</li>
+                <li>数据加密：敏感数据（如密码）使用加密存储</li>
+                <li>会话管理：实现安全的会话管理机制</li>
+                <li>日志审计：记录关键操作的审计日志</li>
+                <li>防注入攻击：防止SQL注入、XSS等常见攻击</li>
+            </ul>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">4.3 兼容性需求</h3>
+            <ul class="list-disc pl-6">
+                <li>浏览器兼容性：支持Chrome、Firefox、Safari、Edge最新版本</li>
+                <li>设备兼容性：支持桌面电脑、平板电脑、移动设备</li>
+                <li>屏幕分辨率：适配1366x768及以上分辨率</li>
+                <li>操作系统：支持Windows、macOS、iOS、Android</li>
+                <li>打印兼容性：支持常见打印机打印报表和单据</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">五、评估与风险</h2>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">5.1 评估指标</h3>
+            <ul class="list-disc pl-6">
+                <li>用户满意度：系统使用满意度达到85%以上</li>
+                <li>业务效率：关键业务流程处理时间减少50%以上</li>
+                <li>数据准确性：库存准确率达到99%以上</li>
+                <li>系统稳定性：系统可用性达到99.9%以上</li>
+                <li>成本节约：人力成本降低30%以上</li>
+            </ul>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">5.2 潜在风险</h3>
+            <div class="table-container mt-2">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>风险</th>
+                            <th>影响</th>
+                            <th>可能性</th>
+                            <th>应对策略</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>数据迁移失败</td>
+                            <td>高</td>
+                            <td>中</td>
+                            <td>制定详细的数据迁移计划，进行充分测试，准备回滚方案</td>
+                        </tr>
+                        <tr>
+                            <td>用户抵触新系统</td>
+                            <td>高</td>
+                            <td>中</td>
+                            <td>提供充分的培训和支持，收集用户反馈并及时调整</td>
+                        </tr>
+                        <tr>
+                            <td>系统性能不足</td>
+                            <td>中</td>
+                            <td>低</td>
+                            <td>进行性能测试，优化关键功能，准备扩容方案</td>
+                        </tr>
+                        <tr>
+                            <td>安全漏洞</td>
+                            <td>高</td>
+                            <td>低</td>
+                            <td>进行安全审计，实施安全最佳实践，定期更新和修补</td>
+                        </tr>
+                        <tr>
+                            <td>需求变更频繁</td>
+                            <td>中</td>
+                            <td>高</td>
+                            <td>采用敏捷开发方法，保持系统灵活性，控制变更范围</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="text-2xl font-bold mb-4">二、方案概述</h2>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">2.1 核心业务流程</h3>
+            <p>聆花文化ERP系统围绕以下核心业务流程展开：</p>
+
+            <div class="mermaid">
+                graph TD
+                    A[产品管理] --> B[库存管理]
+                    B --> C[采购管理]
+                    B --> D[销售管理]
+                    D --> E[客户管理]
+                    D --> F[订单管理]
+                    D --> G[POS销售]
+                    B --> H[渠道管理]
+                    H --> I[渠道价格]
+                    H --> J[渠道库存]
+                    H --> K[渠道销售]
+                    L[员工管理] --> M[排班管理]
+                    L --> N[薪资管理]
+                    O[团建管理] --> P[团建活动]
+                    O --> Q[团建订单]
+                    R[财务管理] --> S[账户管理]
+                    R --> T[交易记录]
+                    R --> U[财务报表]
+                    V[系统管理] --> W[用户管理]
+                    V --> X[角色权限]
+                    V --> Y[系统设置]
+            </div>
+
+            <h3 class="text-xl font-bold mt-6 mb-2">2.2 核心功能流程示意</h3>
+            <p>以下是系统中几个关键功能的流程示意：</p>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">销售流程</h4>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant 销售人员
+                    participant 系统
+                    participant 库存
+                    销售人员->>系统: 创建销售订单
+                    系统->>库存: 检查库存
+                    库存-->>系统: 返回库存状态
+                    alt 库存充足
+                        系统-->>销售人员: 确认订单
+                        销售人员->>系统: 完成支付
+                        系统->>库存: 减少库存
+                        系统-->>销售人员: 生成订单凭证
+                    else 库存不足
+                        系统-->>销售人员: 提示库存不足
+                        销售人员->>系统: 调整订单或取消
+                    end
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">排班流程</h4>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant 管理员
+                    participant 系统
+                    participant 员工
+                    管理员->>系统: 创建排班计划
+                    系统->>系统: 检查员工可用性
+                    系统-->>管理员: 显示可用员工
+                    管理员->>系统: 分配班次
+                    系统->>员工: 通知排班信息
+                    员工-->>系统: 确认排班
+                    系统-->>管理员: 更新排班状态
+            </div>
+
+            <h4 class="text-lg font-bold mt-4 mb-2">渠道管理流程</h4>
+            <div class="mermaid">
+                sequenceDiagram
+                    participant 渠道管理员
+                    participant 系统
+                    participant 库存
+                    渠道管理员->>系统: 创建渠道商
+                    渠道管理员->>系统: 设置渠道价格
+                    渠道管理员->>系统: 分配渠道库存
+                    系统->>库存: 减少主库存
+                    库存-->>系统: 更新库存状态
+                    渠道管理员->>系统: 记录渠道销售
+                    系统->>系统: 更新渠道库存
+                    系统-->>渠道管理员: 生成结算单
+            </div>
+        </div>
+</body>
+</html>

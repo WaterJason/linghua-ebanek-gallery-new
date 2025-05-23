@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOut } from "next-auth/react"
+import { GlobalSearch } from "@/components/ui/global-search"
 import { getCurrentUser } from "@/lib/actions/auth-actions"
 import { NotificationTodoPopover } from "@/components/notification-todo-popover";
 
@@ -159,8 +160,13 @@ export default function CollapsibleSidebar() {
       >
         <div className="flex flex-col h-full">
           {/* 标题 */}
-          <div className="flex items-center justify-center h-16 border-b dark:border-gray-700">
-            <h1 className="text-xl font-semibold text-gray-800 dark:text-white">聆花掐丝珐琅馆</h1>
+          <div className="flex flex-col h-16 border-b dark:border-gray-700">
+            <div className="flex items-center justify-center h-8 mt-2">
+              <h1 className="text-xl font-semibold text-gray-800 dark:text-white">聆花掐丝珐琅馆</h1>
+            </div>
+            <div className="px-2 pb-2">
+              <GlobalSearch />
+            </div>
           </div>
 
           {/* 导航菜单 */}

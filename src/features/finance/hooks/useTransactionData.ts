@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { toast } from "@/src/components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import {
   getFinancialTransactions,
   createFinancialTransaction,

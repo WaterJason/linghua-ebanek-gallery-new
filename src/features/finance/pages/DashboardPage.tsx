@@ -7,7 +7,7 @@ import MobileFinanceDashboard from '../components/mobile/FinanceDashboard';
 import DesktopFinanceDashboard from '../components/desktop/FinanceDashboard';
 import { useAccountData } from '../hooks/useAccountData';
 import { useTransactionData } from '../hooks/useTransactionData';
-import { useToast } from '@/src/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 /**
  * 财务仪表盘页面

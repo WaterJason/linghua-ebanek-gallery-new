@@ -7,7 +7,7 @@ import AccountList from '../components/mobile/AccountList';
 import AccountTable from '../components/desktop/AccountTable';
 import { useAccountData } from '../hooks/useAccountData';
 import { PrismaFinancialAccount } from '@/types/prisma-models';
-import { useToast } from '@/src/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -15,8 +15,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/src/components/ui/dialog';
-import { Button } from '@/src/components/ui/button';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +26,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/src/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 
 /**
  * 账户管理页面

@@ -52,6 +52,7 @@ import {
 import { getWarehouses, getInventory, updateInventory, transferInventory, exportInventory, importInventory, batchDeleteInventory, createInventory } from "@/lib/actions/inventory-actions";
 import { getProducts } from "@/lib/actions/product-actions";
 import { toast } from "@/components/ui/use-toast"
+import { InventoryAuditLog } from "./inventory/inventory-audit-log"
 
 export function InventoryManagement() {
   const [warehouses, setWarehouses] = useState([])
@@ -63,6 +64,8 @@ export function InventoryManagement() {
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false)
   const [isBatchUpdateDialogOpen, setIsBatchUpdateDialogOpen] = useState(false)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false)
+  const [selectedInventoryItem, setSelectedInventoryItem] = useState(null)
   const [editingInventory, setEditingInventory] = useState(null)
   const [transferData, setTransferData] = useState({
     sourceWarehouseId: "",
@@ -227,6 +230,12 @@ export function InventoryManagement() {
       notes: "",
     })
     setIsTransferDialogOpen(true)
+  }
+
+  // 查看库存审计日志
+  const handleViewAuditLog = (inventoryItem) => {
+    setSelectedInventoryItem(inventoryItem)
+    setIsAuditLogOpen(true)
   }
 
   const handleSaveInventory = async () => {
@@ -904,6 +913,13 @@ export function InventoryManagement() {
                                 >
                                   <ArrowRightIcon className="h-4 w-4" />
                                 </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleViewAuditLog(item)}
+                                >
+                                  <FileTextIcon className="h-4 w-4" />
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -1474,6 +1490,17 @@ export function InventoryManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 库存审计日志对话框 */}
+      {selectedInventoryItem && (
+        <InventoryAuditLog
+          open={isAuditLogOpen}
+          onOpenChange={setIsAuditLogOpen}
+          productId={selectedInventoryItem.productId}
+          productName={selectedInventoryItem.product?.name}
+          inventoryId={selectedInventoryItem.id}
+        />
+      )}
     </div>
   )
 }

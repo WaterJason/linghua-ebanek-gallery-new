@@ -45,6 +45,8 @@ import { zhCN } from "date-fns/locale"
 import { PurchaseOrderForm } from "./purchase-order-form"
 import { PurchaseReceiveDialog } from "./purchase-receive-dialog"
 import { PurchaseOrderTemplates } from "./purchase-order-templates"
+import { PurchaseOrderWorkflow } from "./purchase/purchase-order-workflow"
+import { EntityAuditLog } from "./audit/entity-audit-log"
 
 export function PurchaseOrderManagement() {
   const [purchaseOrders, setPurchaseOrders] = useState([])
@@ -538,7 +540,7 @@ export function PurchaseOrderManagement() {
 
       {/* 查看订单对话框 */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>采购订单详情</DialogTitle>
             <DialogDescription>
@@ -547,79 +549,97 @@ export function PurchaseOrderManagement() {
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium">订单编号</h3>
-                  <p>{selectedOrder.orderNumber}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">采购日期</h3>
-                  <p>{formatDate(selectedOrder.orderDate)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">供应商</h3>
-                  <p>{selectedOrder.supplier?.name || "-"}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">采购员工</h3>
-                  <p>{selectedOrder.employee?.name || "-"}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">预计到货日期</h3>
-                  <p>{formatDate(selectedOrder.expectedDate)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">状态</h3>
-                  <p>{getStatusBadge(selectedOrder.status)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">总金额</h3>
-                  <p>{formatCurrency(selectedOrder.totalAmount)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">付款状态</h3>
-                  <p>{getPaymentStatusBadge(selectedOrder.paymentStatus)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">已付金额</h3>
-                  <p>{formatCurrency(selectedOrder.paidAmount)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">付款方式</h3>
-                  <p>{selectedOrder.paymentMethod || "-"}</p>
-                </div>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="text-sm font-medium">订单编号</h3>
+                      <p>{selectedOrder.orderNumber}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">采购日期</h3>
+                      <p>{formatDate(selectedOrder.orderDate)}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">供应商</h3>
+                      <p>{selectedOrder.supplier?.name || "-"}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">采购员工</h3>
+                      <p>{selectedOrder.employee?.name || "-"}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">预计到货日期</h3>
+                      <p>{formatDate(selectedOrder.expectedDate)}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">状态</h3>
+                      <p>{getStatusBadge(selectedOrder.status)}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">总金额</h3>
+                      <p>{formatCurrency(selectedOrder.totalAmount)}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">付款状态</h3>
+                      <p>{getPaymentStatusBadge(selectedOrder.paymentStatus)}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">已付金额</h3>
+                      <p>{formatCurrency(selectedOrder.paidAmount)}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">付款方式</h3>
+                      <p>{selectedOrder.paymentMethod || "-"}</p>
+                    </div>
+                  </div>
 
-              <div>
-                <h3 className="text-sm font-medium mb-2">备注</h3>
-                <p className="text-sm">{selectedOrder.notes || "-"}</p>
-              </div>
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">备注</h3>
+                    <p className="text-sm">{selectedOrder.notes || "-"}</p>
+                  </div>
 
-              <div>
-                <h3 className="text-sm font-medium mb-2">订单项目</h3>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>产品</TableHead>
-                        <TableHead>数量</TableHead>
-                        <TableHead>单价</TableHead>
-                        <TableHead>小计</TableHead>
-                        <TableHead>已收货数量</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {selectedOrder.items.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>{item.product?.name || "-"}</TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell>{formatCurrency(item.price)}</TableCell>
-                          <TableCell>{formatCurrency(item.quantity * item.price)}</TableCell>
-                          <TableCell>{item.receivedQuantity}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">订单项目</h3>
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>产品</TableHead>
+                            <TableHead>数量</TableHead>
+                            <TableHead>单价</TableHead>
+                            <TableHead>小计</TableHead>
+                            <TableHead>已收货数量</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedOrder.items.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>{item.product?.name || "-"}</TableCell>
+                              <TableCell>{item.quantity}</TableCell>
+                              <TableCell>{formatCurrency(item.price)}</TableCell>
+                              <TableCell>{formatCurrency(item.quantity * item.price)}</TableCell>
+                              <TableCell>{item.receivedQuantity}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 审批流程 */}
+                <div className="md:col-span-1 space-y-4">
+                  <PurchaseOrderWorkflow
+                    order={selectedOrder}
+                    onWorkflowUpdated={loadPurchaseOrders}
+                  />
+
+                  <EntityAuditLog
+                    entityType="purchase"
+                    entityId={selectedOrder.id.toString()}
+                    limit={5}
+                  />
                 </div>
               </div>
             </div>

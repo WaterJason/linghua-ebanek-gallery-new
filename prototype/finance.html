@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>财务管理 - 随手记ERP</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F2F2F7;
+            margin: 0;
+            padding: 0;
+        }
+        .finance-container {
+            padding: 15px;
+            padding-bottom: 70px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #E5E5EA;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 15px;
+            font-size: 14px;
+            color: #8E8E93;
+            position: relative;
+        }
+        .tab.active {
+            color: #007AFF;
+            font-weight: 600;
+        }
+        .tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 15px;
+            right: 15px;
+            height: 2px;
+            background-color: #007AFF;
+            border-radius: 1px;
+        }
+        .account-card {
+            background: linear-gradient(135deg, #0A84FF, #0066CC);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #F2F2F7;
+        }
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #F2F2F7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        .expense {
+            color: #FF3B30;
+        }
+        .income {
+            color: #34C759;
+        }
+        .add-button {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background-color: #007AFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+        }
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .filter-button {
+            background-color: #F2F2F7;
+            border-radius: 15px;
+            padding: 5px 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .filter-button i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="finance-container">
+        <div class="header">
+            <h1 class="text-xl font-bold">财务管理</h1>
+            <div class="flex">
+                <i class="fas fa-search text-gray-600 text-xl mr-4"></i>
+                <i class="fas fa-calendar-alt text-gray-600 text-xl"></i>
+            </div>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab active">记账</div>
+            <div class="tab">账户</div>
+            <div class="tab">报表</div>
+            <div class="tab">预算</div>
+        </div>
+        
+        <div class="account-card">
+            <p class="text-white text-opacity-80 text-sm mb-1">总资产</p>
+            <h2 class="text-2xl font-bold mb-4">¥124,568.00</h2>
+            
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-white text-opacity-80 text-xs">本月收入</p>
+                    <p class="font-semibold">¥36,450.00</p>
+                </div>
+                <div>
+                    <p class="text-white text-opacity-80 text-xs">本月支出</p>
+                    <p class="font-semibold">¥11,882.00</p>
+                </div>
+                <div>
+                    <p class="text-white text-opacity-80 text-xs">结余</p>
+                    <p class="font-semibold">¥24,568.00</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="filter-bar">
+            <div class="filter-button">
+                <i class="fas fa-filter"></i>
+                <span>全部类型</span>
+            </div>
+            <div class="filter-button">
+                <i class="fas fa-calendar"></i>
+                <span>本月</span>
+            </div>
+            <div class="filter-button">
+                <i class="fas fa-sort-amount-down"></i>
+                <span>按时间排序</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-semibold">今天</h3>
+                <span class="text-sm text-gray-500">支出: ¥2,500.00</span>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="flex items-center">
+                    <div class="transaction-icon bg-red-50 text-red-500">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">原材料采购</p>
+                        <p class="text-gray-500 text-xs">采购部门</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="expense font-medium">-¥2,500.00</p>
+                    <p class="text-gray-500 text-xs">14:30</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-semibold">昨天</h3>
+                <span class="text-sm text-gray-500">收入: ¥4,850.00 | 支出: ¥3,200.00</span>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="flex items-center">
+                    <div class="transaction-icon bg-green-50 text-green-500">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">产品销售</p>
+                        <p class="text-gray-500 text-xs">销售部门</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="income font-medium">+¥4,850.00</p>
+                    <p class="text-gray-500 text-xs">11:15</p>
+                </div>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="flex items-center">
+                    <div class="transaction-icon bg-blue-50 text-blue-500">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">员工工资</p>
+                        <p class="text-gray-500 text-xs">人事部门</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="expense font-medium">-¥3,200.00</p>
+                    <p class="text-gray-500 text-xs">16:45</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-semibold">5月22日</h3>
+                <span class="text-sm text-gray-500">收入: ¥6,300.00 | 支出: ¥1,850.00</span>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="flex items-center">
+                    <div class="transaction-icon bg-green-50 text-green-500">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">线下门店销售</p>
+                        <p class="text-gray-500 text-xs">销售部门</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="income font-medium">+¥6,300.00</p>
+                    <p class="text-gray-500 text-xs">15:20</p>
+                </div>
+            </div>
+            
+            <div class="transaction-item">
+                <div class="flex items-center">
+                    <div class="transaction-icon bg-red-50 text-red-500">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium">物流费用</p>
+                        <p class="text-gray-500 text-xs">物流部门</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="expense font-medium">-¥1,850.00</p>
+                    <p class="text-gray-500 text-xs">09:30</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="add-button">
+            <i class="fas fa-plus"></i>
+        </div>
+    </div>
+</body>
+</html>

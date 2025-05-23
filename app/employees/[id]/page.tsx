@@ -11,6 +11,7 @@ import { toast } from "@/components/ui/use-toast"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { EditEmployeeDialog } from "@/components/edit-employee-dialog"
 import { EmployeeUserRole } from "@/components/employee-user-role"
+import { EmployeeAuditLog } from "@/components/employee/employee-audit-log"
 import {
   UserIcon, PhoneIcon, MailIcon, CalendarIcon, BriefcaseIcon,
   DollarSignIcon, ArrowLeftIcon, PencilIcon, TrashIcon,
@@ -234,9 +235,9 @@ export default function EmployeeDetailPage() {
 
           {/* 概览选项卡 */}
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* 最近排班 */}
-              <Card>
+              <Card className="md:col-span-1">
                 <CardHeader>
                   <CardTitle className="text-lg">最近排班</CardTitle>
                 </CardHeader>
@@ -272,7 +273,7 @@ export default function EmployeeDetailPage() {
               </Card>
 
               {/* 最近活动 */}
-              <Card>
+              <Card className="md:col-span-1">
                 <CardHeader>
                   <CardTitle className="text-lg">最近活动</CardTitle>
                 </CardHeader>
@@ -305,6 +306,15 @@ export default function EmployeeDetailPage() {
                     </Link>
                   </Button>
                 </CardFooter>
+              </Card>
+
+              {/* 操作日志 */}
+              <Card className="md:col-span-1">
+                <EmployeeAuditLog
+                  employeeId={employee.id}
+                  showHeader={true}
+                  limit={5}
+                />
               </Card>
             </div>
           </TabsContent>

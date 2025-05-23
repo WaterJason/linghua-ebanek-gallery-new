@@ -12,11 +12,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '@/src/components/ui/card';
-import { Button } from '@/src/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/src/components/ui/tabs';
-import { Skeleton } from '@/src/components/ui/skeleton';
-import { Badge } from '@/src/components/ui/badge';
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import {
   WalletIcon,
   ArrowUpIcon,
@@ -27,7 +27,7 @@ import {
   CalendarIcon,
   ListIcon
 } from 'lucide-react';
-import { formatCurrency } from '@/src/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 
 interface FinanceDashboardProps {

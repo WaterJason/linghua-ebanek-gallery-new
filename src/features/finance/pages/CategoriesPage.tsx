@@ -7,7 +7,7 @@ import CategoryList from '../components/mobile/CategoryList';
 import CategoryTable from '../components/desktop/CategoryTable';
 import { useCategoryData } from '../hooks/useCategoryData';
 import { PrismaFinancialCategory } from '@/types/prisma-models';
-import { useToast } from '@/src/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -15,8 +15,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '@/src/components/ui/dialog';
-import { Button } from '@/src/components/ui/button';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +26,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/src/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 
 /**
  * 分类管理页面

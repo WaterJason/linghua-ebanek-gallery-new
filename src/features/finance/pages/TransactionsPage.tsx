@@ -6,7 +6,7 @@ import { ResponsiveContainer } from '@/src/components/ui/responsive-container';
 import TransactionList from '../components/mobile/TransactionList';
 import TransactionTable from '../components/desktop/TransactionTable';
 import { useTransactionData, Transaction, TransactionFilter, TransactionSort, TransactionPagination } from '../hooks/useTransactionData';
-import { useToast } from '@/src/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +16,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/src/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 
 /**
  * 交易记录管理页面

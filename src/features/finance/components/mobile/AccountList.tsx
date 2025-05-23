@@ -2,18 +2,18 @@
 
 import React from 'react';
 import { PlusIcon, SearchIcon, FilterIcon, MoreVerticalIcon } from 'lucide-react';
-import { Card, CardContent, CardFooter } from '@/src/components/ui/card';
-import { Button } from '@/src/components/ui/button';
-import { Input } from '@/src/components/ui/input';
-import { Badge } from '@/src/components/ui/badge';
-import { Skeleton } from '@/src/components/ui/skeleton';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/src/components/ui/dropdown-menu';
-import { formatCurrency } from '@/src/lib/utils';
+} from '@/components/ui/dropdown-menu';
+import { formatCurrency } from '@/lib/utils';
 import { PrismaFinancialAccount } from '@/types/prisma-models';
 
 interface AccountListProps {

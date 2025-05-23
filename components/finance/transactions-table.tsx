@@ -39,6 +39,7 @@ import { toast } from "@/components/ui/use-toast"
 import { Badge } from "@/components/ui/badge"
 import { TransactionDialog } from "@/components/finance/transaction-dialog"
 import { TransactionFilterDialog } from "@/components/finance/transaction-filter-dialog"
+import { FinanceTransactionAuditLog } from "@/components/finance/finance-transaction-audit-log"
 import { formatCurrency, formatDate } from "@/lib/utils"
 import { PrismaFinancialTransaction, PrismaFinancialAccount, PrismaFinancialCategory } from "@/types/prisma-models"
 
@@ -61,6 +62,7 @@ export function TransactionsTable({ transactions: initialTransactions, total: in
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] = useState<PrismaFinancialTransaction | null>(null)
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -84,16 +86,16 @@ export function TransactionsTable({ transactions: initialTransactions, total: in
       if (filters.type) queryParams.append("type", filters.type)
       if (filters.startDate) queryParams.append("startDate", filters.startDate)
       if (filters.endDate) queryParams.append("endDate", filters.endDate)
-      
+
       queryParams.append("limit", pagination.pageSize.toString())
       queryParams.append("offset", (pagination.pageIndex * pagination.pageSize).toString())
-      
+
       const response = await fetch(`/api/finance/transactions?${queryParams.toString()}`)
-      
+
       if (!response.ok) {
         throw new Error("获取交易记录失败")
       }
-      
+
       const data = await response.json()
       setTransactions(data.data)
       setTotal(data.total)
@@ -161,7 +163,7 @@ export function TransactionsTable({ transactions: initialTransactions, total: in
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("amount"))
         const type = row.getValue("type") as string
-        
+
         return (
           <div className={`text-right font-medium ${type === "income" ? "text-green-600" : type === "expense" ? "text-red-600" : ""}`}>
             {formatCurrency(amount)}
@@ -232,6 +234,14 @@ export function TransactionsTable({ transactions: initialTransactions, total: in
               >
                 编辑交易
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedTransaction(transaction)
+                  setIsAuditLogOpen(true)
+                }}
+              >
+                查看日志
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={async () => {
@@ -239,17 +249,17 @@ export function TransactionsTable({ transactions: initialTransactions, total: in
                     const response = await fetch(`/api/finance/transactions/${transaction.id}`, {
                       method: "DELETE",
                     })
-                    
+
                     if (!response.ok) {
                       const error = await response.json()
                       throw new Error(error.error || "删除交易记录失败")
                     }
-                    
+
                     toast({
                       title: "删除成功",
                       description: "交易记录已成功删除",
                     })
-                    
+
                     loadTransactions()
                   } catch (error) {
                     toast({
@@ -405,7 +415,7 @@ export function TransactionsTable({ transactions: initialTransactions, total: in
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          共 {total} 条记录，当前显示第 {pagination.pageIndex * pagination.pageSize + 1} 
+          共 {total} 条记录，当前显示第 {pagination.pageIndex * pagination.pageSize + 1}
           至 {Math.min((pagination.pageIndex + 1) * pagination.pageSize, total)} 条
         </div>
         <div className="space-x-2">
@@ -468,6 +478,15 @@ export function TransactionsTable({ transactions: initialTransactions, total: in
           })
         }}
       />
+
+      {/* 审计日志对话框 */}
+      {selectedTransaction && (
+        <FinanceTransactionAuditLog
+          open={isAuditLogOpen}
+          onOpenChange={setIsAuditLogOpen}
+          transaction={selectedTransaction}
+        />
+      )}
     </div>
   )
 }
