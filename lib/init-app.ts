@@ -1,5 +1,6 @@
 import { setupAutoBackup } from "./auto-backup"
-import { createLog } from "./actions"
+// 暂时注释掉，避免导入错误
+// import { createLog } from "./actions"
 import { setupGlobalErrorHandler } from "./error-logger"
 
 // 初始化应用程序
@@ -15,12 +16,8 @@ export async function initApp() {
 
     // 记录系统启动日志
     try {
-      await createLog({
-        module: "系统",
-        level: "info",
-        message: "系统已启动",
-        details: "应用程序初始化完成，系统正常运行"
-      })
+      // 暂时只输出到控制台，不记录到系统日志
+      console.log("[INFO][系统] 系统已启动")
     } catch (logError) {
       console.error("记录系统启动日志失败:", logError)
     }
@@ -31,22 +28,18 @@ export async function initApp() {
 
     // 记录启动失败日志
     try {
-      await createLog({
-        module: "系统",
-        level: "error",
-        message: "系统启动失败",
-        details: error instanceof Error ? error.message : String(error)
-      })
+      // 暂时只输出到控制台，不记录到系统日志
+      console.error("[ERROR][系统] 系统启动失败:", error instanceof Error ? error.message : String(error))
     } catch (logError) {
       console.error("记录系统启动失败日志失败:", logError)
     }
   }
 }
 
-// 在应用启动时自动执行初始化
-if (typeof window === "undefined") {
-  // 仅在服务器端执行
-  initApp().catch(error => {
-    console.error("应用程序初始化失败:", error)
-  })
-}
+// 注释掉自动执行，改用统一的初始化管理器
+// if (typeof window === "undefined") {
+//   // 仅在服务器端执行
+//   initApp().catch(error => {
+//     console.error("应用程序初始化失败:", error)
+//   })
+// }

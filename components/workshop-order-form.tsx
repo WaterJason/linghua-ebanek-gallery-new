@@ -151,7 +151,7 @@ export function WorkshopOrderForm({ workshop = null, onSubmitted }) {
       notes: workshop?.notes || "",
       serviceItems: workshop?.serviceItems?.length > 0
         ? workshop.serviceItems.map(item => ({
-            productId: item.productId.toString(),
+            productId: item.artworkId.toString(),
             quantity: item.quantity,
             price: item.price,
             notes: item.notes || ""
@@ -165,7 +165,7 @@ export function WorkshopOrderForm({ workshop = null, onSubmitted }) {
     async function loadProducts() {
       setIsLoading(true)
       try {
-        const data = await getProducts()
+        const data = await getArtworks()
         setProducts(data)
       } catch (error) {
         console.error("Error loading products:", error)
@@ -222,7 +222,7 @@ export function WorkshopOrderForm({ workshop = null, onSubmitted }) {
         // 根据活动类型设置角色
         role: values.activityType === "jewelry_enameling" ? "jewelry_workshop" : "cloisonne_workshop",
         serviceItems: values.serviceItems
-          .filter(item => item.productId && item.productId.trim() !== "") // 过滤掉没有选择产品的项目
+          .filter(item => item.productId && item.artworkId.trim() !== "") // 过滤掉没有选择产品的项目
           .map(item => ({
             ...item,
             productId: parseInt(item.productId)
@@ -579,9 +579,9 @@ export function WorkshopOrderForm({ workshop = null, onSubmitted }) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {products.map((product) => (
-                              <SelectItem key={product.id} value={product.id.toString()}>
-                                {product.name}
+                            {artworks.map((product) => (
+                              <SelectItem key={artwork.id} value={artwork.id.toString()}>
+                                {artwork.name}
                               </SelectItem>
                             ))}
                           </SelectContent>

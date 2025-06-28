@@ -977,3 +977,298 @@ export async function getMyWorkflowInstances(status?: WorkflowStatus) {
     throw new Error("获取我发起的工作流实例列表失败");
   }
 }
+
+/**
+ * 创建工作流步骤
+ *
+ * @param params 创建工作流步骤参数
+ * @returns 创建的工作流步骤
+ */
+export async function createWorkflowStep(params: CreateWorkflowStepParams) {
+  try {
+    // 获取当前用户
+    const currentUser = await getCurrentUser();
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new Error("未授权");
+    }
+
+    // 查询工作流
+    const workflow = await prisma.workflow.findUnique({
+      where: { id: params.workflowId },
+      include: {
+        steps: true,
+      },
+    });
+
+    if (!workflow) {
+      throw new Error("工作流不存在");
+    }
+
+    // 创建工作流步骤
+    const workflowStep = await prisma.workflowStep.create({
+      data: {
+        workflowId: params.workflowId,
+        name: params.name,
+        description: params.description,
+        stepNumber: params.stepNumber,
+        approverType: params.approverType,
+        approverId: params.approverId,
+        isRequired: params.isRequired !== undefined ? params.isRequired : true,
+      },
+    });
+
+    // 记录审计日志
+    await logEntityCreation("system", workflowStep.id.toString(), workflowStep, "创建工作流步骤");
+
+    // 重新验证工作流页面
+    revalidatePath("/workflows");
+
+    return workflowStep;
+  } catch (error) {
+    console.error("创建工作流步骤失败:", error);
+    throw new Error(error instanceof Error ? error.message : "创建工作流步骤失败");
+  }
+}
+
+/**
+ * 更新工作流步骤
+ *
+ * @param params 更新工作流步骤参数
+ * @returns 更新的工作流步骤
+ */
+export async function updateWorkflowStep(params: UpdateWorkflowStepParams) {
+  try {
+    // 获取当前用户
+    const currentUser = await getCurrentUser();
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new Error("未授权");
+    }
+
+    // 查询工作流步骤
+    const workflowStep = await prisma.workflowStep.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!workflowStep) {
+      throw new Error("工作流步骤不存在");
+    }
+
+    // 更新工作流步骤
+    const updatedWorkflowStep = await prisma.workflowStep.update({
+      where: { id: params.id },
+      data: {
+        name: params.name,
+        description: params.description,
+        stepNumber: params.stepNumber,
+        approverType: params.approverType,
+        approverId: params.approverId,
+        isRequired: params.isRequired,
+      },
+    });
+
+    // 记录审计日志
+    await logEntityUpdate(
+      "system",
+      updatedWorkflowStep.id.toString(),
+      workflowStep,
+      updatedWorkflowStep,
+      "更新工作流步骤"
+    );
+
+    // 重新验证工作流页面
+    revalidatePath("/workflows");
+
+    return updatedWorkflowStep;
+  } catch (error) {
+    console.error("更新工作流步骤失败:", error);
+    throw new Error(error instanceof Error ? error.message : "更新工作流步骤失败");
+  }
+}
+
+/**
+ * 删除工作流步骤
+ *
+ * @param id 工作流步骤ID
+ * @returns 删除的工作流步骤
+ */
+export async function deleteWorkflowStep(id: number) {
+  try {
+    // 获取当前用户
+    const currentUser = await getCurrentUser();
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new Error("未授权");
+    }
+
+    // 查询工作流步骤
+    const workflowStep = await prisma.workflowStep.findUnique({
+      where: { id },
+      include: {
+        workflow: {
+          include: {
+            instances: {
+              where: {
+                status: "pending",
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!workflowStep) {
+      throw new Error("工作流步骤不存在");
+    }
+
+    // 检查是否有正在进行的工作流实例
+    if (workflowStep.workflow.instances && workflowStep.workflow.instances.length > 0) {
+      throw new Error("无法删除有正在进行的工作流实例的步骤");
+    }
+
+    // 删除工作流步骤
+    const deletedWorkflowStep = await prisma.workflowStep.delete({
+      where: { id },
+    });
+
+    // 记录审计日志
+    await logEntityDeletion(
+      "system",
+      deletedWorkflowStep.id.toString(),
+      workflowStep,
+      "删除工作流步骤"
+    );
+
+    // 重新验证工作流页面
+    revalidatePath("/workflows");
+
+    return deletedWorkflowStep;
+  } catch (error) {
+    console.error("删除工作流步骤失败:", error);
+    throw new Error(error instanceof Error ? error.message : "删除工作流步骤失败");
+  }
+}
+
+/**
+ * 上移工作流步骤
+ *
+ * @param id 工作流步骤ID
+ * @returns 更新的工作流步骤
+ */
+export async function moveWorkflowStepUp(id: number) {
+  try {
+    // 获取当前用户
+    const currentUser = await getCurrentUser();
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new Error("未授权");
+    }
+
+    // 查询工作流步骤
+    const workflowStep = await prisma.workflowStep.findUnique({
+      where: { id },
+      include: {
+        workflow: {
+          include: {
+            steps: {
+              orderBy: { stepNumber: "asc" },
+            },
+          },
+        },
+      },
+    });
+
+    if (!workflowStep) {
+      throw new Error("工作流步骤不存在");
+    }
+
+    const currentStepNumber = workflowStep.stepNumber;
+    const steps = workflowStep.workflow.steps;
+
+    // 找到上一个步骤
+    const previousStep = steps.find(step => step.stepNumber === currentStepNumber - 1);
+    if (!previousStep) {
+      throw new Error("已经是第一个步骤");
+    }
+
+    // 交换步骤顺序
+    await prisma.$transaction([
+      prisma.workflowStep.update({
+        where: { id: workflowStep.id },
+        data: { stepNumber: previousStep.stepNumber },
+      }),
+      prisma.workflowStep.update({
+        where: { id: previousStep.id },
+        data: { stepNumber: currentStepNumber },
+      }),
+    ]);
+
+    // 重新验证工作流页面
+    revalidatePath("/workflows");
+
+    return workflowStep;
+  } catch (error) {
+    console.error("上移工作流步骤失败:", error);
+    throw new Error(error instanceof Error ? error.message : "上移工作流步骤失败");
+  }
+}
+
+/**
+ * 下移工作流步骤
+ *
+ * @param id 工作流步骤ID
+ * @returns 更新的工作流步骤
+ */
+export async function moveWorkflowStepDown(id: number) {
+  try {
+    // 获取当前用户
+    const currentUser = await getCurrentUser();
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new Error("未授权");
+    }
+
+    // 查询工作流步骤
+    const workflowStep = await prisma.workflowStep.findUnique({
+      where: { id },
+      include: {
+        workflow: {
+          include: {
+            steps: {
+              orderBy: { stepNumber: "asc" },
+            },
+          },
+        },
+      },
+    });
+
+    if (!workflowStep) {
+      throw new Error("工作流步骤不存在");
+    }
+
+    const currentStepNumber = workflowStep.stepNumber;
+    const steps = workflowStep.workflow.steps;
+
+    // 找到下一个步骤
+    const nextStep = steps.find(step => step.stepNumber === currentStepNumber + 1);
+    if (!nextStep) {
+      throw new Error("已经是最后一个步骤");
+    }
+
+    // 交换步骤顺序
+    await prisma.$transaction([
+      prisma.workflowStep.update({
+        where: { id: workflowStep.id },
+        data: { stepNumber: nextStep.stepNumber },
+      }),
+      prisma.workflowStep.update({
+        where: { id: nextStep.id },
+        data: { stepNumber: currentStepNumber },
+      }),
+    ]);
+
+    // 重新验证工作流页面
+    revalidatePath("/workflows");
+
+    return workflowStep;
+  } catch (error) {
+    console.error("下移工作流步骤失败:", error);
+    throw new Error(error instanceof Error ? error.message : "下移工作流步骤失败");
+  }
+}

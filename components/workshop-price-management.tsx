@@ -24,7 +24,6 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { PlusIcon, PencilIcon, TrashIcon, SearchIcon } from "lucide-react"
-import { getProducts } from "@/lib/actions/product-actions";
 import { getChannels } from "@/lib/actions/channel-actions";
 import { getWorkshopPrices, createWorkshopPrice, updateWorkshopPrice, deleteWorkshopPrice, getWorkshopActivities } from "@/lib/actions/workshop-actions";
 import { toast } from "@/components/ui/use-toast"
@@ -260,7 +259,7 @@ export function WorkshopPriceManagement() {
             <div className="text-center py-8">加载中...</div>
           ) : filteredPrices.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              {searchQuery || selectedChannel !== "all" || selectedProduct !== "all"
+              {searchQuery || selectedChannel !== "all" || selectedActivity !== "all"
                 ? "没有找到匹配的价格配置"
                 : "暂无团建价格配置数据"}
             </div>

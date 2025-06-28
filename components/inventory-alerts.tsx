@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getInventory, getWarehouses, updateInventory } from "@/lib/actions/inventory-actions";
+import { getInventory, getWarehouses, updateInventory } from "@/lib/api/inventory-api";
 import { toast } from "@/components/ui/use-toast"
 import { AlertTriangleIcon, ArrowUpIcon, PackageIcon, RefreshCwIcon } from "lucide-react"
 

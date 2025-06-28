@@ -1,16 +1,10 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
 import type { NextAuthConfig } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import prisma from "@/lib/db"
 
-// 注意：不要在客户端组件中直接导入和使用 initAccountSystem
-// 初始化账号管理系统应该在服务器端进行
-// 这个文件可能会在客户端被导入，所以不应该在这里直接调用 initAccountSystem
-
-const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma),
+export const authConfig: NextAuthConfig = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -19,17 +13,32 @@ const authConfig: NextAuthConfig = {
         password: { label: "密码", type: "password" },
       },
       async authorize(credentials) {
+        console.log("🔐 [NextAuth] =================================")
+        console.log("🔐 [NextAuth] 开始认证流程")
+        console.log("🔐 [NextAuth] 时间:", new Date().toISOString())
+        console.log("🔐 [NextAuth] 凭证:", {
+          identifier: credentials?.identifier,
+          hasPassword: !!credentials?.password,
+          passwordLength: credentials?.password?.length || 0
+        })
+
+        // 验证凭证完整性
         if (!credentials?.identifier || !credentials?.password) {
-          throw new Error("用户名/邮箱和密码不能为空")
+          console.log("❌ [NextAuth] 凭证不完整，拒绝认证")
+          console.log("❌ [NextAuth] identifier:", !!credentials?.identifier)
+          console.log("❌ [NextAuth] password:", !!credentials?.password)
+          return null
         }
 
         try {
-          // 尝试通过邮箱查找用户
-          let user = await prisma.user.findFirst({
+          console.log("🔍 [NextAuth] 开始查找用户:", credentials.identifier)
+
+          // 查找用户 - 支持邮箱和用户名登录
+          const user = await prisma.user.findFirst({
             where: {
               OR: [
-                { email: credentials.identifier },
-                { name: credentials.identifier }
+                { email: credentials.identifier as string },
+                { name: credentials.identifier as string }
               ]
             },
             include: {
@@ -37,161 +46,169 @@ const authConfig: NextAuthConfig = {
             },
           })
 
-          if (!user || !user.password) {
-            throw new Error("用户不存在或密码错误")
+          if (!user) {
+            console.log("❌ [NextAuth] 用户不存在:", credentials.identifier)
+            console.log("❌ [NextAuth] 查找条件: email或name =", credentials.identifier)
+            return null
           }
 
-          const isPasswordMatch = await bcrypt.compare(credentials.password, user.password)
+          console.log("✅ [NextAuth] 用户找到:", {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            hasPassword: !!user.password,
+            employeeId: user.employeeId
+          })
+
+          // 验证密码是否设置
+          if (!user.password) {
+            console.log("❌ [NextAuth] 用户密码未设置:", user.email)
+            return null
+          }
+
+          // 验证密码
+          console.log("🔑 [NextAuth] 开始密码验证")
+          console.log("🔑 [NextAuth] 输入密码长度:", credentials.password.length)
+          console.log("🔑 [NextAuth] 存储密码哈希长度:", user.password.length)
+
+          const isPasswordMatch = await bcrypt.compare(
+            credentials.password as string,
+            user.password
+          )
 
           if (!isPasswordMatch) {
-            throw new Error("用户不存在或密码错误")
+            console.log("❌ [NextAuth] 密码验证失败:", user.email)
+            console.log("❌ [NextAuth] 输入密码:", credentials.password)
+            console.log("❌ [NextAuth] 密码哈希前缀:", user.password.substring(0, 20))
+            return null
           }
 
+          console.log("✅ [NextAuth] 密码验证成功:", user.email)
+
           // 记录登录历史
-          await prisma.userLoginHistory.create({
-            data: {
-              userId: user.id,
-              ipAddress: "127.0.0.1", // 在实际环境中，应该从请求中获取
-              userAgent: "Unknown", // 在实际环境中，应该从请求中获取
-              loginTime: new Date(),
-              status: "success"
-            }
-          })
+          try {
+            await prisma.userLoginHistory.create({
+              data: {
+                userId: user.id,
+                ipAddress: "127.0.0.1",
+                userAgent: "NextAuth-Credentials",
+                loginTime: new Date(),
+                status: "success"
+              }
+            })
 
-          // 更新最后登录时间
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { lastLogin: new Date() }
-          })
+            // 更新最后登录时间
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { lastLogin: new Date() }
+            })
 
-          return {
+            console.log("✅ [NextAuth] 登录历史已记录")
+          } catch (historyError) {
+            console.log("⚠️ [NextAuth] 记录登录历史失败:", historyError.message)
+            // 不因为历史记录失败而阻止登录
+          }
+
+          // 构建返回的用户对象
+          const authUser = {
             id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
             employeeId: user.employeeId,
-            employeeName: user.employee?.name,
-            employeePosition: user.employee?.position,
+            employeeName: user.employee?.name || null,
+            employeePosition: user.employee?.position || null,
           }
+
+          console.log("✅ [NextAuth] 认证成功，返回用户对象:", authUser)
+          console.log("🔐 [NextAuth] 认证流程完成 =================================")
+          return authUser
+
         } catch (error) {
-          console.error("Authentication error:", error)
-          throw new Error("登录失败，请稍后再试")
+          console.error("❌ [NextAuth] 认证过程发生异常:", error)
+          console.error("❌ [NextAuth] 错误堆栈:", error.stack)
+          return null
         }
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger }) {
-      // 初始登录
+    async signIn({ user }) {
+      console.log("🚪 [NextAuth] signIn回调:", { user: user ? { id: user.id, email: user.email } : null })
+      const result = !!user
+      console.log("🚪 [NextAuth] signIn结果:", result)
+      return result
+    },
+    async jwt({ token, user }) {
+      console.log("🎫 [NextAuth] JWT回调:", { hasUser: !!user, tokenId: token.id })
       if (user) {
         token.id = user.id
         token.role = user.role
         token.employeeId = user.employeeId
         token.employeeName = user.employeeName
         token.employeePosition = user.employeePosition
-
-        // 获取用户角色
-        if (user.id) {
-          try {
-            const userRoles = await prisma.userRole.findMany({
-              where: { userId: user.id },
-              include: { role: true },
-            })
-
-            token.roles = userRoles.map(ur => ({
-              id: ur.role.id,
-              name: ur.role.name,
-              code: ur.role.code,
-            }))
-          } catch (error) {
-            console.error("获取用户角色失败:", error)
-            token.roles = []
-          }
-        }
+        console.log("🎫 [NextAuth] JWT更新:", { id: token.id, role: token.role })
       }
-
-      // 会话更新
-      if (trigger === "update") {
-        // 重新获取用户角色
-        try {
-          const userRoles = await prisma.userRole.findMany({
-            where: { userId: token.id as string },
-            include: { role: true },
-          })
-
-          token.roles = userRoles.map(ur => ({
-            id: ur.role.id,
-            name: ur.role.name,
-            code: ur.role.code,
-          }))
-        } catch (error) {
-          console.error("更新会话时获取用户角色失败:", error)
-        }
-      }
-
       return token
     },
     async session({ session, token }) {
-      if (session.user) {
+      console.log("📋 [NextAuth] Session回调:", { hasSession: !!session.user, tokenId: token.id })
+      if (session.user && token) {
         session.user.id = token.id as string
         session.user.role = token.role as string
         session.user.employeeId = token.employeeId as number
         session.user.employeeName = token.employeeName as string
         session.user.employeePosition = token.employeePosition as string
-        session.user.roles = token.roles as any[] || []
-
-        // 添加权限检查辅助函数
-        session.user.hasPermission = function(permissionCode: string) {
-          const roles = this.roles || []
-          // 超级管理员拥有所有权限
-          if (roles.some(r => r.code === "super_admin")) {
-            return true
-          }
-
-          // 兼容旧版本：admin 角色也拥有所有权限
-          if (this.role === "admin") {
-            return true
-          }
-
-          // 基本权限检查
-          if (permissionCode === "products.view" ||
-              permissionCode === "inventory.view" ||
-              permissionCode === "employees.view") {
-            return true
-          }
-
-          // 编辑权限检查
-          if (permissionCode === "products.edit" ||
-              permissionCode === "inventory.edit" ||
-              permissionCode === "employees.edit") {
-            return roles.some(r => r.code === "editor" || r.code === "manager")
-          }
-
-          // 管理权限检查
-          if (permissionCode === "permissions.edit" ||
-              permissionCode === "users.edit") {
-            return roles.some(r => r.code === "manager")
-          }
-
-          return false
-        }
+        console.log("📋 [NextAuth] Session更新:", { id: session.user.id, email: session.user.email })
       }
       return session
     },
   },
   pages: {
     signIn: "/login",
-    signOut: "/logout",
     error: "/auth/error",
-    verifyRequest: "/auth/verify-request",
-    newUser: "/auth/new-user",
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30天
+    maxAge: 24 * 60 * 60, // 24小时
   },
-  secret: process.env.NEXTAUTH_SECRET || "linghua-enamel-gallery-secret-key-2024",
+  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
+  trustHost: true, // 信任主机，解决开发环境问题
+  useSecureCookies: process.env.NODE_ENV === "production",
+  skipCSRFCheck: process.env.NODE_ENV === "development", // 开发环境跳过CSRF检查
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    callbackUrl: {
+      name: process.env.NODE_ENV === "production" ? "__Secure-next-auth.callback-url" : "next-auth.callback-url",
+      options: {
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    csrfToken: {
+      name: process.env.NODE_ENV === "production" ? "__Host-next-auth.csrf-token" : "next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  }
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)
+const nextAuth = NextAuth(authConfig)
+
+export const { handlers, auth, signIn, signOut } = nextAuth
+export default nextAuth

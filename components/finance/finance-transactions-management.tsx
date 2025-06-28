@@ -1,6 +1,23 @@
 "use client"
 
 import { useState } from "react"
+
+  // 数据同步 - 自动刷新数据
+  useEffect(() => {
+    const handleDataRefresh = () => {
+      // 触发数据重新获取
+      if (typeof refetch === 'function') {
+        refetch();
+      }
+    };
+    
+    // 监听存储变化
+    window.addEventListener('storage', handleDataRefresh);
+    
+    return () => {
+      window.removeEventListener('storage', handleDataRefresh);
+    };
+  }, []);
 import { Button } from "@/components/ui/button"
 import { TransactionsTable } from "@/components/finance/transactions-table"
 import { TransactionDialog } from "@/components/finance/transaction-dialog"

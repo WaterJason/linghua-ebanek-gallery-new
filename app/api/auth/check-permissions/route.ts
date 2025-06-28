@@ -19,7 +19,8 @@ export async function GET(request: NextRequest) {
     }
     
     // 检查是否需要检查超级管理员权限
-    const shouldCheck = cookies().get("check_super_admin_permissions");
+    const cookieStore = await cookies();
+    const shouldCheck = cookieStore.get("check_super_admin_permissions");
     
     if (!shouldCheck) {
       return NextResponse.json({ message: "无需检查权限" });

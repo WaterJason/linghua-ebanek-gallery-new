@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import prisma from "@/lib/db"
 
 // 获取所有仓库
 export async function GET() {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
@@ -29,7 +28,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
@@ -62,7 +61,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
@@ -96,7 +95,7 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }

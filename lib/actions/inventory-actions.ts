@@ -2066,3 +2066,55 @@ export async function getInventoryHistory(productId: number) {
     throw new Error("Failed to fetch inventory history");
   }
 }
+
+/**
+ * 获取库存汇总信息
+ * @returns 库存汇总数据
+ */
+export async function getInventorySummary() {
+  try {
+    // 获取总产品数
+    const totalProducts = await prisma.product.count();
+
+    // 获取有库存的产品数
+    const productsWithInventory = await prisma.inventoryItem.count({
+      distinct: ['productId'],
+    });
+
+    // 获取库存不足的产品数（库存小于最小库存）
+    const lowStockProducts = await prisma.inventoryItem.count({
+      where: {
+        AND: [
+          { minQuantity: { not: null } },
+          { quantity: { lt: prisma.inventoryItem.fields.minQuantity } }
+        ]
+      }
+    });
+
+    // 获取总库存价值
+    const inventoryValue = await prisma.inventoryItem.findMany({
+      include: {
+        product: true,
+      },
+    });
+
+    const totalValue = inventoryValue.reduce((sum, item) => {
+      const price = item.product.price || 0;
+      return sum + (price * item.quantity);
+    }, 0);
+
+    // 获取仓库数量
+    const totalWarehouses = await prisma.warehouse.count();
+
+    return {
+      totalProducts,
+      productsWithInventory,
+      lowStockProducts,
+      totalValue,
+      totalWarehouses,
+    };
+  } catch (error) {
+    console.error("Error getting inventory summary:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to get inventory summary");
+  }
+}

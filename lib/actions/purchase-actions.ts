@@ -26,6 +26,7 @@ import {
   validateUpdateSupplier
 } from "@/lib/validation";
 import { findRecord, findRecords, createRecord, updateRecord } from "@/lib/prisma-wrapper";
+import { generateOrderNumber, OrderType } from "@/lib/order-number-generator";
 
 /**
  * 获取所有采购订单
@@ -183,14 +184,19 @@ export async function createPurchaseOrder(data: CreatePurchaseOrderInput): Promi
       totalAmount += Number(item.price) * Number(item.quantity);
     }
 
+    // 生成订单号
+    const orderDate = data.orderDate instanceof Date ? data.orderDate : new Date(data.orderDate);
+    const orderNumber = await generateOrderNumber(OrderType.PURCHASE, orderDate);
+
     // 开始事务
     const result = await prisma.$transaction(async (tx) => {
       // 创建订单
       const order = await tx.purchaseOrder.create({
         data: {
+          orderNumber,
           supplierId: data.supplierId ? Number(data.supplierId) : null,
           employeeId: data.employeeId ? Number(data.employeeId) : null,
-          orderDate: data.orderDate instanceof Date ? data.orderDate : new Date(data.orderDate),
+          orderDate: orderDate,
           expectedDate: data.expectedDate ? (data.expectedDate instanceof Date ? data.expectedDate : new Date(data.expectedDate)) : null,
           totalAmount,
           status: data.status || "pending",
@@ -204,7 +210,7 @@ export async function createPurchaseOrder(data: CreatePurchaseOrderInput): Promi
       for (const item of data.items) {
         await tx.purchaseOrderItem.create({
           data: {
-            orderId: order.id,
+            purchaseOrderId: order.id,
             productId: Number(item.productId),
             quantity: Number(item.quantity),
             price: Number(item.price),
@@ -281,7 +287,7 @@ export async function updatePurchaseOrder(id: number, data: UpdatePurchaseOrderI
       if (data.items && Array.isArray(data.items)) {
         // 删除现有订单项
         await tx.purchaseOrderItem.deleteMany({
-          where: { orderId: id },
+          where: { purchaseOrderId: id },
         });
 
         // 计算订单总金额
@@ -295,7 +301,7 @@ export async function updatePurchaseOrder(id: number, data: UpdatePurchaseOrderI
 
           await tx.purchaseOrderItem.create({
             data: {
-              orderId: id,
+              purchaseOrderId: id,
               productId: Number(item.productId),
               quantity: Number(item.quantity),
               price: Number(item.price),
@@ -379,7 +385,7 @@ export async function deletePurchaseOrder(id: number): Promise<{ success: boolea
     await prisma.$transaction(async (tx) => {
       // 删除订单项
       await tx.purchaseOrderItem.deleteMany({
-        where: { orderId: id },
+        where: { purchaseOrderId: id },
       });
 
       // 删除订单

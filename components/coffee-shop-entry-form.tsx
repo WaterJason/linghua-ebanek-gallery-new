@@ -23,6 +23,9 @@ import { createCoffeeShopSale } from "@/lib/actions/sales-actions";
 import { getSystemSettings } from "@/lib/actions/system-actions";
 import { toast } from "@/components/ui/use-toast"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 const itemSchema = z.object({
   name: z.string().min(1, "商品名称不能为空"),
   category: z.string().min(1, "请选择商品类别"),
@@ -70,6 +73,9 @@ export function CoffeeShopEntryForm() {
   const [commissionRate, setCommissionRate] = useState(20)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('sales')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -127,12 +133,20 @@ export function CoffeeShopEntryForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     try {
-      await createCoffeeShopSale(values)
+      await enhancedOps.create('咖啡店销售').form(
+        async () => {
+          return await createCoffeeShopSale(values)
+        },
+        null,
+        values,
+        { canUndo: true }
+      )
 
       // 计算每位员工的提成
       const commissionTotal = values.totalSales * (commissionRate / 100)
       const commissionPerStaff = commissionTotal / values.staffOnDuty.length
 
+      // 显示提成信息
       toast({
         title: "咖啡店销售数据提交成功",
         description: `总提成: ¥${commissionTotal.toFixed(2)}, 每人提成: ¥${commissionPerStaff.toFixed(2)}`,
@@ -153,11 +167,7 @@ export function CoffeeShopEntryForm() {
       })
     } catch (error) {
       console.error("Error submitting coffee shop sale data:", error)
-      toast({
-        title: "提交失败",
-        description: "保存咖啡店销售记录时出错",
-        variant: "destructive",
-      })
+      // 错误已由增强操作系统处理
     } finally {
       setSubmitting(false)
     }

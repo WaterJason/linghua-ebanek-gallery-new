@@ -15,6 +15,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
+import { SmartInput } from "@/components/ui/smart-input"
+import { SmartTooltip } from "@/components/ui/tooltip"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { PlusIcon, PencilIcon, TrashIcon, SearchIcon } from "lucide-react"
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier } from "@/lib/actions/purchase-actions";
 import { toast } from "@/components/ui/use-toast"
@@ -26,6 +29,15 @@ export function SupplierManagement() {
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredSuppliers, setFilteredSuppliers] = useState([])
+
+  // 智能建议数据
+  const supplierSearchSuggestions = [
+    { id: '1', value: '北京', label: '北京', category: '地区', frequency: 10 },
+    { id: '2', value: '上海', label: '上海', category: '地区', frequency: 8 },
+    { id: '3', value: '广州', label: '广州', category: '地区', frequency: 6 },
+    { id: '4', value: '珐琅材料', label: '珐琅材料', category: '供应类型', frequency: 15 },
+    { id: '5', value: '金属配件', label: '金属配件', category: '供应类型', frequency: 12 },
+  ]
 
   useEffect(() => {
     loadSuppliers()
@@ -135,26 +147,45 @@ export function SupplierManagement() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">供应商管理</h3>
-        <Button onClick={handleAddSupplier}>
-          <PlusIcon className="mr-2 h-4 w-4" />
-          添加供应商
-        </Button>
-      </div>
-
-      <div className="flex gap-4 mb-4">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="搜索供应商名称、联系人、电话或邮箱"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
-          />
+    <TooltipProvider>
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium">供应商管理</h3>
+          <SmartTooltip
+            content="添加新的供应商，包括基本信息和联系方式"
+            type="help"
+            title="添加供应商"
+          >
+            <Button onClick={handleAddSupplier}>
+              <PlusIcon className="mr-2 h-4 w-4" />
+              添加供应商
+            </Button>
+          </SmartTooltip>
         </div>
-      </div>
+
+        <div className="flex gap-4 mb-4">
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <SmartTooltip
+              content="搜索供应商名称、联系人、电话或邮箱，支持智能建议"
+              type="help"
+              title="供应商搜索"
+            >
+              <SmartInput
+                suggestions={supplierSearchSuggestions}
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onSuggestionSelect={(suggestion) => {
+                  setSearchQuery(suggestion.value)
+                }}
+                placeholder="搜索供应商名称、联系人、电话或邮箱"
+                showHistory={true}
+                showFrequent={true}
+                className="pl-8"
+              />
+            </SmartTooltip>
+          </div>
+        </div>
 
       <div className="rounded-md border">
         <Table>
@@ -311,6 +342,7 @@ export function SupplierManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </TooltipProvider>
   )
 }

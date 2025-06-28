@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-import withPWA from 'next-pwa';
-
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -14,21 +12,47 @@ const nextConfig = {
   experimental: {
     // Remove fallbackNodePolyfills as it's not a valid option
   },
-  webpack: (config, { isServer }) => {
-    // Fix for ChunkLoadError
-    config.output.chunkFilename = isServer
-      ? `[name].js`
-      : `static/chunks/[name].[contenthash].js`;
+  webpack: (config, { isServer, dev }) => {
+    // Fix for ChunkLoadError - Enhanced configuration
+    if (!isServer) {
+      config.output.chunkFilename = dev
+        ? 'static/chunks/[name].js'
+        : 'static/chunks/[name].[contenthash].js';
+
+      // Improve chunk loading reliability
+      config.output.crossOriginLoading = 'anonymous';
+
+      // Optimize chunk splitting
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          chunks: 'all',
+          cacheGroups: {
+            ...config.optimization.splitChunks?.cacheGroups,
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: -10,
+              chunks: 'all',
+            },
+          },
+        },
+      };
+    }
 
     return config;
   },
+  // Add retry configuration for chunk loading
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
 }
 
-const pwaConfig = withPWA({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-})(nextConfig);
-
-export default pwaConfig;
+export default nextConfig

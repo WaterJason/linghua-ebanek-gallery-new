@@ -3,7 +3,8 @@
  * 提供简单的接口用于记录系统日志
  */
 
-import { createLog } from './actions'
+// 暂时注释掉，避免导入错误
+// import { createLog } from './actions'
 
 // 日志级别类型
 export type LogLevel = 'info' | 'warning' | 'error' | 'debug'
@@ -24,10 +25,16 @@ export interface LogData {
  */
 export async function log(level: LogLevel, data: LogData) {
   try {
-    return await createLog({
+    // 暂时只输出到控制台，不记录到系统日志
+    console.log(`[${level.toUpperCase()}][${data.module}] ${data.message}${data.details ? ': ' + data.details : ''}${data.userId ? ' (User: ' + data.userId + ')' : ''}`)
+
+    // 返回模拟的日志对象
+    return {
+      id: `log-${Date.now()}`,
+      level,
       ...data,
-      level
-    })
+      timestamp: new Date()
+    }
   } catch (error) {
     console.error('Failed to create log:', error)
     // 即使日志记录失败，也不抛出异常，避免影响主要业务流程
@@ -69,16 +76,16 @@ export async function logDebug(data: LogData) {
  */
 export function createLogger(module: string) {
   return {
-    info: (message: string, details?: string, userId?: string) => 
+    info: (message: string, details?: string, userId?: string) =>
       logInfo({ module, message, details, userId }),
-    
-    warning: (message: string, details?: string, userId?: string) => 
+
+    warning: (message: string, details?: string, userId?: string) =>
       logWarning({ module, message, details, userId }),
-    
-    error: (message: string, details?: string, userId?: string) => 
+
+    error: (message: string, details?: string, userId?: string) =>
       logError({ module, message, details, userId }),
-    
-    debug: (message: string, details?: string, userId?: string) => 
+
+    debug: (message: string, details?: string, userId?: string) =>
       logDebug({ module, message, details, userId })
   }
 }

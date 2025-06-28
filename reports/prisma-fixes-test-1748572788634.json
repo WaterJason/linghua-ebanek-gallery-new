@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-05-30T02:39:41.050Z",
+  "tests": [
+    {
+      "name": "采购订单创建",
+      "status": "failed",
+      "error": "未授权"
+    },
+    {
+      "name": "渠道创建",
+      "status": "failed",
+      "error": "Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"
+    },
+    {
+      "name": "团建订单创建",
+      "status": "failed",
+      "error": "Failed to create workshop"
+    },
+    {
+      "name": "产品材质添加",
+      "status": "failed",
+      "error": "Failed to add material"
+    },
+    {
+      "name": "产品单位添加",
+      "status": "failed",
+      "error": "Failed to add unit"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 0,
+    "failed": 5,
+    "errors": [
+      "未授权",
+      "Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "Failed to create workshop",
+      "Failed to add material",
+      "Failed to add unit"
+    ]
+  }
+}

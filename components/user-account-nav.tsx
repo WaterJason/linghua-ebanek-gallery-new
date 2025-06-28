@@ -26,7 +26,7 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
     <div className="flex items-center gap-2">
       {/* 通知和待办事项弹出窗口 */}
       <NotificationTodoPopover />
-      
+
       {/* 用户账号下拉菜单 */}
       <DropdownMenu>
         <DropdownMenuTrigger>
@@ -65,7 +65,12 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
             onSelect={(event) => {
               event.preventDefault()
               signOut({
-                callbackUrl: `${window.location.origin}/login`,
+                redirect: false,
+                callbackUrl: "/login",
+              }).then(() => {
+                window.location.href = "/login"
+              }).catch(() => {
+                window.location.href = "/login"
               })
             }}
           >

@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-05-30T02:17:39.356Z",
+  "tests": [
+    {
+      "name": "正常API调用",
+      "status": "passed",
+      "details": "成功获取 0 个产品"
+    },
+    {
+      "name": "产品创建API",
+      "status": "passed",
+      "details": "成功创建产品 ID: 1"
+    },
+    {
+      "name": "产品分类API",
+      "status": "passed",
+      "details": "成功获取 0 个分类"
+    },
+    {
+      "name": "404错误处理",
+      "status": "passed",
+      "details": "正确返回404状态码"
+    },
+    {
+      "name": "数据库连接",
+      "status": "passed",
+      "details": "数据库连接正常"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "errors": []
+  }
+}

@@ -11,6 +11,9 @@ import { Switch } from "@/components/ui/switch"
 import { getSystemSettings, updateSystemSettings } from "@/lib/actions/system-actions";
 import { toast } from "@/components/ui/use-toast"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 const formSchema = z.object({
   companyName: z.string().min(2, {
     message: "公司名称至少需要2个字符",
@@ -28,6 +31,9 @@ const formSchema = z.object({
 export function SystemSettings() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('settings')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,18 +73,27 @@ export function SystemSettings() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     try {
-      await updateSystemSettings(values)
-      toast({
-        title: "设置已保存",
-        description: "系统设置已成功更新",
-      })
+      // 获取当前设置作为beforeData
+      const currentSettings = await getSystemSettings()
+      const beforeData = currentSettings ? {
+        companyName: currentSettings.companyName,
+        coffeeSalesCommissionRate: currentSettings.coffeeSalesCommissionRate,
+        gallerySalesCommissionRate: currentSettings.gallerySalesCommissionRate,
+        enableImageUpload: currentSettings.enableImageUpload,
+        enableNotifications: currentSettings.enableNotifications,
+      } : null
+
+      await enhancedOps.update('系统设置').form(
+        async () => {
+          return await updateSystemSettings(values)
+        },
+        beforeData,
+        values,
+        { canUndo: true }
+      )
     } catch (error) {
       console.error("Error updating settings:", error)
-      toast({
-        title: "保存失败",
-        description: "更新系统设置时出错",
-        variant: "destructive",
-      })
+      // 错误已由增强操作系统处理
     } finally {
       setSubmitting(false)
     }

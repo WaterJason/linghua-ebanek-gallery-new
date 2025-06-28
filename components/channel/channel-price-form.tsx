@@ -26,6 +26,9 @@ import {
 } from "@/components/ui/select"
 import { createChannelPrice, updateChannelPrice } from "@/lib/actions/channel-actions"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 // 表单验证模式
 const formSchema = z.object({
   channelId: z.string().min(1, "请选择渠道"),
@@ -40,6 +43,9 @@ const formSchema = z.object({
 export function ChannelPriceForm({ price, channels, products, onSuccess }) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('channel')
 
   // 初始化表单
   const form = useForm({
@@ -68,32 +74,42 @@ export function ChannelPriceForm({ price, channels, products, onSuccess }) {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true)
-      
+
+      const beforeData = price ? {
+        channelId: price.channelId,
+        productId: price.productId,
+        price: price.price,
+        isActive: price.isActive,
+      } : null
+
       if (price) {
         // 更新价格
-        await updateChannelPrice(price.id, data)
-        toast({
-          title: "更新成功",
-          description: "渠道价格已成功更新",
-        })
+        await enhancedOps.update('渠道价格').form(
+          async () => {
+            return await updateChannelPrice(price.id, data)
+          },
+          beforeData,
+          data,
+          { canUndo: true }
+        )
       } else {
         // 创建价格
-        await createChannelPrice(data)
-        toast({
-          title: "创建成功",
-          description: "渠道价格已成功创建",
-        })
+        await enhancedOps.create('渠道价格').form(
+          async () => {
+            return await createChannelPrice(data)
+          },
+          null,
+          data,
+          { canUndo: true }
+        )
       }
-      
+
       if (onSuccess) {
         onSuccess()
       }
     } catch (error) {
-      toast({
-        title: price ? "更新失败" : "创建失败",
-        description: error.message || "操作失败，请重试",
-        variant: "destructive",
-      })
+      console.error("渠道价格表单提交错误:", error)
+      // 错误已由增强操作系统处理
     } finally {
       setIsSubmitting(false)
     }
@@ -130,7 +146,7 @@ export function ChannelPriceForm({ price, channels, products, onSuccess }) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="productId"
@@ -159,7 +175,7 @@ export function ChannelPriceForm({ price, channels, products, onSuccess }) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="price"
@@ -182,7 +198,7 @@ export function ChannelPriceForm({ price, channels, products, onSuccess }) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="isActive"
@@ -203,7 +219,7 @@ export function ChannelPriceForm({ price, channels, products, onSuccess }) {
             </FormItem>
           )}
         />
-        
+
         <div className="flex justify-end space-x-2">
           <Button
             type="button"

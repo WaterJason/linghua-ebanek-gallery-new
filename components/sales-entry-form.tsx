@@ -22,6 +22,9 @@ import { toast } from "@/components/ui/use-toast"
 import { FileUpload } from "@/components/file-upload"
 import { Card, CardContent } from "@/components/ui/card"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 const formSchema = z.object({
   date: z.date({
     required_error: "请选择日期",
@@ -50,6 +53,9 @@ export function SalesEntryForm() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [createdSaleId, setCreatedSaleId] = useState<number | null>(null)
+
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('sales')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,22 +89,20 @@ export function SalesEntryForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true)
     try {
-      const result = await createGallerySale(values)
+      const result = await enhancedOps.create('销售记录').form(
+        async () => {
+          return await createGallerySale(values)
+        },
+        null,
+        values,
+        { canUndo: true }
+      )
+
       setCreatedSaleId(result.id)
-
-      toast({
-        title: "销售数据提交成功",
-        description: "销售记录已保存到数据库",
-      })
-
       // 不重置表单，让用户可以上传图片
     } catch (error) {
       console.error("Error submitting sales data:", error)
-      toast({
-        title: "提交失败",
-        description: "保存销售记录时出错",
-        variant: "destructive",
-      })
+      // 错误已由增强操作系统处理
     } finally {
       setSubmitting(false)
     }

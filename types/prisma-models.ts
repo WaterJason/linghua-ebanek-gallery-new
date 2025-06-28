@@ -6,7 +6,7 @@
  */
 
 /**
- * 用户模型接口
+ * 用户模型接口 - 与Prisma模型完全匹配
  */
 export interface PrismaUser {
   id: string;
@@ -18,13 +18,16 @@ export interface PrismaUser {
   role: string;
   createdAt: Date;
   updatedAt: Date;
-  employeeId: number | null;
-  roles: number[];
   bio: string | null;
-  phone: string | null;
+  employeeId: number | null;
   lastLogin: Date | null;
+  phone: string | null;
   resetToken: string | null;
   resetTokenExpiry: Date | null;
+  roles: number[];
+  passwordLastChanged: Date | null;
+  failedLoginAttempts: number;
+  lockedUntil: Date | null;
 }
 
 /**
@@ -1398,21 +1401,6 @@ export interface UpdateRoleInput {
 }
 
 /**
- * 用户模型接口
- */
-export interface PrismaUser {
-  id: string;
-  name: string;
-  email: string;
-  password?: string;
-  role: string;
-  createdAt: Date;
-  updatedAt: Date;
-  employee?: any;
-  userRoles?: any[];
-}
-
-/**
  * 用户创建参数接口
  */
 export interface UserCreateParams {
@@ -1421,6 +1409,9 @@ export interface UserCreateParams {
   password: string;
   role?: string;
   roleIds?: number[];
+  employeeId?: number | null;
+  bio?: string | null;
+  phone?: string | null;
 }
 
 /**
@@ -1432,6 +1423,9 @@ export interface UserUpdateParams {
   password?: string;
   role?: string;
   roleIds?: number[];
+  employeeId?: number | null;
+  bio?: string | null;
+  phone?: string | null;
 }
 
 /**
@@ -1447,6 +1441,8 @@ export interface UserRolesUpdateParams {
 export interface UserProfileUpdateParams {
   name?: string;
   email?: string;
+  bio?: string | null;
+  phone?: string | null;
 }
 
 /**
@@ -1767,4 +1763,146 @@ export interface InventoryTransferInput {
   fromLocationId: number;
   toLocationId?: number | null;
   notes?: string | null;
+}
+
+/**
+ * 作品模型接口
+ */
+export interface PrismaArtwork {
+  id: number;
+  name: string;
+  price: number;
+  commissionRate: number;
+  type: string;
+  createdAt: Date;
+  updatedAt: Date;
+  description: string | null;
+  imageUrl: string | null;
+  imageUrls: string[];
+  barcode: string | null;
+  category: string | null;
+  categoryId: number | null;
+  cost: number | null;
+  sku: string | null;
+  details: string | null;
+  dimensions: string | null;
+  material: string | null;
+  unit: string | null;
+  inventory: number | null;
+}
+
+/**
+ * 作品分类模型接口
+ */
+export interface PrismaArtworkCategory {
+  id: number;
+  name: string;
+  code: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  parentId: number | null;
+  level: number;
+  path: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * 作品标签模型接口
+ */
+export interface PrismaArtworkTag {
+  id: number;
+  name: string;
+  color: string | null;
+  description: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * 创建作品的输入类型
+ * 用于 createArtwork 函数
+ */
+export interface CreateArtworkInput {
+  name: string;
+  description?: string | null;
+  sku?: string | null;
+  barcode?: string | null;
+  price: number;
+  commissionRate: number;
+  cost?: number | null;
+  categoryId?: number | null;
+  unit?: string | null;
+  imageUrl?: string | null;
+  imageUrls?: string[];
+  dimensions?: string | null;
+  material?: string | null;
+  inventory?: number | null;
+  details?: string | null;
+  type?: string;
+  isActive?: boolean;
+}
+
+/**
+ * 更新作品的输入类型
+ * 用于 updateArtwork 函数
+ */
+export interface UpdateArtworkInput {
+  name?: string;
+  description?: string | null;
+  sku?: string | null;
+  barcode?: string | null;
+  price?: number;
+  commissionRate?: number;
+  cost?: number | null;
+  categoryId?: number | null;
+  unit?: string | null;
+  imageUrl?: string | null;
+  imageUrls?: string[];
+  dimensions?: string | null;
+  material?: string | null;
+  inventory?: number | null;
+  details?: string | null;
+  type?: string;
+  isActive?: boolean;
+}
+
+/**
+ * 创建作品分类的输入类型
+ * 用于 createArtworkCategory 函数
+ */
+export interface CreateArtworkCategoryInput {
+  name: string;
+  code?: string | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  isActive?: boolean;
+  sortOrder?: number;
+  parentId?: number | null;
+}
+
+/**
+ * 更新作品分类的输入类型
+ * 用于 updateArtworkCategory 函数
+ */
+export interface UpdateArtworkCategoryInput {
+  name?: string;
+  code?: string | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  isActive?: boolean;
+  sortOrder?: number;
+  parentId?: number | null;
+}
+
+/**
+ * 批量更新作品的输入类型
+ * 用于 batchUpdateArtworks 函数
+ */
+export interface BatchUpdateArtworksInput {
+  artworkIds: number[];
+  updates: Partial<UpdateArtworkInput>;
 }

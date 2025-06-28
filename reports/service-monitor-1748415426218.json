@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-05-28T06:57:06.218Z",
+  "overallStatus": "healthy",
+  "services": [
+    {
+      "service": "postgres-docker",
+      "status": "healthy",
+      "output": "Up 22 minutes\n"
+    },
+    {
+      "service": "nextjs-app",
+      "status": "healthy",
+      "output": "node      76997 macmini   20u  IPv6 0x239a34f28b627f24      0t0  TCP *:hbci (LISTEN)\n"
+    }
+  ],
+  "recommendations": []
+}

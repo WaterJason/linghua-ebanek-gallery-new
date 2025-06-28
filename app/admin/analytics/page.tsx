@@ -4,44 +4,44 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DatePicker } from "@/components/ui/date-picker"
-import { 
-  BarChart, 
-  Bar, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart,
   Line
 } from "recharts"
-import { 
-  BarChart3Icon, 
-  PieChartIcon, 
-  LineChartIcon, 
-  UsersIcon, 
+import {
+  BarChart3Icon,
+  PieChartIcon,
+  LineChartIcon,
+  UsersIcon,
   MousePointerClickIcon,
   SearchIcon,
   PackageIcon,
@@ -54,7 +54,7 @@ import { usePageViewLogger } from "@/lib/user-activity-logger"
 
 export default function UserAnalyticsPage() {
   usePageViewLogger("user_analytics")
-  
+
   const [activeTab, setActiveTab] = useState("overview")
   const [logs, setLogs] = useState<ActivityData[]>([])
   const [filteredLogs, setFilteredLogs] = useState<ActivityData[]>([])
@@ -65,7 +65,7 @@ export default function UserAnalyticsPage() {
     endDate: null as Date | null,
     searchQuery: ""
   })
-  
+
   // 加载日志数据
   useEffect(() => {
     const loadLogs = () => {
@@ -73,40 +73,40 @@ export default function UserAnalyticsPage() {
       setLogs(allLogs)
       setFilteredLogs(allLogs)
     }
-    
+
     loadLogs()
-    
+
     // 每分钟刷新一次数据
     const intervalId = setInterval(loadLogs, 60000)
-    
+
     return () => clearInterval(intervalId)
   }, [])
-  
+
   // 应用过滤器
   useEffect(() => {
     let result = [...logs]
-    
+
     if (filter.type) {
       result = result.filter(log => log.type === filter.type)
     }
-    
+
     if (filter.userId) {
       result = result.filter(log => log.userId === filter.userId)
     }
-    
+
     if (filter.startDate) {
       result = result.filter(log => new Date(log.timestamp) >= filter.startDate!)
     }
-    
+
     if (filter.endDate) {
       const endDate = new Date(filter.endDate)
       endDate.setHours(23, 59, 59, 999)
       result = result.filter(log => new Date(log.timestamp) <= endDate)
     }
-    
+
     if (filter.searchQuery) {
       const query = filter.searchQuery.toLowerCase()
-      result = result.filter(log => 
+      result = result.filter(log =>
         (log.userId && log.userId.toLowerCase().includes(query)) ||
         (log.userName && log.userName.toLowerCase().includes(query)) ||
         (log.userEmail && log.userEmail.toLowerCase().includes(query)) ||
@@ -114,10 +114,10 @@ export default function UserAnalyticsPage() {
         (log.details && JSON.stringify(log.details).toLowerCase().includes(query))
       )
     }
-    
+
     setFilteredLogs(result)
   }, [logs, filter])
-  
+
   // 处理导出JSON
   const handleExportJson = () => {
     const jsonData = exportLogsAsJson()
@@ -131,7 +131,7 @@ export default function UserAnalyticsPage() {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
-  
+
   // 处理导出CSV
   const handleExportCsv = () => {
     const csvData = exportLogsAsCsv()
@@ -145,17 +145,17 @@ export default function UserAnalyticsPage() {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
-  
+
   // 计算活动类型统计
   const activityTypeStats = logs.reduce((acc, log) => {
     acc[log.type] = (acc[log.type] || 0) + 1
     return acc
   }, {} as Record<string, number>)
-  
+
   const activityTypeData = Object.entries(activityTypeStats)
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
-  
+
   // 计算用户活动统计
   const userActivityStats = logs.reduce((acc, log) => {
     if (log.userId) {
@@ -164,24 +164,24 @@ export default function UserAnalyticsPage() {
     }
     return acc
   }, {} as Record<string, number>)
-  
+
   const userActivityData = Object.entries(userActivityStats)
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 10) // 只显示前10个用户
-  
+
   // 计算每日活动统计
   const dailyActivityStats = logs.reduce((acc, log) => {
     const date = new Date(log.timestamp).toISOString().split("T")[0]
     acc[date] = (acc[date] || 0) + 1
     return acc
   }, {} as Record<string, number>)
-  
+
   const dailyActivityData = Object.entries(dailyActivityStats)
     .map(([date, count]) => ({ date, count }))
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(-30) // 只显示最近30天
-  
+
   // 计算页面浏览统计
   const pageViewStats = logs
     .filter(log => log.type === "page_view")
@@ -189,27 +189,27 @@ export default function UserAnalyticsPage() {
       acc[log.path] = (acc[log.path] || 0) + 1
       return acc
     }, {} as Record<string, number>)
-  
+
   const pageViewData = Object.entries(pageViewStats)
     .map(([path, count]) => ({ path, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 10) // 只显示前10个页面
-  
+
   // 饼图颜色
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#8DD1E1', '#A4DE6C', '#D0ED57']
-  
+
   // 格式化时间戳
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp)
     return date.toLocaleString()
   }
-  
+
   // 获取唯一用户列表
   const uniqueUsers = Array.from(new Set(logs.filter(log => log.userId).map(log => log.userId)))
-  
+
   // 获取活动类型列表
   const activityTypes = Array.from(new Set(logs.map(log => log.type)))
-  
+
   return (
     <div className="container py-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -230,7 +230,7 @@ export default function UserAnalyticsPage() {
           </Button>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -240,7 +240,7 @@ export default function UserAnalyticsPage() {
             <div className="text-2xl font-bold">{logs.length}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">唯一用户数</CardTitle>
@@ -249,7 +249,7 @@ export default function UserAnalyticsPage() {
             <div className="text-2xl font-bold">{uniqueUsers.length}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">页面浏览数</CardTitle>
@@ -260,7 +260,7 @@ export default function UserAnalyticsPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">搜索次数</CardTitle>
@@ -272,7 +272,7 @@ export default function UserAnalyticsPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="overview" className="flex items-center gap-1">
@@ -296,7 +296,7 @@ export default function UserAnalyticsPage() {
             <span className="hidden sm:inline">日志详情</span>
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -328,7 +328,7 @@ export default function UserAnalyticsPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>每日活动趋势</CardTitle>
@@ -353,7 +353,7 @@ export default function UserAnalyticsPage() {
             </Card>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="users">
           <Card>
             <CardHeader>
@@ -379,7 +379,7 @@ export default function UserAnalyticsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="pages">
           <Card>
             <CardHeader>
@@ -405,7 +405,7 @@ export default function UserAnalyticsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="products">
           <Card>
             <CardHeader>
@@ -424,21 +424,20 @@ export default function UserAnalyticsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {logs
+                      {Object.values(logs
                         .filter(log => log.type === "product_view" && log.details?.productId)
                         .reduce((acc, log) => {
                           const productId = log.details!.productId
                           const productName = log.details!.productName || `产品 ${productId}`
-                          
+
                           if (!acc[productId]) {
                             acc[productId] = { productId, productName, count: 0 }
                           }
-                          
+
                           acc[productId].count++
                           return acc
-                        }, {} as Record<string, { productId: string, productName: string, count: number }>)
-                        .values()
-                        .toSorted((a, b) => b.count - a.count)
+                        }, {} as Record<string, { productId: string, productName: string, count: number }>))
+                        .sort((a, b) => b.count - a.count)
                         .slice(0, 10)
                         .map(item => (
                           <TableRow key={item.productId}>
@@ -451,7 +450,7 @@ export default function UserAnalyticsPage() {
                     </TableBody>
                   </Table>
                 </div>
-                
+
                 <div>
                   <h3 className="text-lg font-medium mb-2">产品操作统计</h3>
                   <div className="h-[300px]">
@@ -486,7 +485,7 @@ export default function UserAnalyticsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="logs">
           <Card>
             <CardHeader>
@@ -512,7 +511,7 @@ export default function UserAnalyticsPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div>
                     <Label>用户</Label>
                     <Select
@@ -530,7 +529,7 @@ export default function UserAnalyticsPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div>
                     <Label>开始日期</Label>
                     <DatePicker
@@ -538,7 +537,7 @@ export default function UserAnalyticsPage() {
                       setDate={(date) => setFilter(prev => ({ ...prev, startDate: date }))}
                     />
                   </div>
-                  
+
                   <div>
                     <Label>结束日期</Label>
                     <DatePicker
@@ -547,7 +546,7 @@ export default function UserAnalyticsPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div>
                   <Label>搜索</Label>
                   <div className="relative">
@@ -560,7 +559,7 @@ export default function UserAnalyticsPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -604,7 +603,7 @@ export default function UserAnalyticsPage() {
                     </TableBody>
                   </Table>
                 </div>
-                
+
                 {filteredLogs.length > 100 && (
                   <div className="text-center text-sm text-muted-foreground">
                     显示前 100 条记录，共 {filteredLogs.length} 条
@@ -613,9 +612,9 @@ export default function UserAnalyticsPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setFilter({
                   type: "",
                   userId: "",

@@ -33,12 +33,15 @@ import {
 } from "@/components/ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { 
-  getFinancialAccounts, 
-  getFinancialCategories, 
-  createFinancialTransaction, 
-  updateFinancialTransaction 
+import {
+  getFinancialAccounts,
+  getFinancialCategories,
+  createFinancialTransaction,
+  updateFinancialTransaction
 } from "@/lib/actions/finance-actions"
+
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
 
 // 表单验证模式
 const transactionFormSchema = z.object({
@@ -67,6 +70,9 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
   const [categories, setCategories] = useState([])
   const [selectedType, setSelectedType] = useState(transaction?.type || "expense")
 
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('finance')
+
   // 加载账户和分类数据
   useEffect(() => {
     const loadData = async () => {
@@ -74,7 +80,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
         // 加载账户
         const accountsData = await getFinancialAccounts()
         setAccounts(accountsData)
-        
+
         // 加载分类
         const categoriesData = await getFinancialCategories("all")
         setCategories(categoriesData)
@@ -87,7 +93,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
         })
       }
     }
-    
+
     loadData()
   }, [toast])
 
@@ -121,34 +127,46 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
   const onSubmit = async (values: z.infer<typeof transactionFormSchema>) => {
     setIsSubmitting(true)
     try {
+      const beforeData = isEditing && transaction ? {
+        type: transaction.type,
+        amount: transaction.amount,
+        transactionDate: transaction.transactionDate,
+        accountId: transaction.accountId,
+        categoryId: transaction.categoryId,
+        counterparty: transaction.counterparty,
+        notes: transaction.notes,
+      } : null
+
       let result
-      
+
       if (isEditing && transaction) {
         // 更新交易
-        result = await updateFinancialTransaction(transaction.id, values)
-        toast({
-          title: "更新成功",
-          description: "交易记录已更新",
-        })
+        result = await enhancedOps.update('财务交易').form(
+          async () => {
+            return await updateFinancialTransaction(transaction.id, values)
+          },
+          beforeData,
+          values,
+          { canUndo: true }
+        )
       } else {
         // 创建交易
-        result = await createFinancialTransaction(values)
-        toast({
-          title: "创建成功",
-          description: "交易记录已创建",
-        })
+        result = await enhancedOps.create('财务交易').form(
+          async () => {
+            return await createFinancialTransaction(values)
+          },
+          null,
+          values,
+          { canUndo: true }
+        )
       }
-      
+
       if (onSuccess) {
         onSuccess(result)
       }
     } catch (error) {
       console.error("保存交易记录失败:", error)
-      toast({
-        variant: "destructive",
-        title: "保存失败",
-        description: error.message || "无法保存交易记录",
-      })
+      // 错误已由增强操作系统处理
     } finally {
       setIsSubmitting(false)
     }
@@ -187,7 +205,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="amount"
@@ -204,7 +222,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="transactionDate"
@@ -249,7 +267,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="accountId"
@@ -277,7 +295,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="categoryId"
@@ -306,7 +324,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="counterparty"
@@ -323,7 +341,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="notes"
@@ -340,7 +358,7 @@ export function TransactionForm({ transaction, isEditing = false, onSuccess, onC
             </FormItem>
           )}
         />
-        
+
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             取消

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-
+import { getServerSession } from "@/lib/auth-helpers"
 // 限流配置类型
 interface RateLimitConfig {
   limit: number // 时间窗口内允许的请求数
@@ -66,7 +64,7 @@ export async function withApiRateLimit(
   }
   
   // 获取会话
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession()
   
   // 生成键
   const key = rateLimitConfig.keyGenerator(request, session)

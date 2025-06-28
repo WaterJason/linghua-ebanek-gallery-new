@@ -43,3 +43,15 @@ export {
 
 // 导出类型定义
 export * from "./actions/types";
+
+// 创建日志的简化函数，直接调用 createSystemLog
+import { createSystemLog } from "./actions/system-actions";
+export const createLog = async (data: {
+  module: string;
+  level: "info" | "warn" | "error";
+  message: string;
+  details?: any;
+  userId?: string;
+}) => {
+  return createSystemLog(data);
+};

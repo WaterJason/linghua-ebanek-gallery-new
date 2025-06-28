@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   Dialog,
   DialogContent,
@@ -15,15 +15,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { PlusIcon, PencilIcon, TrashIcon, ImageIcon } from "lucide-react"
-import { getProducts, createProduct, updateProduct, deleteProduct } from "@/lib/actions/product-actions";
-import { toast } from "@/components/ui/use-toast"
+import { getProducts, createProduct, updateProduct, deleteProduct } from "@/lib/actions/product-actions"
+import { useToast } from "@/components/ui/use-toast"
 import { FileUpload } from "@/components/file-upload"
 import { ExportImportButtons } from "@/components/export-import-buttons"
 
+interface Product {
+  id: number
+  name: string
+  price: number
+  commissionRate?: number
+  imageUrl?: string | null
+  description?: string | null
+}
+
 export function ProductSettings() {
-  const [products, setProducts] = useState([])
+  const { toast } = useToast()
+  const [products, setProducts] = useState<Product[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingProduct, setEditingProduct] = useState(null)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
 
@@ -32,34 +42,54 @@ export function ProductSettings() {
     async function fetchProducts() {
       try {
         const data = await getProducts()
-        setProducts(data)
+        // 转换数据格式以匹配本地Product接口
+        const formattedProducts = data.map(product => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          commissionRate: 10, // 默认佣金率，因为产品模块不包含此字段
+          imageUrl: product.imageUrl,
+          description: product.description
+        }))
+        setProducts(formattedProducts)
       } catch (error) {
         console.error("Error fetching products:", error)
+        toast({
+          title: "加载失败",
+          description: "获取产品数据时出错",
+        })
       } finally {
         setLoading(false)
       }
     }
 
     fetchProducts()
-  }, [])
+  }, [toast])
 
   const handleAddProduct = () => {
-    setEditingProduct({ id: 0, name: "", price: 0, commissionRate: 10, imageUrl: "", description: "" })
+    setEditingProduct({
+      id: 0,
+      name: "",
+      price: 0,
+      commissionRate: 10,
+      imageUrl: "",
+      description: ""
+    })
     setIsDialogOpen(true)
   }
 
-  const handleEditProduct = (product) => {
+  const handleEditProduct = (product: Product) => {
     setEditingProduct({ ...product })
     setIsDialogOpen(true)
   }
 
-  const handleImageUpload = (url) => {
+  const handleImageUpload = (url: string) => {
     if (editingProduct) {
       setEditingProduct({ ...editingProduct, imageUrl: url })
     }
   }
 
-  const handleDeleteProduct = async (id) => {
+  const handleDeleteProduct = async (id: number) => {
     if (confirm("确定要删除这个产品吗？")) {
       try {
         await deleteProduct(id)
@@ -73,27 +103,54 @@ export function ProductSettings() {
         toast({
           title: "删除失败",
           description: "删除产品时出错",
-          variant: "destructive",
         })
       }
     }
   }
 
   const handleSaveProduct = async () => {
+    if (!editingProduct) return
+
     setSubmitting(true)
     try {
       if (editingProduct.id === 0) {
         // 添加新产品
-        const newProduct = await createProduct(editingProduct)
-        setProducts([...products, newProduct])
+        const newProduct = await createProduct({
+          name: editingProduct.name,
+          price: editingProduct.price,
+          imageUrl: editingProduct.imageUrl,
+          description: editingProduct.description
+        })
+        setProducts([...products, {
+          id: newProduct.id,
+          name: newProduct.name,
+          price: newProduct.price,
+          commissionRate: 10,
+          imageUrl: newProduct.imageUrl,
+          description: newProduct.description
+        }])
         toast({
           title: "添加成功",
           description: "新产品已成功添加",
         })
       } else {
         // 更新现有产品
-        const updatedProduct = await updateProduct(editingProduct.id, editingProduct)
-        setProducts(products.map((product) => (product.id === editingProduct.id ? updatedProduct : product)))
+        const updatedProduct = await updateProduct(editingProduct.id, {
+          name: editingProduct.name,
+          price: editingProduct.price,
+          imageUrl: editingProduct.imageUrl,
+          description: editingProduct.description
+        })
+        setProducts(products.map((product) =>
+          product.id === editingProduct.id ? {
+            id: updatedProduct.id,
+            name: updatedProduct.name,
+            price: updatedProduct.price,
+            commissionRate: editingProduct.commissionRate || 10,
+            imageUrl: updatedProduct.imageUrl,
+            description: updatedProduct.description
+          } : product
+        ))
         toast({
           title: "更新成功",
           description: "产品信息已成功更新",
@@ -105,7 +162,6 @@ export function ProductSettings() {
       toast({
         title: "保存失败",
         description: "保存产品信息时出错",
-        variant: "destructive",
       })
     } finally {
       setSubmitting(false)
@@ -203,7 +259,7 @@ export function ProductSettings() {
               <Input
                 id="name"
                 value={editingProduct?.name || ""}
-                onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                onChange={(e) => editingProduct && setEditingProduct({ ...editingProduct, name: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -216,21 +272,7 @@ export function ProductSettings() {
                 type="number"
                 value={editingProduct?.price || 0}
                 onChange={(e) =>
-                  setEditingProduct({ ...editingProduct, price: Number.parseFloat(e.target.value) || 0 })
-                }
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="commissionRate" className="text-right">
-                提成比例 (%)
-              </Label>
-              <Input
-                id="commissionRate"
-                type="number"
-                value={editingProduct?.commissionRate || 10}
-                onChange={(e) =>
-                  setEditingProduct({ ...editingProduct, commissionRate: Number.parseFloat(e.target.value) || 10 })
+                  editingProduct && setEditingProduct({ ...editingProduct, price: Number.parseFloat(e.target.value) || 0 })
                 }
                 className="col-span-3"
               />
@@ -242,7 +284,7 @@ export function ProductSettings() {
               <Textarea
                 id="description"
                 value={editingProduct?.description || ""}
-                onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                onChange={(e) => editingProduct && setEditingProduct({ ...editingProduct, description: e.target.value })}
                 className="col-span-3"
                 rows={3}
               />
@@ -267,7 +309,7 @@ export function ProductSettings() {
                         variant="destructive"
                         size="icon"
                         className="absolute top-1 right-1 h-6 w-6 rounded-full"
-                        onClick={() => setEditingProduct({ ...editingProduct, imageUrl: "" })}
+                        onClick={() => editingProduct && setEditingProduct({ ...editingProduct, imageUrl: "" })}
                       >
                         <TrashIcon className="h-3 w-3" />
                       </Button>

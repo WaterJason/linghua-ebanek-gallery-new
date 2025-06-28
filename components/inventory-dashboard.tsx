@@ -24,7 +24,7 @@ import {
   PieChartIcon,
   ListIcon
 } from "lucide-react"
-import { getInventory, getWarehouses } from "@/lib/actions/inventory-actions";
+import { getInventory, getWarehouses } from "@/lib/api/inventory-api";
 
 export function InventoryDashboard() {
   const [isLoading, setIsLoading] = useState(true)

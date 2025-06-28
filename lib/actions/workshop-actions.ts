@@ -972,6 +972,84 @@ export async function deletePieceWorkItem(id: number) {
 }
 
 /**
+ * 创建计件工作记录
+ *
+ * 创建员工计件工作记录，包括工作类型、数量、单价等信息。
+ *
+ * @param data - 计件工作数据
+ * @returns 创建的计件工作记录
+ *
+ * @example
+ * ```typescript
+ * // 创建计件工作记录
+ * const pieceWork = await createPieceWork({
+ *   employeeId: 1,
+ *   date: new Date(),
+ *   itemId: 2,
+ *   quantity: 5,
+ *   notes: "完成得很好"
+ * });
+ * ```
+ *
+ * @throws 如果创建计件工作记录失败，会抛出错误
+ *
+ * @category 创建
+ */
+export async function createPieceWork(data: any) {
+  try {
+    // 验证必填字段
+    if (!data.employeeId) throw new Error("员工ID为必填项");
+    if (!data.date) throw new Error("日期为必填项");
+    if (!data.itemId) throw new Error("工项ID为必填项");
+    if (!data.quantity || Number(data.quantity) <= 0) throw new Error("数量必须大于0");
+
+    // 获取员工信息
+    const employee = await prisma.employee.findUnique({
+      where: { id: Number(data.employeeId) },
+    });
+
+    if (!employee) {
+      throw new Error("员工不存在");
+    }
+
+    // 获取工项信息
+    const pieceWorkItem = await prisma.pieceWorkItem.findUnique({
+      where: { id: Number(data.itemId) },
+    });
+
+    if (!pieceWorkItem) {
+      throw new Error("工项不存在");
+    }
+
+    // 计算总金额
+    const amount = pieceWorkItem.price * Number(data.quantity);
+
+    // 创建计件工作记录
+    const pieceWork = await prisma.pieceWork.create({
+      data: {
+        employeeId: Number(data.employeeId),
+        date: data.date instanceof Date ? data.date : new Date(data.date),
+        itemId: Number(data.itemId),
+        quantity: Number(data.quantity),
+        unitPrice: pieceWorkItem.price,
+        amount,
+        notes: data.notes || null,
+      },
+    });
+
+    // 重新验证路径
+    revalidatePath("/daily-log");
+    revalidatePath("/employees");
+    revalidatePath(`/employees/${data.employeeId}`);
+
+    return pieceWork;
+  } catch (error) {
+    console.error("Error creating piece work:", error);
+    throw new Error(error instanceof Error ? error.message : "创建计件工作记录失败");
+  }
+}
+
+/**
  * 创建手作团建记录
  *
  * 此函数是为了兼容旧版的数据录入表单，将其提交的数据转换为新的团建订单格式。
@@ -1071,5 +1149,160 @@ export async function createWorkshop(data: any) {
   } catch (error) {
     console.error("Error creating workshop:", error);
     throw new Error(error instanceof Error ? error.message : "创建手作团建记录失败");
+  }
+}
+
+/**
+ * 获取团建活动报告
+ * @param startDate 开始日期
+ * @param endDate 结束日期
+ * @returns 团建活动报告数据
+ */
+export async function getWorkshopReport(startDate?: string, endDate?: string) {
+  try {
+    // 构建日期过滤条件
+    let dateFilter: any = {}
+    if (startDate && endDate) {
+      dateFilter = {
+        date: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        }
+      }
+    } else if (startDate) {
+      dateFilter = {
+        date: {
+          gte: new Date(startDate),
+        }
+      }
+    } else if (endDate) {
+      dateFilter = {
+        date: {
+          lte: new Date(endDate),
+        }
+      }
+    }
+
+    // 获取团建订单数据
+    const workshopOrders = await prisma.workshopOrder.findMany({
+      where: dateFilter,
+      include: {
+        customer: true,
+        teacher: true,
+        assistant: true,
+        manager: true,
+        serviceItems: {
+          include: {
+            product: true,
+          }
+        }
+      },
+      orderBy: {
+        date: 'desc'
+      }
+    })
+
+    // 计算统计数据
+    const totalOrders = workshopOrders.length
+    const totalParticipants = workshopOrders.reduce((sum, order) => sum + order.participants, 0)
+    const totalRevenue = workshopOrders.reduce((sum, order) => sum + order.totalAmount, 0)
+    const totalDuration = workshopOrders.reduce((sum, order) => sum + order.duration, 0)
+
+    // 按活动类型分组
+    const byActivityType = workshopOrders.reduce((acc, order) => {
+      const type = order.activityType
+      if (!acc[type]) {
+        acc[type] = {
+          count: 0,
+          participants: 0,
+          revenue: 0,
+          duration: 0
+        }
+      }
+      acc[type].count++
+      acc[type].participants += order.participants
+      acc[type].revenue += order.totalAmount
+      acc[type].duration += order.duration
+      return acc
+    }, {} as Record<string, any>)
+
+    // 按地点类型分组
+    const byLocationType = workshopOrders.reduce((acc, order) => {
+      const type = order.locationType
+      if (!acc[type]) {
+        acc[type] = {
+          count: 0,
+          participants: 0,
+          revenue: 0
+        }
+      }
+      acc[type].count++
+      acc[type].participants += order.participants
+      acc[type].revenue += order.totalAmount
+      return acc
+    }, {} as Record<string, any>)
+
+    // 按状态分组
+    const byStatus = workshopOrders.reduce((acc, order) => {
+      const status = order.status
+      if (!acc[status]) {
+        acc[status] = {
+          count: 0,
+          participants: 0,
+          revenue: 0
+        }
+      }
+      acc[status].count++
+      acc[status].participants += order.participants
+      acc[status].revenue += order.totalAmount
+      return acc
+    }, {} as Record<string, any>)
+
+    return {
+      summary: {
+        totalOrders,
+        totalParticipants,
+        totalRevenue,
+        totalDuration,
+        averageParticipants: totalOrders > 0 ? Math.round(totalParticipants / totalOrders) : 0,
+        averageRevenue: totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0,
+        averageDuration: totalOrders > 0 ? Math.round(totalDuration / totalOrders * 10) / 10 : 0
+      },
+      byActivityType,
+      byLocationType,
+      byStatus,
+      orders: workshopOrders.map(order => ({
+        id: order.id,
+        date: order.date,
+        activityType: order.activityType,
+        locationType: order.locationType,
+        location: order.location,
+        participants: order.participants,
+        duration: order.duration,
+        totalAmount: order.totalAmount,
+        status: order.status,
+        customer: order.customer?.name || 'Unknown',
+        teacher: order.teacher?.name || null,
+        assistant: order.assistant?.name || null,
+        manager: order.manager?.name || null,
+      }))
+    }
+  } catch (error) {
+    console.error("Error getting workshop report:", error)
+    return {
+      summary: {
+        totalOrders: 0,
+        totalParticipants: 0,
+        totalRevenue: 0,
+        totalDuration: 0,
+        averageParticipants: 0,
+        averageRevenue: 0,
+        averageDuration: 0
+      },
+      byActivityType: {},
+      byLocationType: {},
+      byStatus: {},
+      orders: []
+    }
   }
 }

@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from "react"
 import { ImageIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface LazyImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+  src?: string | null
   fallbackIcon?: React.ReactNode
   loadingPlaceholder?: React.ReactNode
   containerClassName?: string
@@ -23,6 +24,9 @@ export function LazyImage({
   const [isError, setIsError] = useState(false)
   const [isInView, setIsInView] = useState(false)
   const imgRef = useRef<HTMLImageElement>(null)
+
+  // Check if src is valid (not null, undefined, or empty string)
+  const hasValidSrc = src && src.trim() !== ""
 
   // 使用 IntersectionObserver 检测图片是否在视口中
   useEffect(() => {
@@ -66,7 +70,12 @@ export function LazyImage({
         containerClassName
       )}
     >
-      {isInView && !isError ? (
+      {!hasValidSrc ? (
+        // Show fallback icon immediately if no valid src
+        <div className="flex items-center justify-center w-full h-full">
+          {fallbackIcon}
+        </div>
+      ) : isInView && !isError ? (
         <>
           {!isLoaded && loadingPlaceholder}
           <img

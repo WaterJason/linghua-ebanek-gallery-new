@@ -1,0 +1,112 @@
+{
+  "timestamp": "2025-05-28T06:56:31.734Z",
+  "version": "2.0",
+  "reportType": "ERP系统改进诊断报告",
+  "overall": "healthy",
+  "summary": {
+    "healthyCount": 7,
+    "warningCount": 0,
+    "errorCount": 0,
+    "totalChecks": 7
+  },
+  "components": [
+    {
+      "id": "docker-container",
+      "name": "Docker PostgreSQL容器",
+      "status": "healthy",
+      "priority": "P0",
+      "details": {
+        "status": "Up 21 minutes",
+        "ports": "5432/tcp -> 0.0.0.0:5432",
+        "message": "PostgreSQL容器运行正常"
+      },
+      "suggestions": []
+    },
+    {
+      "id": "nextjs-app",
+      "name": "Next.js应用服务",
+      "status": "healthy",
+      "priority": "P0",
+      "details": {
+        "processRunning": true,
+        "portListening": true,
+        "message": "Next.js应用服务运行正常"
+      },
+      "suggestions": []
+    },
+    {
+      "id": "health-api",
+      "name": "健康检查API",
+      "status": "healthy",
+      "priority": "P0",
+      "details": {
+        "httpCode": 200,
+        "responseTime": 150,
+        "message": "API响应正常 (150ms)"
+      },
+      "suggestions": []
+    },
+    {
+      "id": "system-info-api",
+      "name": "系统信息API",
+      "status": "healthy",
+      "priority": "P0",
+      "details": {
+        "httpCode": 200,
+        "responseTime": 55,
+        "message": "API响应正常 (55ms)"
+      },
+      "suggestions": []
+    },
+    {
+      "id": "auth-api",
+      "name": "认证API",
+      "status": "healthy",
+      "priority": "P0",
+      "details": {
+        "httpCode": 401,
+        "responseTime": 25,
+        "message": "API响应正常 (25ms)"
+      },
+      "suggestions": []
+    },
+    {
+      "id": "database-connection",
+      "name": "数据库连接",
+      "status": "healthy",
+      "priority": "P0",
+      "details": {
+        "connectionTime": 49,
+        "dataCounts": {
+          "users": 1,
+          "employees": 2,
+          "customers": 2
+        },
+        "message": "数据库连接正常 (49ms)"
+      },
+      "suggestions": []
+    },
+    {
+      "id": "business-functions",
+      "name": "关键业务功能",
+      "status": "healthy",
+      "priority": "P1",
+      "details": {
+        "scheduleQuery": 1,
+        "customerQuery": 2,
+        "message": "关键业务功能正常"
+      },
+      "suggestions": []
+    }
+  ],
+  "recommendations": [
+    "系统运行状态良好，所有组件正常",
+    "建议继续定期监控",
+    "保持当前的维护计划"
+  ],
+  "metadata": {
+    "diagnosticDuration": 492,
+    "retryAttempts": 3,
+    "timeoutSeconds": 10
+  }
+}

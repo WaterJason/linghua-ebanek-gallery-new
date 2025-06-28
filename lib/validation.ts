@@ -307,7 +307,7 @@ export function phone(fieldName: string, displayName: string, options: { require
 export function validateCreateProduct(data: any): ValidationResult {
   return validate(data, [
     required('name', '产品名称'),
-    number('price', '产品价格', { min: 0, required: true }),
+    number('price', '产品价格', { min: 0, required: false }), // 价格改为非必填
     number('commissionRate', '佣金率', { min: 0, max: 100 }),
     number('cost', '成本', { min: 0 }),
     integer('categoryId', '分类ID', { min: 1 }),
@@ -315,7 +315,7 @@ export function validateCreateProduct(data: any): ValidationResult {
     string('name', '产品名称', { maxLength: 100, required: true }),
     string('description', '产品描述', { maxLength: 1000 }),
     string('sku', 'SKU', { maxLength: 50 }),
-    string('barcode', '条形码', { maxLength: 50 }),
+    string('barcode', '艺术品序列号', { maxLength: 50 }), // 更新字段名称
     string('unit', '单位', { maxLength: 20 }),
     string('material', '材料', { maxLength: 50 }),
   ]);
@@ -1308,6 +1308,88 @@ export function validateUpdateOrder(data: any): ValidationResult {
       }
     }
   }
+
+  return validate(data, validations);
+}
+
+/**
+ * 验证作品创建数据
+ * @param data 作品创建数据
+ * @returns 验证结果，包含是否有效和错误信息
+ */
+export function validateCreateArtwork(data: any): ValidationResult {
+  return validate(data, [
+    required('name', '作品名称'),
+    number('price', '作品价格', { min: 0, required: true }),
+    number('commissionRate', '佣金率', { min: 0, max: 100 }),
+    number('cost', '成本', { min: 0 }),
+    integer('categoryId', '分类ID', { min: 1 }),
+    integer('inventory', '库存', { min: 0 }),
+    string('name', '作品名称', { maxLength: 100, required: true }),
+    string('description', '作品描述', { maxLength: 1000 }),
+    string('sku', 'SKU', { maxLength: 50 }),
+    string('barcode', '条形码', { maxLength: 50 }),
+    string('unit', '单位', { maxLength: 20 }),
+    string('material', '材料', { maxLength: 50 }),
+  ]);
+}
+
+/**
+ * 验证作品更新数据
+ * @param data 作品更新数据
+ * @returns 验证结果，包含是否有效和错误信息
+ */
+export function validateUpdateArtwork(data: any): ValidationResult {
+  const validations = [];
+
+  // 只验证提供的字段
+  if (data.name !== undefined) validations.push(string('name', '作品名称', { maxLength: 100 }));
+  if (data.price !== undefined) validations.push(number('price', '作品价格', { min: 0 }));
+  if (data.commissionRate !== undefined) validations.push(number('commissionRate', '佣金率', { min: 0, max: 100 }));
+  if (data.cost !== undefined) validations.push(number('cost', '成本', { min: 0 }));
+  if (data.categoryId !== undefined) validations.push(integer('categoryId', '分类ID', { min: 1 }));
+  if (data.inventory !== undefined) validations.push(integer('inventory', '库存', { min: 0 }));
+  if (data.description !== undefined) validations.push(string('description', '作品描述', { maxLength: 1000 }));
+  if (data.sku !== undefined) validations.push(string('sku', 'SKU', { maxLength: 50 }));
+  if (data.barcode !== undefined) validations.push(string('barcode', '条形码', { maxLength: 50 }));
+  if (data.unit !== undefined) validations.push(string('unit', '单位', { maxLength: 20 }));
+  if (data.material !== undefined) validations.push(string('material', '材料', { maxLength: 50 }));
+
+  return validate(data, validations);
+}
+
+/**
+ * 验证作品分类创建数据
+ * @param data 作品分类创建数据
+ * @returns 验证结果，包含是否有效和错误信息
+ */
+export function validateCreateArtworkCategory(data: any): ValidationResult {
+  return validate(data, [
+    required('name', '分类名称'),
+    string('name', '分类名称', { maxLength: 50, required: true }),
+    string('code', '分类代码', { maxLength: 20 }),
+    string('description', '分类描述', { maxLength: 500 }),
+    integer('parentId', '父分类ID', { min: 1 }),
+    integer('sortOrder', '排序', { min: 0 }),
+    boolean('isActive', '是否启用'),
+  ]);
+}
+
+/**
+ * 验证作品分类更新数据
+ * @param data 作品分类更新数据
+ * @returns 验证结果，包含是否有效和错误信息
+ */
+export function validateUpdateArtworkCategory(data: any): ValidationResult {
+  const validations = [];
+
+  // 只验证提供的字段
+  if (data.name !== undefined) validations.push(string('name', '分类名称', { maxLength: 50 }));
+  if (data.code !== undefined) validations.push(string('code', '分类代码', { maxLength: 20 }));
+  if (data.description !== undefined) validations.push(string('description', '分类描述', { maxLength: 500 }));
+  if (data.parentId !== undefined) validations.push(integer('parentId', '父分类ID', { min: 1 }));
+  if (data.sortOrder !== undefined) validations.push(integer('sortOrder', '排序', { min: 0 }));
+  if (data.isActive !== undefined) validations.push(boolean('isActive', '是否启用'));
 
   return validate(data, validations);
 }

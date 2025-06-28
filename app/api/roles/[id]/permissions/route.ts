@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/db"
 import { withPermission } from "@/lib/auth-middleware"
+import { triggerRolePermissionChange } from "@/lib/sync-manager"
 
 /**
  * 获取角色权限
@@ -135,10 +136,19 @@ export async function PUT(
     const updatedPermissions = updatedRolePermissions.map(rp => rp.permission)
     const updatedPermissionIds = updatedRolePermissions.map(rp => rp.permissionId)
 
+    // 触发角色权限变更同步事件
+    await triggerRolePermissionChange(roleId, {
+      roleName: role.name,
+      oldPermissionIds: [], // 这里可以传入旧的权限ID列表
+      newPermissionIds: updatedPermissionIds
+    })
+
     return NextResponse.json({
       success: true,
+      message: "角色权限更新成功，相关缓存已自动刷新",
       permissions: updatedPermissions,
       permissionIds: updatedPermissionIds,
+      timestamp: new Date().toISOString()
     })
   } catch (error) {
     console.error("更新角色权限失败:", error)

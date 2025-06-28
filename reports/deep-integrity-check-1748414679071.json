@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-05-28T06:44:38.946Z",
+  "checks": [
+    {
+      "name": "schema_consistency",
+      "status": "completed",
+      "tablesFound": 85,
+      "keyTablesPresent": 6
+    },
+    {
+      "name": "data_associations",
+      "status": "completed",
+      "usersChecked": 1,
+      "employeesChecked": 2,
+      "customersChecked": 1,
+      "productsChecked": 3
+    },
+    {
+      "name": "business_logic",
+      "status": "completed",
+      "ordersChecked": 1,
+      "schedulesChecked": 1
+    },
+    {
+      "name": "data_consistency",
+      "status": "completed",
+      "duplicatePhones": 0,
+      "duplicateEmails": 0
+    }
+  ],
+  "issues": [],
+  "warnings": [
+    "用户 cmb6der6000016w3ills0rhxb 缺少用户设置",
+    "产品 13 价格异常: 0",
+    "产品 14 价格异常: 0"
+  ],
+  "summary": {
+    "totalChecks": 4,
+    "completedChecks": 4,
+    "totalIssues": 0,
+    "totalWarnings": 3,
+    "overallStatus": "healthy"
+  }
+}

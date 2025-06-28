@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-05-28T06:55:22.455Z",
+  "overallStatus": "healthy",
+  "components": {
+    "dockerContainer": {
+      "status": "healthy",
+      "details": "Up 20 minutes"
+    },
+    "nextjsApp": {
+      "status": "healthy",
+      "details": "Running"
+    },
+    "ports": {
+      "status": "healthy",
+      "details": {
+        "port3000": true,
+        "port5432": true
+      }
+    },
+    "apiEndpoints": {
+      "health": {
+        "status": "healthy",
+        "httpCode": "200",
+        "responseTime": 1832
+      },
+      "system-info": {
+        "status": "healthy",
+        "httpCode": "200",
+        "responseTime": 1695
+      },
+      "auth-check": {
+        "status": "warning",
+        "httpCode": "401",
+        "responseTime": 2665
+      }
+    },
+    "database": {
+      "status": "healthy",
+      "connectionTime": 121,
+      "userCount": 1,
+      "employeeCount": 2
+    },
+    "businessFunctions": {
+      "status": "healthy",
+      "scheduleQuery": 1,
+      "customerQuery": 2
+    },
+    "networkConnection": {
+      "status": "healthy",
+      "responseTime": 1466
+    }
+  },
+  "issues": [],
+  "recommendations": [
+    "系统运行状态良好，所有组件正常",
+    "建议继续定期监控系统状态"
+  ]
+}

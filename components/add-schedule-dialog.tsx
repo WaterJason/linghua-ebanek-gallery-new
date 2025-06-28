@@ -23,6 +23,9 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { createSchedule } from "@/lib/actions/schedule-actions";
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 const formSchema = z.object({
   date: z.date({
     required_error: "请选择日期",
@@ -40,6 +43,9 @@ const formSchema = z.object({
 
 export function AddScheduleDialog({ open, onOpenChange, employees, onScheduleAdded, selectedDate }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('schedule')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,7 +66,15 @@ export function AddScheduleDialog({ open, onOpenChange, employees, onScheduleAdd
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true)
     try {
-      const newSchedule = await createSchedule(values)
+      const newSchedule = await enhancedOps.create('排班记录').form(
+        async () => {
+          return await createSchedule(values)
+        },
+        null,
+        values,
+        { canUndo: true }
+      )
+
       onScheduleAdded(newSchedule)
       form.reset({
         date: new Date(),
@@ -69,6 +83,7 @@ export function AddScheduleDialog({ open, onOpenChange, employees, onScheduleAdd
       })
     } catch (error) {
       console.error("Failed to create schedule:", error)
+      // 错误已由增强操作系统处理
     } finally {
       setIsSubmitting(false)
     }

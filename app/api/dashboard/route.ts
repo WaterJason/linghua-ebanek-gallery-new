@@ -8,16 +8,16 @@ export async function GET(request: Request) {
     // 获取查询参数
     const url = new URL(request.url)
     const timeRange = url.searchParams.get("timeRange") || "month"
-    
+
     // 获取当前日期信息
     const now = new Date()
-    
+
     // 根据时间范围确定日期范围
     let startDate: Date
     let endDate: Date = now
     let previousStartDate: Date
     let previousEndDate: Date
-    
+
     switch (timeRange) {
       case "week":
         startDate = subDays(now, 7)
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
         previousStartDate = startOfMonth(subMonths(now, 1))
         previousEndDate = endOfMonth(subMonths(now, 1))
     }
-    
+
     // 获取珐琅馆销售数据
     const gallerySales = await prisma.gallerySale.findMany({
       where: {
@@ -57,7 +57,7 @@ export async function GET(request: Request) {
         },
       },
     })
-    
+
     const previousGallerySales = await prisma.gallerySale.findMany({
       where: {
         date: {
@@ -66,14 +66,14 @@ export async function GET(request: Request) {
         },
       },
     })
-    
+
     // 计算珐琅馆销售总额
     const gallerySalesTotal = gallerySales.reduce((sum, sale) => sum + sale.totalAmount, 0)
     const previousGallerySalesTotal = previousGallerySales.reduce((sum, sale) => sum + sale.totalAmount, 0)
-    const gallerySalesGrowth = previousGallerySalesTotal > 0 
-      ? ((gallerySalesTotal - previousGallerySalesTotal) / previousGallerySalesTotal) * 100 
+    const gallerySalesGrowth = previousGallerySalesTotal > 0
+      ? ((gallerySalesTotal - previousGallerySalesTotal) / previousGallerySalesTotal) * 100
       : 0
-    
+
     // 获取咖啡店销售数据
     const coffeeSales = await prisma.coffeeShopSale.findMany({
       where: {
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
         items: true,
       },
     })
-    
+
     const previousCoffeeSales = await prisma.coffeeShopSale.findMany({
       where: {
         date: {
@@ -100,14 +100,14 @@ export async function GET(request: Request) {
         },
       },
     })
-    
+
     // 计算咖啡店销售总额
     const coffeeSalesTotal = coffeeSales.reduce((sum, sale) => sum + sale.totalSales, 0)
     const previousCoffeeSalesTotal = previousCoffeeSales.reduce((sum, sale) => sum + sale.totalSales, 0)
-    const coffeeSalesGrowth = previousCoffeeSalesTotal > 0 
-      ? ((coffeeSalesTotal - previousCoffeeSalesTotal) / previousCoffeeSalesTotal) * 100 
+    const coffeeSalesGrowth = previousCoffeeSalesTotal > 0
+      ? ((coffeeSalesTotal - previousCoffeeSalesTotal) / previousCoffeeSalesTotal) * 100
       : 0
-    
+
     // 获取手作体验数据
     const workshops = await prisma.workshop.findMany({
       where: {
@@ -121,7 +121,7 @@ export async function GET(request: Request) {
         assistant: true,
       },
     })
-    
+
     const previousWorkshops = await prisma.workshop.findMany({
       where: {
         date: {
@@ -130,21 +130,21 @@ export async function GET(request: Request) {
         },
       },
     })
-    
+
     // 计算手作体验增长率
     const workshopsCount = workshops.length
     const previousWorkshopsCount = previousWorkshops.length
-    const workshopsGrowth = previousWorkshopsCount > 0 
-      ? ((workshopsCount - previousWorkshopsCount) / previousWorkshopsCount) * 100 
+    const workshopsGrowth = previousWorkshopsCount > 0
+      ? ((workshopsCount - previousWorkshopsCount) / previousWorkshopsCount) * 100
       : 0
-    
+
     // 获取员工数据
     const employees = await prisma.employee.findMany({
       where: {
         status: "active",
       },
     })
-    
+
     // 获取库存数据
     const inventoryItems = await prisma.inventoryItem.findMany({
       include: {
@@ -152,31 +152,31 @@ export async function GET(request: Request) {
         warehouse: true,
       },
     })
-    
+
     // 计算库存总量和低库存商品数量
     const totalInventory = inventoryItems.reduce((sum, item) => sum + item.quantity, 0)
     const lowStockItems = inventoryItems.filter(item => item.quantity < (item.minQuantity || 10))
-    
+
     // 生成销售趋势数据
     const salesTrendData = []
     const days = timeRange === "week" ? 7 : timeRange === "month" ? 30 : 90
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = subDays(now, i)
       const dateString = format(date, "yyyy-MM-dd")
-      
+
       // 查找当天的珐琅馆销售
       const dailyGallerySales = gallerySales.filter(
         sale => format(new Date(sale.date), "yyyy-MM-dd") === dateString
       )
       const dailyGallerySalesTotal = dailyGallerySales.reduce((sum, sale) => sum + sale.totalAmount, 0)
-      
+
       // 查找当天的咖啡店销售
       const dailyCoffeeSales = coffeeSales.filter(
         sale => format(new Date(sale.date), "yyyy-MM-dd") === dateString
       )
       const dailyCoffeeSalesTotal = dailyCoffeeSales.reduce((sum, sale) => sum + sale.totalSales, 0)
-      
+
       salesTrendData.push({
         date: format(date, "MM-dd", { locale: zhCN }),
         gallery: dailyGallerySalesTotal,
@@ -184,44 +184,44 @@ export async function GET(request: Request) {
         total: dailyGallerySalesTotal + dailyCoffeeSalesTotal
       })
     }
-    
-    // 计算热销产品
-    const productSales = new Map()
-    
-    // 统计珐琅馆产品销售
+
+    // 计算热销作品
+    const artworkSales = new Map()
+
+    // 统计珐琅馆作品销售
     gallerySales.forEach(sale => {
       sale.salesItems.forEach(item => {
-        const productName = item.product.name
+        const artworkName = item.product.name
         const salesAmount = item.price * item.quantity
-        
-        if (productSales.has(productName)) {
-          productSales.set(productName, productSales.get(productName) + salesAmount)
+
+        if (artworkSales.has(artworkName)) {
+          artworkSales.set(artworkName, artworkSales.get(artworkName) + salesAmount)
         } else {
-          productSales.set(productName, salesAmount)
+          artworkSales.set(artworkName, salesAmount)
         }
       })
     })
-    
+
     // 统计咖啡店产品销售
     coffeeSales.forEach(sale => {
       sale.items.forEach(item => {
         const productName = item.name
         const salesAmount = item.price * item.quantity
-        
-        if (productSales.has(productName)) {
-          productSales.set(productName, productSales.get(productName) + salesAmount)
+
+        if (artworkSales.has(productName)) {
+          artworkSales.set(productName, artworkSales.get(productName) + salesAmount)
         } else {
-          productSales.set(productName, salesAmount)
+          artworkSales.set(productName, salesAmount)
         }
       })
     })
-    
+
     // 转换为数组并排序
-    const topProducts = Array.from(productSales.entries())
+    const topArtworks = Array.from(artworkSales.entries())
       .map(([name, sales]) => ({ name, sales }))
       .sort((a, b) => b.sales - a.sales)
       .slice(0, 5)
-    
+
     // 构建响应数据
     const dashboardData = {
       gallerySales: {
@@ -257,15 +257,15 @@ export async function GET(request: Request) {
         .slice(0, 5)
         .map(sale => ({
           id: sale.id,
-          product: sale.salesItems[0]?.product.name || "未知产品",
+          product: sale.salesItems[0]?.product.name || "未知作品",
           employee: sale.employee.name,
           amount: sale.totalAmount,
           date: sale.date
         })),
-      topProducts: topProducts,
+      topArtworks: topArtworks,
       salesTrend: salesTrendData
     }
-    
+
     return NextResponse.json(dashboardData)
   } catch (error) {
     console.error("Error fetching dashboard data:", error)

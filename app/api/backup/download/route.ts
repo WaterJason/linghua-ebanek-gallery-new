@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import fs from "fs"
 import path from "path"
 
@@ -10,8 +9,7 @@ const BACKUP_DIR = path.join(process.cwd(), "backups")
 export async function GET(request: Request) {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== "admin") {
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
 

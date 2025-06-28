@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import prisma from "@/lib/db"
-import { authOptions } from "@/lib/auth"
 import { updatePieceWork, deletePieceWork } from "@/lib/actions/piece-work-actions"
 
 // 获取单个计件工作记录
@@ -11,7 +10,7 @@ export async function GET(
 ) {
   try {
     // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
@@ -51,7 +50,7 @@ export async function PUT(
 ) {
   try {
     // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
@@ -97,7 +96,7 @@ export async function DELETE(
 ) {
   try {
     // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
