@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
-import { QuickActions } from "@/components/dashboard/quick-actions"
 import { EnhancedChart } from "@/components/enhanced-chart"
+import { ExecutiveSummary } from "@/components/dashboard/executive-summary"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -170,7 +170,8 @@ export function MobileDashboardPage() {
         onRefresh={fetchDashboardData}
       />
 
-      <QuickActions limit={4} showDescription={false} />
+      {/* 高管总览 */}
+      <ExecutiveSummary data={dashboardData} />
 
       {isLoading ? (
         <div className="space-y-4">

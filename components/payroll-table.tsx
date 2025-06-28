@@ -43,60 +43,62 @@ export function PayrollTable({ year, month }) {
   }
 
   return (
-    <div className="rounded-md border overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>员工</TableHead>
-            <TableHead>职位</TableHead>
-            <TableHead>出勤天数</TableHead>
-            <TableHead className="text-right">基本工资</TableHead>
-            <TableHead className="text-right">手作团建费</TableHead>
-            <TableHead className="text-right">咖啡店提成</TableHead>
-            <TableHead className="text-right">珐琅馆提成</TableHead>
-            <TableHead className="text-right">计件工费</TableHead>
-            <TableHead className="text-right">总薪酬</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {payrollData.map((payroll) => (
-            <TableRow key={payroll.id}>
-              <TableCell className="font-medium">{payroll.employee}</TableCell>
-              <TableCell>{payroll.position}</TableCell>
-              <TableCell>{payroll.workDays}天</TableCell>
-              <TableCell className="text-right">¥{payroll.baseSalary.toFixed(2)}</TableCell>
-              <TableCell className="text-right">¥{payroll.workshopFee.toFixed(2)}</TableCell>
-              <TableCell className="text-right">¥{payroll.coffeeSalesCommission.toFixed(2)}</TableCell>
-              <TableCell className="text-right">¥{payroll.gallerySalesCommission.toFixed(2)}</TableCell>
-              <TableCell className="text-right">¥{(payroll.accessoryFee + payroll.enamellingFee).toFixed(2)}</TableCell>
-              <TableCell className="text-right font-bold">¥{payroll.totalSalary.toFixed(2)}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontalIcon className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleViewDetails(payroll)}>
-                      <FileTextIcon className="mr-2 h-4 w-4" />
-                      查看详情
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+    <>
+      <div className="rounded-md border overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>员工</TableHead>
+              <TableHead>职位</TableHead>
+              <TableHead>出勤天数</TableHead>
+              <TableHead className="text-right">基本工资</TableHead>
+              <TableHead className="text-right">手作团建费</TableHead>
+              <TableHead className="text-right">咖啡店提成</TableHead>
+              <TableHead className="text-right">珐琅馆提成</TableHead>
+              <TableHead className="text-right">计件工费</TableHead>
+              <TableHead className="text-right">总薪酬</TableHead>
+              <TableHead></TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {payrollData.map((payroll) => (
+              <TableRow key={payroll.id}>
+                <TableCell className="font-medium">{payroll.employee}</TableCell>
+                <TableCell>{payroll.position}</TableCell>
+                <TableCell>{payroll.workDays}天</TableCell>
+                <TableCell className="text-right">¥{payroll.baseSalary.toFixed(2)}</TableCell>
+                <TableCell className="text-right">¥{payroll.workshopFee.toFixed(2)}</TableCell>
+                <TableCell className="text-right">¥{payroll.coffeeSalesCommission.toFixed(2)}</TableCell>
+                <TableCell className="text-right">¥{payroll.gallerySalesCommission.toFixed(2)}</TableCell>
+                <TableCell className="text-right">¥{(payroll.accessoryFee + payroll.enamellingFee).toFixed(2)}</TableCell>
+                <TableCell className="text-right font-bold">¥{payroll.totalSalary.toFixed(2)}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontalIcon className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleViewDetails(payroll)}>
+                        <FileTextIcon className="mr-2 h-4 w-4" />
+                        查看详情
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-    {/* 薪资详情对话框 */}
-    <SalaryDetailDialog
-      open={detailDialogOpen}
-      onOpenChange={setDetailDialogOpen}
-      salaryRecord={selectedSalary}
-    />
+      {/* 薪资详情对话框 */}
+      <SalaryDetailDialog
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        salaryRecord={selectedSalary}
+      />
+    </>
   )
 }

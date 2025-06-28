@@ -1,8 +1,5 @@
 import type React from "react"
 import type { Metadata } from "next"
-import "@/app/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { SessionProvider } from "@/components/session-provider"
 
 export const metadata: Metadata = {
   title: "登录 - 聆花掐丝珐琅馆管理系统",
@@ -15,14 +12,10 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
-      <body className="font-sans">
-        <SessionProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
-        </SessionProvider>
-      </body>
-    </html>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {children}
+      </div>
+    </div>
   )
 }

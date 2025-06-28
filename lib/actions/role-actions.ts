@@ -43,20 +43,8 @@ import { findRecord, findRecords, createRecord, updateRecord } from "@/lib/prism
  */
 export async function getRoles(): Promise<(PrismaRole & { userCount: number })[]> {
   try {
-    // 检查角色表是否为空，如果为空则尝试初始化
-    const roleCount = await prisma.role.count();
-    if (roleCount === 0) {
-      console.log("角色表为空，尝试初始化账号管理系统...");
-      try {
-        // 动态导入初始化函数，避免循环依赖
-        const { initAccountSystem } = await import("../init-account-system");
-        await initAccountSystem();
-        console.log("账号管理系统初始化成功");
-      } catch (initError) {
-        console.error("初始化账号管理系统失败:", initError);
-        // 即使初始化失败，也继续尝试获取角色列表
-      }
-    }
+    // 直接获取角色，不再在action中进行初始化检查
+    // 系统初始化已在layout.tsx中统一处理
 
     // 使用类型安全的包装函数获取角色
     const roles = await findRecords('role', {

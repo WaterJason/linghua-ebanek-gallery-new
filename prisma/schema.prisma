@@ -8,56 +8,71 @@ datasource db {
 }
 
 model User {
-  id               String             @id @default(cuid())
-  name             String?
-  email            String?            @unique
-  emailVerified    DateTime?
-  image            String?
-  password         String?
-  role             String             @default("user")
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  bio              String?
-  employeeId       Int?               @unique
-  lastLogin        DateTime?
-  phone            String?
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  roles            Int[]              @default([])
-  employee         Employee?          @relation(fields: [employeeId], references: [id])
-  loginHistory     UserLoginHistory[]
-  notifications    Notification[]
-  userRoles        UserRole[]
-  userSettings     UserSettings?
-  passwordLastChanged DateTime?
-  failedLoginAttempts Int             @default(0)
-  lockedUntil      DateTime?
+  id                      String                   @id @default(cuid())
+  name                    String?
+  email                   String?                  @unique
+  emailVerified           DateTime?
+  image                   String?
+  password                String?
+  role                    String                   @default("user")
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  bio                     String?
+  employeeId              Int?                     @unique
+  lastLogin               DateTime?
+  phone                   String?
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  roles                   Int[]                    @default([])
+  passwordLastChanged     DateTime?
+  failedLoginAttempts     Int                      @default(0)
+  lockedUntil             DateTime?
+  dashboardLayouts        DashboardLayout[]
+  receivedMessages        Message[]                @relation("ReceivedMessages")
+  sentMessages            Message[]                @relation("SentMessages")
+  messageRecipients       MessageRecipient[]
+  notifications           Notification[]
+  purchaseOrderApprovals  PurchaseOrderApproval[]
+  purchaseOrderImports    PurchaseOrderImport[]
+  purchaseOrderReceivings PurchaseOrderReceiving[]
+  reportConfigs           ReportConfig[]
+  todos                   Todo[]
+  employee                Employee?                @relation(fields: [employeeId], references: [id])
+  favorites               UserFavorite[]
+  loginHistory            UserLoginHistory[]
+  preferences             UserPreference[]
+  userRoles               UserRole[]
+  userSettings            UserSettings?
 }
 
 model Employee {
-  id                 Int                 @id @default(autoincrement())
-  name               String
-  position           String
-  phone              String?
-  email              String?
-  dailySalary        Float
-  status             String              @default("active")
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  coffeeShopShifts   CoffeeShopShift[]
-  gallerySales       GallerySale[]
-  orders             Order[]
-  pieceWorks         PieceWork[]
-  posSales           PosSale[]
-  purchaseOrders     PurchaseOrder[]
-  salaryAdjustments  SalaryAdjustment[]
-  salaryRecords      SalaryRecord[]
-  schedules          Schedule[]
-  user               User?
-  assistedWorkshops  Workshop[]          @relation("AssistantWorkshops")
-  managedWorkshops   Workshop[]          @relation("ManagerWorkshops")
-  workshops          Workshop[]          @relation("TeacherWorkshops")
-  workshopTeamMember WorkshopTeamMember?
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  position            String
+  phone               String?
+  email               String?
+  dailySalary         Float
+  status              String               @default("active")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  coffeeShopPurchases CoffeeShopPurchase[] @relation("CoffeeShopPurchaseEmployee")
+  coffeeShopSales     CoffeeShopSale[]     @relation("CoffeeShopSaleEmployee")
+  coffeeShopShifts    CoffeeShopShift[]
+  gallerySales        GallerySale[]
+  orders              Order[]
+  pieceWorks          PieceWork[]
+  posSales            PosSale[]
+  productionOrders    ProductionOrder[]
+  purchaseOrders      PurchaseOrder[]
+  qualityInspections  QualityRecord[]
+  salaryAdjustments   SalaryAdjustment[]
+  salaryRecords       SalaryRecord[]
+  schedules           Schedule[]
+  user                User?
+  assistedWorkshops   Workshop[]           @relation("AssistantWorkshops")
+  managedWorkshops    Workshop[]           @relation("ManagerWorkshops")
+  workshops           Workshop[]           @relation("TeacherWorkshops")
+  workshopTeamMember  WorkshopTeamMember?
 }
 
 model Product {
@@ -84,13 +99,16 @@ model Product {
   channelInventory      ChannelInventory[]
   channelPrices         ChannelPrice[]
   channelSaleItems      ChannelSaleItem[]
+  financeRecords        FinanceRecord[]
   inventoryItems        InventoryItem[]
   inventoryTransactions InventoryTransaction[]
   orderItems            OrderItem[]
   posSaleItems          PosSaleItem[]
   productCategory       ProductCategory?        @relation(fields: [categoryId], references: [id])
   productTags           ProductTagsOnProducts[]
+  productionOrderItems  ProductionOrderItem[]
   purchaseOrderItems    PurchaseOrderItem[]
+  qualityRecords        QualityRecord[]
   salesItems            SalesItem[]
   workshops             Workshop[]
   workshopActivities    WorkshopActivity[]
@@ -213,20 +231,37 @@ model PieceWork {
 }
 
 model CoffeeShopSale {
-  id            Int               @id @default(autoincrement())
+  id             Int               @id @default(autoincrement())
+  date           DateTime
+  totalSales     Float
+  notes          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  alipayAmount   Float             @default(0)
+  cardAmount     Float             @default(0)
+  cashAmount     Float             @default(0)
+  customerCount  Int               @default(0)
+  otherAmount    Float             @default(0)
+  wechatAmount   Float             @default(0)
+  employeeId     Int?
+  paymentMethods String?
+  items          CoffeeShopItem[]
+  employee       Employee?         @relation("CoffeeShopSaleEmployee", fields: [employeeId], references: [id])
+  shifts         CoffeeShopShift[]
+}
+
+model CoffeeShopPurchase {
+  id            Int      @id @default(autoincrement())
   date          DateTime
-  totalSales    Float
+  supplier      String
+  employeeId    Int
+  items         String
+  totalAmount   Float
+  paymentMethod String?
   notes         String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  alipayAmount  Float             @default(0)
-  cardAmount    Float             @default(0)
-  cashAmount    Float             @default(0)
-  customerCount Int               @default(0)
-  otherAmount   Float             @default(0)
-  wechatAmount  Float             @default(0)
-  items         CoffeeShopItem[]
-  shifts        CoffeeShopShift[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  employee      Employee @relation("CoffeeShopPurchaseEmployee", fields: [employeeId], references: [id])
 }
 
 model UploadedFile {
@@ -245,13 +280,13 @@ model UploadedFile {
 model SalesItem {
   id            Int         @id @default(autoincrement())
   gallerySaleId Int
-  productId     Int
+  productId     Int?
   quantity      Int
   price         Float
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   gallerySale   GallerySale @relation(fields: [gallerySaleId], references: [id])
-  product       Product     @relation(fields: [productId], references: [id])
+  product       Product?    @relation(fields: [productId], references: [id])
 }
 
 model PieceWorkDetail {
@@ -313,20 +348,66 @@ model SystemSetting {
   teacherWorkshopFeeOutside   Float    @default(200)
 }
 
+model CompanyProfile {
+  id                  Int       @id @default(autoincrement())
+  companyName         String
+  companyNameEn       String?
+  logoUrl             String?
+  address             String
+  city                String?
+  province            String?
+  postalCode          String?
+  country             String    @default("中国")
+  phone               String
+  fax                 String?
+  email               String
+  website             String?
+  taxNumber           String?
+  businessLicense     String?
+  legalRepresentative String?
+  registeredCapital   String?
+  businessScope       String?
+  description         String?
+  foundedDate         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([companyName])
+}
+
+model SystemParameter {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  description String?
+  group       String   @default("general")
+  type        String   @default("string")
+  options     String?
+  isSystem    Boolean  @default(false)
+  isReadonly  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([group])
+  @@index([key])
+}
+
 model Warehouse {
-  id                 Int                    @id @default(autoincrement())
-  name               String
-  type               String                 @default("physical")
-  location           String?
-  description        String?
-  isActive           Boolean                @default(true)
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime               @updatedAt
-  code               String?
-  isDefault          Boolean                @default(false)
-  inventoryItems     InventoryItem[]        @relation("WarehouseToInventoryItem")
-  sourceTransactions InventoryTransaction[] @relation("SourceWarehouse")
-  targetTransactions InventoryTransaction[] @relation("TargetWarehouse")
+  id                      Int                      @id @default(autoincrement())
+  name                    String
+  type                    String                   @default("physical")
+  location                String?
+  description             String?
+  isActive                Boolean                  @default(true)
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  code                    String?
+  isDefault               Boolean                  @default(false)
+  productionBaseId        Int?
+  inventoryItems          InventoryItem[]          @relation("WarehouseToInventoryItem")
+  sourceTransactions      InventoryTransaction[]   @relation("SourceWarehouse")
+  targetTransactions      InventoryTransaction[]   @relation("TargetWarehouse")
+  purchaseOrderReceivings PurchaseOrderReceiving[]
 }
 
 model InventoryItem {
@@ -356,6 +437,8 @@ model InventoryTransaction {
   updatedAt            DateTime               @updatedAt
   attachmentUrl        String?
   relatedTransactionId Int?
+  productionOrderId    Int?
+  qualityStatus        String?
   product              Product                @relation(fields: [productId], references: [id])
   relatedTransaction   InventoryTransaction?  @relation("RelatedTransactions", fields: [relatedTransactionId], references: [id])
   relatedTransactions  InventoryTransaction[] @relation("RelatedTransactions")
@@ -407,7 +490,7 @@ model Order {
 model OrderItem {
   id        Int      @id @default(autoincrement())
   orderId   Int
-  productId Int
+  productId Int?
   quantity  Int
   price     Float
   discount  Float    @default(0)
@@ -415,7 +498,7 @@ model OrderItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   order     Order    @relation(fields: [orderId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product? @relation(fields: [productId], references: [id])
 }
 
 model Channel {
@@ -512,43 +595,228 @@ model Supplier {
   address        String?
   description    String?
   isActive       Boolean         @default(true)
+  supplierType   String          @default("material")
+  balance        Float           @default(0)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  financeRecords FinanceRecord[]
   purchaseOrders PurchaseOrder[]
 }
 
+model ProductionBase {
+  id               Int               @id @default(autoincrement())
+  name             String
+  code             String            @unique
+  location         String
+  contactName      String?
+  contactPhone     String?
+  contactEmail     String?
+  address          String?
+  specialties      String[]          @default([])
+  capacity         Int?
+  leadTime         Int?
+  qualityRating    Float?
+  isActive         Boolean           @default(true)
+  notes            String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  productionOrders ProductionOrder[]
+  qualityRecords   QualityRecord[]
+}
+
+model ProductionOrder {
+  id                Int                   @id @default(autoincrement())
+  orderNumber       String                @unique
+  productionBaseId  Int
+  employeeId        Int
+  sourceOrderId     Int?
+  orderDate         DateTime
+  expectedStartDate DateTime?
+  expectedEndDate   DateTime?
+  actualStartDate   DateTime?
+  actualEndDate     DateTime?
+  status            String                @default("pending")
+  priority          String                @default("normal")
+  totalAmount       Float
+  paidAmount        Float                 @default(0)
+  paymentStatus     String                @default("unpaid")
+  paymentMethod     String?
+  shippingMethod    String?
+  trackingNumber    String?
+  notes             String?
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  employee          Employee              @relation(fields: [employeeId], references: [id])
+  productionBase    ProductionBase        @relation(fields: [productionBaseId], references: [id])
+  items             ProductionOrderItem[]
+  qualityRecords    QualityRecord[]
+  shippingRecords   ShippingRecord[]
+}
+
+model ProductionOrderItem {
+  id                Int             @id @default(autoincrement())
+  productionOrderId Int
+  productId         Int?
+  quantity          Int
+  specifications    String?
+  completedQuantity Int             @default(0)
+  qualityStatus     String          @default("pending")
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  product           Product?        @relation(fields: [productId], references: [id])
+  productionOrder   ProductionOrder @relation(fields: [productionOrderId], references: [id])
+}
+
+model QualityRecord {
+  id                Int              @id @default(autoincrement())
+  productionOrderId Int?
+  productionBaseId  Int
+  productId         Int
+  inspectorId       Int
+  inspectionDate    DateTime
+  qualityGrade      String
+  qualityScore      Float?
+  defectDescription String?
+  actionRequired    String?
+  status            String           @default("pending")
+  images            String[]         @default([])
+  notes             String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  inspector         Employee         @relation(fields: [inspectorId], references: [id])
+  product           Product          @relation(fields: [productId], references: [id])
+  productionBase    ProductionBase   @relation(fields: [productionBaseId], references: [id])
+  productionOrder   ProductionOrder? @relation(fields: [productionOrderId], references: [id])
+}
+
+model ShippingRecord {
+  id                Int             @id @default(autoincrement())
+  productionOrderId Int
+  shippingType      String
+  shippingDate      DateTime
+  expectedDate      DateTime?
+  actualDate        DateTime?
+  carrier           String?
+  trackingNumber    String?
+  shippingCost      Float?
+  status            String          @default("pending")
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  productionOrder   ProductionOrder @relation(fields: [productionOrderId], references: [id])
+}
+
 model PurchaseOrder {
-  id            Int                 @id @default(autoincrement())
-  orderNumber   String              @unique
-  supplierId    Int
-  employeeId    Int
-  orderDate     DateTime
-  expectedDate  DateTime?
-  status        String              @default("pending")
-  totalAmount   Float
-  paidAmount    Float               @default(0)
-  paymentStatus String              @default("unpaid")
-  paymentMethod String?
-  notes         String?
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
-  employee      Employee            @relation(fields: [employeeId], references: [id])
-  supplier      Supplier            @relation(fields: [supplierId], references: [id])
-  items         PurchaseOrderItem[]
+  id             Int                      @id @default(autoincrement())
+  orderNumber    String                   @unique
+  supplierId     Int
+  employeeId     Int
+  orderDate      DateTime
+  expectedDate   DateTime?
+  status         String                   @default("pending")
+  approvalStatus String                   @default("draft")
+  currentStep    Int                      @default(0)
+  totalAmount    Float
+  paidAmount     Float                    @default(0)
+  paymentStatus  String                   @default("unpaid")
+  paymentMethod  String?
+  notes          String?
+  importBatchId  String?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  employee       Employee                 @relation(fields: [employeeId], references: [id])
+  importRecord   PurchaseOrderImport?     @relation(fields: [importBatchId], references: [batchId])
+  supplier       Supplier                 @relation(fields: [supplierId], references: [id])
+  approvals      PurchaseOrderApproval[]
+  items          PurchaseOrderItem[]
+  receivings     PurchaseOrderReceiving[]
 }
 
 model PurchaseOrderItem {
-  id               Int           @id @default(autoincrement())
+  id               Int                          @id @default(autoincrement())
   purchaseOrderId  Int
-  productId        Int
+  productId        Int?
+  productName      String?
   quantity         Int
   price            Float
-  receivedQuantity Int           @default(0)
+  receivedQuantity Int                          @default(0)
   notes            String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  product          Product       @relation(fields: [productId], references: [id])
-  purchaseOrder    PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+  product          Product?                     @relation(fields: [productId], references: [id])
+  purchaseOrder    PurchaseOrder                @relation(fields: [purchaseOrderId], references: [id])
+  receivingItems   PurchaseOrderReceivingItem[]
+}
+
+model PurchaseOrderApproval {
+  id              String        @id @default(cuid())
+  purchaseOrderId Int
+  workflowStepId  Int?
+  approverId      String
+  approverName    String
+  status          String        @default("pending")
+  comments        String?
+  approvedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  approver        User          @relation(fields: [approverId], references: [id])
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  workflowStep    WorkflowStep? @relation(fields: [workflowStepId], references: [id])
+}
+
+model PurchaseOrderImport {
+  id             Int             @id @default(autoincrement())
+  batchId        String          @unique @default(cuid())
+  fileName       String
+  filePath       String?
+  importedBy     String
+  totalRows      Int
+  successRows    Int
+  failedRows     Int
+  status         String          @default("processing")
+  errorLog       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  purchaseOrders PurchaseOrder[]
+  importer       User            @relation(fields: [importedBy], references: [id])
+}
+
+model PurchaseOrderReceiving {
+  id              Int                          @id @default(autoincrement())
+  purchaseOrderId Int
+  receivingNumber String                       @unique
+  warehouseId     Int
+  receivedDate    DateTime
+  receivedBy      String
+  receiverName    String
+  totalReceived   Int
+  totalExpected   Int
+  status          String                       @default("partial")
+  qualityNotes    String?
+  notes           String?
+  createdAt       DateTime                     @default(now())
+  updatedAt       DateTime                     @updatedAt
+  purchaseOrder   PurchaseOrder                @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  receiver        User                         @relation(fields: [receivedBy], references: [id])
+  warehouse       Warehouse                    @relation(fields: [warehouseId], references: [id])
+  items           PurchaseOrderReceivingItem[]
+}
+
+model PurchaseOrderReceivingItem {
+  id                  Int                    @id @default(autoincrement())
+  receivingId         Int
+  purchaseOrderItemId Int
+  expectedQuantity    Int
+  receivedQuantity    Int
+  qualityGrade        String                 @default("A")
+  qualityNotes        String?
+  unitCost            Float?
+  notes               String?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  purchaseOrderItem   PurchaseOrderItem      @relation(fields: [purchaseOrderItemId], references: [id], onDelete: Cascade)
+  receiving           PurchaseOrderReceiving @relation(fields: [receivingId], references: [id], onDelete: Cascade)
 }
 
 model Role {
@@ -610,6 +878,73 @@ model UserSettings {
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model UserPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  category  String
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, key])
+  @@index([userId, category])
+}
+
+model DashboardLayout {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  isDefault Boolean  @default(false)
+  layout    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UserFavorite {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String
+  title       String
+  url         String?
+  icon        String?
+  category    String?
+  description String?
+  config      Json?
+  sortOrder   Int       @default(0)
+  isShared    Boolean   @default(false)
+  sharedWith  String[]  @default([])
+  accessCount Int       @default(0)
+  lastAccess  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([userId, category])
+}
+
+model ReportConfig {
+  id          String   @id @default(cuid())
+  userId      String
+  reportType  String
+  name        String
+  description String?
+  config      Json
+  isDefault   Boolean  @default(false)
+  isShared    Boolean  @default(false)
+  sharedWith  String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, reportType])
+}
+
 model UserLoginHistory {
   id        Int      @id @default(autoincrement())
   userId    String
@@ -626,123 +961,184 @@ model SystemLog {
   module    String
   level     String
   message   String
-  details   String?
-  timestamp DateTime @default(now())
+  details   Json?
   userId    String?
+  action    String?
+  ipAddress String?
+  userAgent String?
+  sessionId String?
+  requestId String?
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([module])
+  @@index([level])
+  @@index([userId])
+  @@index([timestamp])
+  @@index([createdAt])
 }
 
 model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  priority  String
+  read      Boolean   @default(false)
+  link      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiresAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Todo {
   id          String    @id @default(cuid())
   userId      String
   title       String
-  message     String
-  type        String    // order, inventory, schedule, workshop, system, other
-  priority    String    // high, medium, low
-  read        Boolean   @default(false)
+  description String?
+  type        String
+  priority    String
+  status      String    @default("pending")
+  completed   Boolean   @default(false)
+  dueDate     DateTime?
   link        String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  expiresAt   DateTime?
+  completedAt DateTime?
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Message {
+  id          String             @id @default(cuid())
+  senderId    String
+  recipientId String?
+  subject     String
+  content     String
+  type        String             @default("chat")
+  priority    String             @default("normal")
+  read        Boolean            @default(false)
+  readAt      DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  recipient   User?              @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender      User               @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  recipients  MessageRecipient[]
+}
+
+model MessageRecipient {
+  id        String    @id @default(cuid())
+  messageId String
+  userId    String
+  read      Boolean   @default(false)
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  message   Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+}
+
 model AuditLog {
-  id            Int      @id @default(autoincrement())
-  userId        String?
-  action        String   // create, update, delete, view, login, logout, etc.
-  entityType    String   // user, product, order, etc.
-  entityId      String
-  oldValues     String?  // JSON string of old values
-  newValues     String?  // JSON string of new values
-  ipAddress     String?
-  userAgent     String?
-  timestamp     DateTime @default(now())
-  details       String?
+  id         Int      @id @default(autoincrement())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String
+  oldValues  String?
+  newValues  String?
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+  details    String?
 }
 
 model DataDictionary {
-  id          Int                 @id @default(autoincrement())
-  code        String              @unique
+  id          Int                  @id @default(autoincrement())
+  code        String               @unique
   name        String
   description String?
-  isSystem    Boolean             @default(false)
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  isSystem    Boolean              @default(false)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
   items       DataDictionaryItem[]
 }
 
 model DataDictionaryItem {
-  id                Int            @id @default(autoincrement())
-  dictionaryId      Int
-  code              String
-  value             String
-  label             String
-  sortOrder         Int            @default(0)
-  isDefault         Boolean        @default(false)
-  isActive          Boolean        @default(true)
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  dictionary        DataDictionary @relation(fields: [dictionaryId], references: [id], onDelete: Cascade)
+  id           Int            @id @default(autoincrement())
+  dictionaryId Int
+  code         String
+  value        String
+  label        String
+  sortOrder    Int            @default(0)
+  isDefault    Boolean        @default(false)
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  dictionary   DataDictionary @relation(fields: [dictionaryId], references: [id], onDelete: Cascade)
 
   @@unique([dictionaryId, code])
 }
 
 model Workflow {
-  id              Int               @id @default(autoincrement())
-  code            String            @unique
-  name            String
-  description     String?
-  entityType      String            // order, purchase, expense, etc.
-  isActive        Boolean           @default(true)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  steps           WorkflowStep[]
-  instances       WorkflowInstance[]
+  id          Int                @id @default(autoincrement())
+  code        String             @unique
+  name        String
+  description String?
+  entityType  String
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  instances   WorkflowInstance[]
+  steps       WorkflowStep[]
 }
 
 model WorkflowStep {
-  id              Int               @id @default(autoincrement())
-  workflowId      Int
-  name            String
-  description     String?
-  stepNumber      Int
-  approverType    String            // role, user, department, etc.
-  approverId      String?           // roleId or userId
-  isRequired      Boolean           @default(true)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  workflow        Workflow          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-  approvals       WorkflowApproval[]
+  id                     Int                     @id @default(autoincrement())
+  workflowId             Int
+  name                   String
+  description            String?
+  stepNumber             Int
+  approverType           String
+  approverId             String?
+  isRequired             Boolean                 @default(true)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  purchaseOrderApprovals PurchaseOrderApproval[]
+  approvals              WorkflowApproval[]
+  workflow               Workflow                @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 }
 
 model WorkflowInstance {
-  id              String            @id @default(cuid())
-  workflowId      Int
-  entityId        String            // ID of the entity being approved
-  status          String            @default("pending") // pending, approved, rejected, canceled
-  initiatedBy     String
-  initiatedAt     DateTime          @default(now())
-  completedAt     DateTime?
+  id                String             @id @default(cuid())
+  workflowId        Int
+  entityId          String
+  status            String             @default("pending")
+  initiatedBy       String
+  initiatedAt       DateTime           @default(now())
+  completedAt       DateTime?
   currentStepNumber Int?
-  notes           String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  workflow        Workflow          @relation(fields: [workflowId], references: [id])
-  approvals       WorkflowApproval[]
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  approvals         WorkflowApproval[]
+  workflow          Workflow           @relation(fields: [workflowId], references: [id])
 }
 
 model WorkflowApproval {
-  id                String          @id @default(cuid())
+  id                 String           @id @default(cuid())
   workflowInstanceId String
-  workflowStepId    Int
-  approverId        String
-  status            String          @default("pending") // pending, approved, rejected
-  comments          String?
-  actionDate        DateTime?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  workflowInstance  WorkflowInstance @relation(fields: [workflowInstanceId], references: [id], onDelete: Cascade)
-  workflowStep      WorkflowStep    @relation(fields: [workflowStepId], references: [id])
+  workflowStepId     Int
+  approverId         String
+  status             String           @default("pending")
+  comments           String?
+  actionDate         DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  workflowInstance   WorkflowInstance @relation(fields: [workflowInstanceId], references: [id], onDelete: Cascade)
+  workflowStep       WorkflowStep     @relation(fields: [workflowStepId], references: [id])
 }
 
 model ProductTag {
@@ -848,6 +1244,69 @@ model ProductCategory {
   children    ProductCategory[] @relation("CategoryHierarchy")
 }
 
+model Artwork {
+  id              Int                     @id @default(autoincrement())
+  name            String
+  price           Float
+  commissionRate  Float
+  type            String                  @default("artwork")
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  description     String?
+  imageUrl        String?
+  barcode         String?
+  category        String?
+  cost            Float?
+  sku             String?
+  categoryId      Int?
+  details         String?
+  dimensions      String?
+  imageUrls       String[]                @default([])
+  inventory       Int?
+  material        String?
+  unit            String?
+  artworkCategory ArtworkCategory?        @relation(fields: [categoryId], references: [id])
+  artworkTags     ArtworkTagsOnArtworks[]
+}
+
+model ArtworkCategory {
+  id          Int               @id @default(autoincrement())
+  name        String
+  code        String?
+  description String?
+  imageUrl    String?
+  isActive    Boolean           @default(true)
+  sortOrder   Int               @default(0)
+  parentId    Int?
+  level       Int               @default(1)
+  path        String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  artworks    Artwork[]
+  parent      ArtworkCategory?  @relation("ArtworkCategoryHierarchy", fields: [parentId], references: [id])
+  children    ArtworkCategory[] @relation("ArtworkCategoryHierarchy")
+}
+
+model ArtworkTag {
+  id          Int                     @id @default(autoincrement())
+  name        String                  @unique
+  color       String?
+  description String?
+  isActive    Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  artworks    ArtworkTagsOnArtworks[]
+}
+
+model ArtworkTagsOnArtworks {
+  artworkId Int
+  tagId     Int
+  artwork   Artwork    @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  tag       ArtworkTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([artworkId, tagId])
+}
+
 model PosSale {
   id            Int           @id @default(autoincrement())
   employeeId    Int
@@ -866,14 +1325,14 @@ model PosSale {
 model PosSaleItem {
   id        Int      @id @default(autoincrement())
   posSaleId Int
-  productId Int
+  productId Int?
   quantity  Int
   price     Float
   discount  Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   posSale   PosSale  @relation(fields: [posSaleId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product? @relation(fields: [productId], references: [id])
 }
 
 model ChannelDeposit {
@@ -908,7 +1367,7 @@ model ChannelSale {
 model ChannelSaleItem {
   id                 Int              @id @default(autoincrement())
   channelSaleId      Int
-  productId          Int
+  productId          Int?
   channelInventoryId Int
   quantity           Int
   price              Float
@@ -917,7 +1376,7 @@ model ChannelSaleItem {
   updatedAt          DateTime         @updatedAt
   channelInventory   ChannelInventory @relation(fields: [channelInventoryId], references: [id])
   channelSale        ChannelSale      @relation(fields: [channelSaleId], references: [id], onDelete: Cascade)
-  product            Product          @relation(fields: [productId], references: [id])
+  product            Product?         @relation(fields: [productId], references: [id])
 }
 
 model ChannelSettlement {
@@ -1017,4 +1476,148 @@ model FinancialTransaction {
   updatedAt       DateTime           @updatedAt
   account         FinancialAccount   @relation("AccountTransactions", fields: [accountId], references: [id])
   category        FinancialCategory? @relation("CategoryTransactions", fields: [categoryId], references: [id])
+}
+
+model DataBackup {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  type         String
+  status       String    @default("pending")
+  filePath     String?
+  fileSize     Int?
+  modules      String[]
+  startTime    DateTime  @default(now())
+  endTime      DateTime?
+  duration     Int?
+  errorMessage String?
+  createdBy    String
+  isEncrypted  Boolean   @default(true)
+  checksum     String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdBy])
+  @@index([startTime])
+}
+
+model DataTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String
+  module      String
+  description String?
+  fields      Json
+  mapping     Json?
+  validation  Json?
+  example     Json?
+  version     String   @default("1.0")
+  isActive    Boolean  @default(true)
+  isSystem    Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([module])
+  @@index([isActive])
+}
+
+model SystemAnnouncement {
+  id          Int                @id @default(autoincrement())
+  title       String
+  content     String
+  type        String             @default("info")
+  priority    String             @default("normal")
+  targetUsers String[]
+  displayType String             @default("banner")
+  startTime   DateTime           @default(now())
+  endTime     DateTime?
+  isActive    Boolean            @default(true)
+  requireRead Boolean            @default(false)
+  createdBy   String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  readRecords AnnouncementRead[]
+
+  @@index([isActive])
+  @@index([startTime])
+  @@index([type])
+}
+
+model AnnouncementRead {
+  id             Int                @id @default(autoincrement())
+  announcementId Int
+  userId         String
+  readAt         DateTime           @default(now())
+  announcement   SystemAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@index([userId])
+}
+
+model SystemMetrics {
+  id         Int      @id @default(autoincrement())
+  metricType String
+  metricName String
+  value      Float
+  unit       String?
+  threshold  Float?
+  status     String   @default("normal")
+  details    Json?
+  timestamp  DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([metricType])
+  @@index([timestamp])
+  @@index([status])
+}
+
+model PrintTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String
+  description String?
+  template    Json
+  paperSize   String   @default("A4")
+  orientation String   @default("portrait")
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  version     String   @default("1.0")
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+  @@index([isDefault])
+}
+
+model FinanceRecord {
+  id              Int       @id @default(autoincrement())
+  type            String
+  amount          Float
+  description     String
+  referenceId     String?
+  referenceType   String?
+  supplierId      Int?
+  productId       Int?
+  accountId       Int?
+  operatorId      String?
+  transactionDate DateTime  @default(now())
+  dueDate         DateTime?
+  notes           String?
+  status          String    @default("active")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  product         Product?  @relation(fields: [productId], references: [id])
+  supplier        Supplier? @relation(fields: [supplierId], references: [id])
+
+  @@index([type])
+  @@index([referenceId])
+  @@index([referenceType])
+  @@index([supplierId])
+  @@index([transactionDate])
+  @@index([status])
 }

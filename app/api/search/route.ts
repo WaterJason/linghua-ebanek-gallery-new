@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import { globalSearch, SearchResultType } from "@/lib/actions/search-actions"
 import { createAuditLog } from "@/lib/actions/audit-actions"
 
@@ -10,7 +9,7 @@ import { createAuditLog } from "@/lib/actions/audit-actions"
 export async function GET(req: NextRequest) {
   try {
     // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session?.user) {
       return NextResponse.json({ error: "未授权" }, { status: 401 })
     }

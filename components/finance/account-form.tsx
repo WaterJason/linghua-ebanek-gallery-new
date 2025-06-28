@@ -27,6 +27,9 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { createFinancialAccount, updateFinancialAccount } from "@/lib/actions/finance-actions"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 // 表单验证模式
 const accountFormSchema = z.object({
   name: z.string().min(1, "账户名称不能为空").max(100, "账户名称不能超过100个字符"),
@@ -48,6 +51,9 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('finance')
+
   // 初始化表单
   const form = useForm<z.infer<typeof accountFormSchema>>({
     resolver: zodResolver(accountFormSchema),
@@ -65,34 +71,45 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
   const onSubmit = async (values: z.infer<typeof accountFormSchema>) => {
     setIsSubmitting(true)
     try {
+      const beforeData = isEditing && account ? {
+        name: account.name,
+        type: account.type,
+        accountNumber: account.accountNumber,
+        description: account.description,
+        currentBalance: account.currentBalance,
+        isActive: account.isActive,
+      } : null
+
       let result
-      
+
       if (isEditing && account) {
         // 更新账户
-        result = await updateFinancialAccount(account.id, values)
-        toast({
-          title: "更新成功",
-          description: `账户 ${result.name} 已更新`,
-        })
+        result = await enhancedOps.update('财务账户').form(
+          async () => {
+            return await updateFinancialAccount(account.id, values)
+          },
+          beforeData,
+          values,
+          { canUndo: true }
+        )
       } else {
         // 创建账户
-        result = await createFinancialAccount(values)
-        toast({
-          title: "创建成功",
-          description: `账户 ${result.name} 已创建`,
-        })
+        result = await enhancedOps.create('财务账户').form(
+          async () => {
+            return await createFinancialAccount(values)
+          },
+          null,
+          values,
+          { canUndo: true }
+        )
       }
-      
+
       if (onSuccess) {
         onSuccess(result)
       }
     } catch (error) {
       console.error("保存账户失败:", error)
-      toast({
-        variant: "destructive",
-        title: "保存失败",
-        description: error.message || "无法保存账户信息",
-      })
+      // 错误已由增强操作系统处理
     } finally {
       setIsSubmitting(false)
     }
@@ -117,7 +134,7 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="type"
@@ -145,7 +162,7 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="accountNumber"
@@ -162,7 +179,7 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="currentBalance"
@@ -179,7 +196,7 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="description"
@@ -196,7 +213,7 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="isActive"
@@ -217,7 +234,7 @@ export function AccountForm({ account, isEditing = false, onSuccess, onCancel }:
             </FormItem>
           )}
         />
-        
+
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             取消

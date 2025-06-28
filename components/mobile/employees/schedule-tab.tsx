@@ -1,134 +1,205 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Icons } from "@/components/icons"
 import { Badge } from "@/components/ui/badge"
+import { Calendar } from "@/components/ui/calendar"
+import { 
+  CalendarIcon, 
+  ClockIcon, 
+  UserIcon,
+  PlusIcon
+} from "lucide-react"
+import { getSchedules } from "@/lib/actions/schedule-actions"
+import { toast } from "@/components/ui/use-toast"
+import { format } from "date-fns"
+import { zhCN } from "date-fns/locale"
 
 export function ScheduleTab() {
-  // 获取当前周的日期
-  const getCurrentWeekDates = () => {
-    const today = new Date()
-    const currentDay = today.getDay() // 0 是周日，1 是周一，以此类推
-    const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1) // 调整到周一
-    
-    return Array(7).fill(0).map((_, i) => {
-      const day = new Date(today.setDate(diff + i))
-      return {
-        date: day.getDate(),
-        day: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i],
-        isToday: new Date().getDate() === day.getDate()
-      }
-    })
+  const [schedules, setSchedules] = useState([])
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    loadSchedules()
+  }, [selectedDate])
+
+  const loadSchedules = async () => {
+    try {
+      setIsLoading(true)
+      const data = await getSchedules({
+        date: selectedDate
+      })
+      setSchedules(data)
+    } catch (error) {
+      console.error("Error loading schedules:", error)
+      toast({
+        title: "加载失败",
+        description: "无法加载排班数据",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const weekDates = getCurrentWeekDates()
+  const todaySchedules = schedules.filter(schedule => {
+    const scheduleDate = new Date(schedule.date)
+    return scheduleDate.toDateString() === selectedDate.toDateString()
+  })
+
+  const getShiftColor = (shift) => {
+    switch (shift) {
+      case "morning":
+        return "bg-blue-100 text-blue-800"
+      case "afternoon":
+        return "bg-green-100 text-green-800"
+      case "evening":
+        return "bg-purple-100 text-purple-800"
+      case "night":
+        return "bg-gray-100 text-gray-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  const getShiftText = (shift) => {
+    switch (shift) {
+      case "morning":
+        return "早班"
+      case "afternoon":
+        return "中班"
+      case "evening":
+        return "晚班"
+      case "night":
+        return "夜班"
+      default:
+        return "未知"
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardContent className="p-4">
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">排班管理</h2>
-        <Button size="sm">
-          <Icons.plus className="h-4 w-4 mr-2" />
-          新建排班
-        </Button>
-      </div>
-      
-      <div className="flex justify-between items-center">
-        <Button variant="outline" size="sm">
-          <Icons.chevronLeft className="h-4 w-4 mr-2" />
-          上一周
-        </Button>
-        <span className="text-sm font-medium">2025年5月</span>
-        <Button variant="outline" size="sm">
-          下一周
-          <Icons.chevronRight className="h-4 w-4 ml-2" />
-        </Button>
-      </div>
-      
-      <div className="grid grid-cols-7 gap-1 text-center">
-        {weekDates.map((date, index) => (
-          <div key={index} className={`p-2 text-xs ${date.isToday ? 'bg-primary text-primary-foreground rounded-md' : ''}`}>
-            <div>{date.day}</div>
-            <div className="font-bold">{date.date}</div>
-          </div>
-        ))}
-      </div>
-      
+      {/* 日期选择 */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3 overflow-hidden">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="张三" className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <p className="font-medium">张三</p>
-                <p className="text-xs text-muted-foreground">销售经理</p>
-              </div>
-            </div>
-            <Badge className="bg-blue-100 text-blue-800 border-blue-200">销售部</Badge>
-          </div>
-          
-          <div className="grid grid-cols-7 gap-1 mt-3">
-            {Array(7).fill(0).map((_, index) => (
-              <div key={index} className={`h-6 rounded-md flex items-center justify-center text-xs ${index < 5 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
-                {index < 5 ? '上班' : '休息'}
-              </div>
-            ))}
-          </div>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">选择日期</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            locale={zhCN}
+            className="rounded-md border"
+          />
         </CardContent>
       </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3 overflow-hidden">
-                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="李四" className="w-full h-full object-cover" />
-              </div>
+
+      {/* 当日排班统计 */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <CalendarIcon className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="font-medium">李四</p>
-                <p className="text-xs text-muted-foreground">采购专员</p>
+                <p className="text-sm font-medium">选中日期</p>
+                <p className="text-lg font-bold">
+                  {format(selectedDate, "MM月dd日", { locale: zhCN })}
+                </p>
               </div>
             </div>
-            <Badge className="bg-green-100 text-green-800 border-green-200">采购部</Badge>
-          </div>
-          
-          <div className="grid grid-cols-7 gap-1 mt-3">
-            {Array(7).fill(0).map((_, index) => (
-              <div key={index} className={`h-6 rounded-md flex items-center justify-center text-xs ${index !== 0 && index !== 6 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
-                {index !== 0 && index !== 6 ? '上班' : '休息'}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3 overflow-hidden">
-                <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="王五" className="w-full h-full object-cover" />
-              </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <UserIcon className="h-5 w-5 text-green-600" />
               <div>
-                <p className="font-medium">王五</p>
-                <p className="text-xs text-muted-foreground">生产主管</p>
+                <p className="text-sm font-medium">排班人数</p>
+                <p className="text-lg font-bold">{todaySchedules.length}</p>
               </div>
             </div>
-            <Badge className="bg-purple-100 text-purple-800 border-purple-200">生产部</Badge>
-          </div>
-          
-          <div className="grid grid-cols-7 gap-1 mt-3">
-            {Array(7).fill(0).map((_, index) => (
-              <div key={index} className={`h-6 rounded-md flex items-center justify-center text-xs ${index % 2 === 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}`}>
-                {index % 2 === 0 ? '上班' : '休息'}
-              </div>
-            ))}
-          </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 当日排班列表 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">
+            {format(selectedDate, "yyyy年MM月dd日", { locale: zhCN })} 排班
+          </CardTitle>
+          <CardDescription>
+            共 {todaySchedules.length} 人排班
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {todaySchedules.length === 0 ? (
+            <div className="text-center py-8">
+              <ClockIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">当日暂无排班</p>
+            </div>
+          ) : (
+            todaySchedules.map((schedule) => (
+              <Card key={schedule.id} className="border-l-4 border-l-blue-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div>
+                        <h3 className="font-medium">{schedule.employee?.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {schedule.employee?.position}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <Badge className={getShiftColor(schedule.shift)}>
+                        {getShiftText(schedule.shift)}
+                      </Badge>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {schedule.startTime} - {schedule.endTime}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {schedule.notes && (
+                    <div className="mt-3 p-2 bg-gray-50 rounded">
+                      <p className="text-sm text-gray-600">{schedule.notes}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </CardContent>
       </Card>
+
+      {/* 添加排班按钮 */}
+      <Button className="w-full" size="lg">
+        <PlusIcon className="h-4 w-4 mr-2" />
+        添加排班
+      </Button>
     </div>
   )
 }

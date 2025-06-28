@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-05-28T06:43:22.304Z",
+  "backupType": "full-database-backup",
+  "files": {
+    "sqlDump": "backups/database/full-backup-2025-05-28T06-43-21-577Z.sql",
+    "schemaDump": "backups/database/schema-backup-2025-05-28T06-43-21-577Z.sql",
+    "dataDump": "backups/database/data-backup-2025-05-28T06-43-21-577Z.sql",
+    "prismaConfig": "backups/database/prisma-config-2025-05-28T06-43-21-577Z",
+    "envConfig": "backups/database/.env-backup-2025-05-28T06-43-21-577Z"
+  },
+  "databaseInfo": {
+    "containerName": "linghua-postgres",
+    "databaseName": "linghua_enamel_gallery",
+    "user": "postgres"
+  },
+  "notes": "完整数据库备份，包含数据、架构、Prisma配置和环境变量"
+}

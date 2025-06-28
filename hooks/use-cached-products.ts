@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useToast } from "@/components/ui/use-toast"
-import { Product, ProductCategory } from "@/types/product"
-import { getProducts, getProductCategories } from "@/lib/actions"
+import { Artwork, ArtworkCategory } from "@/types/product"
+import { getArtworks, getArtworkCategories } from "@/lib/actions"
 
 // 缓存数据类型
 interface CachedData<T> {
@@ -63,8 +63,8 @@ export function useCachedProducts(options?: {
   refreshInterval?: number
 }) {
   const { toast } = useToast()
-  const [products, setProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<ProductCategory[]>([])
+  const [products, setProducts] = useState<Artwork[]>([])
+  const [categories, setCategories] = useState<ArtworkCategory[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   
@@ -72,8 +72,8 @@ export function useCachedProducts(options?: {
   const loadProducts = useCallback(async (forceRefresh = false) => {
     // 如果不强制刷新且不跳过缓存，尝试从缓存加载
     if (!forceRefresh && !options?.skipCache) {
-      const cachedProducts = getFromCache<Product[]>(PRODUCTS_CACHE_KEY)
-      const cachedCategories = getFromCache<ProductCategory[]>(CATEGORIES_CACHE_KEY)
+      const cachedProducts = getFromCache<Artwork[]>(PRODUCTS_CACHE_KEY)
+      const cachedCategories = getFromCache<ArtworkCategory[]>(CATEGORIES_CACHE_KEY)
       
       if (cachedProducts && cachedCategories) {
         setProducts(cachedProducts.data)
@@ -88,8 +88,8 @@ export function useCachedProducts(options?: {
     try {
       // 并行加载产品和分类数据
       const [productsData, categoriesData] = await Promise.all([
-        getProducts(),
-        getProductCategories()
+        getArtworks(),
+        getArtworkCategories()
       ])
       
       setProducts(productsData)
@@ -132,7 +132,7 @@ export function useCachedProducts(options?: {
   }, [loadProducts])
   
   // 添加产品到本地状态（不等待服务器响应）
-  const addProductLocally = useCallback((product: Product) => {
+  const addProductLocally = useCallback((product: Artwork) => {
     setProducts(prev => {
       const newProducts = [...prev, product]
       saveToCache(PRODUCTS_CACHE_KEY, newProducts)
@@ -141,7 +141,7 @@ export function useCachedProducts(options?: {
   }, [])
   
   // 更新产品在本地状态（不等待服务器响应）
-  const updateProductLocally = useCallback((updatedProduct: Product) => {
+  const updateProductLocally = useCallback((updatedProduct: Artwork) => {
     setProducts(prev => {
       const newProducts = prev.map(p => 
         p.id === updatedProduct.id ? updatedProduct : p
@@ -161,7 +161,7 @@ export function useCachedProducts(options?: {
   }, [])
   
   // 添加分类到本地状态
-  const addCategoryLocally = useCallback((category: ProductCategory) => {
+  const addCategoryLocally = useCallback((category: ArtworkCategory) => {
     setCategories(prev => {
       const newCategories = [...prev, category]
       saveToCache(CATEGORIES_CACHE_KEY, newCategories)
@@ -170,7 +170,7 @@ export function useCachedProducts(options?: {
   }, [])
   
   // 更新分类在本地状态
-  const updateCategoryLocally = useCallback((updatedCategory: ProductCategory) => {
+  const updateCategoryLocally = useCallback((updatedCategory: ArtworkCategory) => {
     setCategories(prev => {
       const newCategories = prev.map(c => 
         c.id === updatedCategory.id ? updatedCategory : c
@@ -196,7 +196,7 @@ export function useCachedProducts(options?: {
   }, [])
   
   return {
-    products,
+    artworks,
     categories,
     isLoading,
     error,

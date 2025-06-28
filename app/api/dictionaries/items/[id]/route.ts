@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession, isAdmin } from "@/lib/auth-helpers"
 import prisma from "@/lib/db"
 import { createAuditLog } from "@/lib/actions/audit-actions"
 
@@ -13,7 +12,7 @@ export async function GET(
 ) {
   try {
     // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session?.user) {
       return NextResponse.json({ error: "未授权" }, { status: 401 })
     }
@@ -52,7 +51,7 @@ export async function PATCH(
 ) {
   try {
     // 检查用户是否已登录且是管理员
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session?.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "未授权" }, { status: 401 })
     }
@@ -126,7 +125,7 @@ export async function DELETE(
 ) {
   try {
     // 检查用户是否已登录且是管理员
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session?.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "未授权" }, { status: 401 })
     }

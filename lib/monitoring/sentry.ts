@@ -1,8 +1,8 @@
 /**
  * Sentry 错误监控集成
- * 
+ *
  * 提供 Sentry 错误监控相关的功能，包括初始化、错误捕获、性能监控等。
- * 
+ *
  * @module Sentry监控
  * @category 监控工具
  */
@@ -20,7 +20,7 @@ const SENTRY_ENABLED = process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true';
 
 /**
  * 初始化 Sentry
- * 
+ *
  * 在应用启动时调用此函数初始化 Sentry
  */
 export function initSentry(): void {
@@ -28,7 +28,7 @@ export function initSentry(): void {
     console.log('Sentry is disabled or DSN is not provided');
     return;
   }
-  
+
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: ENVIRONMENT,
@@ -53,12 +53,10 @@ export function initSentry(): void {
       'Script error',
     ],
   });
-  
+
   // 设置用户信息
-  Sentry.configureScope((scope) => {
-    scope.setTag('app.version', process.env.NEXT_PUBLIC_APP_VERSION || 'unknown');
-  });
-  
+  Sentry.setTag('app.version', process.env.NEXT_PUBLIC_APP_VERSION || 'unknown');
+
   console.log('Sentry initialized');
 }
 
@@ -68,7 +66,7 @@ export function initSentry(): void {
  */
 export function setUser(user: { id: string; email?: string; username?: string } | null): void {
   if (!SENTRY_ENABLED) return;
-  
+
   Sentry.setUser(user);
 }
 
@@ -79,7 +77,7 @@ export function setUser(user: { id: string; email?: string; username?: string } 
  */
 export function captureError(error: Error | AppError | ErrorResponse | unknown, context?: Record<string, any>): string {
   if (!SENTRY_ENABLED) return 'sentry-disabled';
-  
+
   // 处理 AppError
   if (error instanceof AppError) {
     return Sentry.captureException(error, {
@@ -95,7 +93,7 @@ export function captureError(error: Error | AppError | ErrorResponse | unknown, 
       },
     });
   }
-  
+
   // 处理 ErrorResponse
   if (typeof error === 'object' && error !== null && 'success' in error && error.success === false && 'error' in error) {
     const errorResponse = error as ErrorResponse;
@@ -110,7 +108,7 @@ export function captureError(error: Error | AppError | ErrorResponse | unknown, 
       },
     });
   }
-  
+
   // 处理普通 Error
   if (error instanceof Error) {
     return Sentry.captureException(error, {
@@ -119,7 +117,7 @@ export function captureError(error: Error | AppError | ErrorResponse | unknown, 
       },
     });
   }
-  
+
   // 处理未知类型的错误
   return Sentry.captureException(new Error(String(error)), {
     extra: {
@@ -141,7 +139,7 @@ export function captureMessage(
   context?: Record<string, any>
 ): string {
   if (!SENTRY_ENABLED) return 'sentry-disabled';
-  
+
   return Sentry.captureMessage(message, {
     level,
     extra: {
@@ -157,13 +155,21 @@ export function captureMessage(
  */
 export function startTransaction(
   name: string,
-  options?: Sentry.TransactionContext
-): Sentry.Transaction | undefined {
-  if (!SENTRY_ENABLED) return undefined;
-  
-  return Sentry.startTransaction({
-    name,
-    ...options,
+  options?: any
+): any {
+  if (!SENTRY_ENABLED) return {
+    finish: () => {},
+    setTag: () => {},
+    setData: () => {},
+  };
+
+  // 使用新的 Sentry API
+  return Sentry.startSpan({ name, ...options }, (span) => {
+    return {
+      finish: () => span?.end(),
+      setTag: (key: string, value: string) => span?.setTag(key, value),
+      setData: (key: string, value: any) => span?.setData(key, value),
+    };
   });
 }
 
@@ -173,18 +179,18 @@ export function startTransaction(
  */
 export function addBreadcrumb(breadcrumb: Sentry.Breadcrumb): void {
   if (!SENTRY_ENABLED) return;
-  
+
   Sentry.addBreadcrumb(breadcrumb);
 }
 
 /**
  * 刷新 Sentry 事件
- * 
+ *
  * 在应用关闭前调用此函数，确保所有事件都被发送
  */
 export function flush(timeout?: number): Promise<boolean> {
   if (!SENTRY_ENABLED) return Promise.resolve(true);
-  
+
   return Sentry.flush(timeout);
 }
 
@@ -193,7 +199,7 @@ export function flush(timeout?: number): Promise<boolean> {
  */
 export function close(): Promise<boolean> {
   if (!SENTRY_ENABLED) return Promise.resolve(true);
-  
+
   return Sentry.close();
 }
 
@@ -209,9 +215,9 @@ export function withPerformanceMonitoring<T, Args extends any[]>(
 ): (...args: Args) => Promise<T> {
   return async (...args: Args): Promise<T> => {
     if (!SENTRY_ENABLED) return fn(...args);
-    
+
     const transaction = startTransaction(name);
-    
+
     try {
       const result = await fn(...args);
       transaction?.finish();

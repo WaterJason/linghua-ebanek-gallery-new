@@ -1,14 +1,6 @@
-"use client"
+import { redirect } from "next/navigation"
 
-import { DashboardPage, MobileDashboardPage } from "@/components/dashboard"
-import { useIsMobile } from "@/hooks/use-mobile"
-
-export default function Dashboard() {
-  const isMobile = useIsMobile()
-
-  return (
-    <>
-      {isMobile ? <MobileDashboardPage /> : <DashboardPage />}
-    </>
-  )
+export default function HomePage() {
+  // 重定向到正确的路由组中的仪表盘页面
+  redirect("/dashboard")
 }

@@ -23,10 +23,24 @@ export async function POST(request: Request) {
   try {
     const data = await request.json()
 
+    // 验证必需字段
+    if (!data.name) {
+      return NextResponse.json({ error: "Workshop name is required" }, { status: 400 })
+    }
+    if (!data.startTime) {
+      return NextResponse.json({ error: "Start time is required" }, { status: 400 })
+    }
+    if (!data.endTime) {
+      return NextResponse.json({ error: "End time is required" }, { status: 400 })
+    }
+
     const workshop = await prisma.workshop.create({
       data: {
+        name: data.name,
         employeeId: Number.parseInt(data.employee),
         date: new Date(data.date),
+        startTime: data.startTime,
+        endTime: data.endTime,
         role: data.role,
         locationType: data.locationType,
         location: data.location,

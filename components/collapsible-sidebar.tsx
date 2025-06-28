@@ -68,10 +68,15 @@ export default function CollapsibleSidebar() {
   // 处理退出登录
   const handleSignOut = async () => {
     try {
-      await signOut({ redirect: false });
+      await signOut({
+        redirect: false,
+        callbackUrl: "/login"
+      });
       router.push('/login');
     } catch (error) {
       console.error('退出登录失败:', error);
+      // 确保即使出错也能跳转到登录页
+      router.push('/login');
     }
   }
 

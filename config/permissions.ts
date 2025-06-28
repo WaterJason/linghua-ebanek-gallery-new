@@ -15,6 +15,8 @@ export const PERMISSION_MODULES = [
       { code: "create", name: "创建产品", description: "允许创建新产品" },
       { code: "edit", name: "编辑产品", description: "允许编辑现有产品" },
       { code: "delete", name: "删除产品", description: "允许删除产品" },
+      { code: "category", name: "管理分类", description: "允许管理产品分类" },
+      { code: "analytics", name: "查看分析", description: "允许查看产品分析报告" },
     ]
   },
   {

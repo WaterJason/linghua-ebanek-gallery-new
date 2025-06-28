@@ -31,6 +31,9 @@ import {
 } from "@/components/ui/select"
 import { createChannel, updateChannel } from "@/lib/actions/channel-actions"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 // 表单验证模式
 const formSchema = z.object({
   name: z.string().min(1, "渠道名称不能为空"),
@@ -51,6 +54,9 @@ const formSchema = z.object({
 export function ChannelForm({ channel, onSuccess }) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('channel')
 
   // 初始化表单
   const form = useForm({
@@ -97,32 +103,51 @@ export function ChannelForm({ channel, onSuccess }) {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true)
-      
+
+      const beforeData = channel ? {
+        name: channel.name,
+        code: channel.code,
+        description: channel.description,
+        contactName: channel.contactName,
+        contactPhone: channel.contactPhone,
+        contactEmail: channel.contactEmail,
+        address: channel.address,
+        bankName: channel.bankName,
+        bankAccount: channel.bankAccount,
+        settlementCycle: channel.settlementCycle,
+        cooperationStart: channel.cooperationStart,
+        status: channel.status,
+        isActive: channel.isActive,
+      } : null
+
       if (channel) {
         // 更新渠道
-        await updateChannel(channel.id, data)
-        toast({
-          title: "更新成功",
-          description: `渠道 ${data.name} 已成功更新`,
-        })
+        await enhancedOps.update('渠道').form(
+          async () => {
+            return await updateChannel(channel.id, data)
+          },
+          beforeData,
+          data,
+          { canUndo: true }
+        )
       } else {
         // 创建渠道
-        await createChannel(data)
-        toast({
-          title: "创建成功",
-          description: `渠道 ${data.name} 已成功创建`,
-        })
+        await enhancedOps.create('渠道').form(
+          async () => {
+            return await createChannel(data)
+          },
+          null,
+          data,
+          { canUndo: true }
+        )
       }
-      
+
       if (onSuccess) {
         onSuccess()
       }
     } catch (error) {
-      toast({
-        title: channel ? "更新失败" : "创建失败",
-        description: error.message || "操作失败，请重试",
-        variant: "destructive",
-      })
+      console.error("渠道表单提交错误:", error)
+      // 错误已由增强操作系统处理
     } finally {
       setIsSubmitting(false)
     }
@@ -145,7 +170,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="code"
@@ -162,7 +187,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="contactName"
@@ -176,7 +201,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="contactPhone"
@@ -190,7 +215,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="contactEmail"
@@ -204,7 +229,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="address"
@@ -218,7 +243,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="bankName"
@@ -232,7 +257,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="bankAccount"
@@ -246,7 +271,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="settlementCycle"
@@ -271,7 +296,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="cooperationStart"
@@ -307,7 +332,7 @@ export function ChannelForm({ channel, onSuccess }) {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="status"
@@ -334,7 +359,7 @@ export function ChannelForm({ channel, onSuccess }) {
             )}
           />
         </div>
-        
+
         <FormField
           control={form.control}
           name="description"
@@ -352,7 +377,7 @@ export function ChannelForm({ channel, onSuccess }) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="isActive"
@@ -373,7 +398,7 @@ export function ChannelForm({ channel, onSuccess }) {
             </FormItem>
           )}
         />
-        
+
         <div className="flex justify-end space-x-2">
           <Button
             type="button"

@@ -1,0 +1,263 @@
+{
+  "timestamp": "2025-05-26T16:45:50.525Z",
+  "reason": "startup",
+  "version": "1.0.0",
+  "data": {
+    "employees": [
+      {
+        "id": 1,
+        "name": "梁朝伟",
+        "position": "CEO",
+        "phone": null,
+        "email": null,
+        "dailySalary": 0,
+        "status": "active",
+        "createdAt": "2025-05-24T23:52:16.350Z",
+        "updatedAt": "2025-05-24T23:52:16.350Z"
+      },
+      {
+        "id": 2,
+        "name": "伍尚明",
+        "position": "店长",
+        "phone": null,
+        "email": null,
+        "dailySalary": 100,
+        "status": "active",
+        "createdAt": "2025-05-25T08:04:58.023Z",
+        "updatedAt": "2025-05-25T08:04:58.023Z"
+      }
+    ],
+    "products": [
+      {
+        "id": 1,
+        "name": "2231312",
+        "price": 1111,
+        "commissionRate": 0,
+        "type": "product",
+        "createdAt": "2025-05-24T22:57:25.074Z",
+        "updatedAt": "2025-05-24T22:57:25.074Z",
+        "description": "",
+        "imageUrl": "/uploads/20944aba-f3a6-4ed0-b416-238b8e5dd514.jpg",
+        "barcode": "",
+        "category": null,
+        "cost": null,
+        "sku": "",
+        "categoryId": null,
+        "details": null,
+        "dimensions": null,
+        "imageUrls": [
+          "/uploads/20944aba-f3a6-4ed0-b416-238b8e5dd514.jpg"
+        ],
+        "inventory": null,
+        "material": null,
+        "unit": null
+      },
+      {
+        "id": 2,
+        "name": "套 单位",
+        "price": 0,
+        "commissionRate": 0,
+        "type": "unit_placeholder",
+        "createdAt": "2025-05-25T09:50:32.975Z",
+        "updatedAt": "2025-05-25T09:50:32.975Z",
+        "description": "套 单位的占位产品",
+        "imageUrl": null,
+        "barcode": null,
+        "category": null,
+        "cost": null,
+        "sku": null,
+        "categoryId": null,
+        "details": null,
+        "dimensions": null,
+        "imageUrls": [],
+        "inventory": null,
+        "material": null,
+        "unit": "套"
+      },
+      {
+        "id": 3,
+        "name": "铜镀金 材料",
+        "price": 0,
+        "commissionRate": 0,
+        "type": "material_placeholder",
+        "createdAt": "2025-05-25T09:50:40.747Z",
+        "updatedAt": "2025-05-25T09:50:40.747Z",
+        "description": "铜镀金 材料的占位产品",
+        "imageUrl": null,
+        "barcode": null,
+        "category": null,
+        "cost": null,
+        "sku": null,
+        "categoryId": null,
+        "details": null,
+        "dimensions": null,
+        "imageUrls": [],
+        "inventory": null,
+        "material": "铜镀金",
+        "unit": null
+      },
+      {
+        "id": 4,
+        "name": "玉石 材料",
+        "price": 0,
+        "commissionRate": 0,
+        "type": "material_placeholder",
+        "createdAt": "2025-05-25T09:50:46.224Z",
+        "updatedAt": "2025-05-25T09:50:46.224Z",
+        "description": "玉石 材料的占位产品",
+        "imageUrl": null,
+        "barcode": null,
+        "category": null,
+        "cost": null,
+        "sku": null,
+        "categoryId": null,
+        "details": null,
+        "dimensions": null,
+        "imageUrls": [],
+        "inventory": null,
+        "material": "玉石",
+        "unit": null
+      }
+    ],
+    "pieceWorkItems": [],
+    "schedules": [],
+    "scheduleTemplates": [],
+    "gallerySales": [],
+    "workshops": [
+      {
+        "id": 1,
+        "date": "2025-05-25T06:00:00.000Z",
+        "productId": null,
+        "teacherId": 1,
+        "assistantId": 1,
+        "role": "cloisonne_workshop",
+        "locationType": "outside",
+        "location": "2222",
+        "participants": 10,
+        "duration": 2,
+        "notes": null,
+        "createdAt": "2025-05-25T08:54:13.777Z",
+        "updatedAt": "2025-05-25T08:54:13.777Z",
+        "activityId": null,
+        "activityType": "cloisonne_enameling",
+        "baseType": "jewelry",
+        "channelId": null,
+        "customerId": 1,
+        "depositAmount": 500,
+        "managerId": 1,
+        "paymentMethod": null,
+        "paymentStatus": "deposit_paid",
+        "status": "confirmed",
+        "totalAmount": 1111
+      },
+      {
+        "id": 2,
+        "date": "2025-05-26T06:00:00.000Z",
+        "productId": null,
+        "teacherId": 1,
+        "assistantId": 2,
+        "role": "jewelry_workshop",
+        "locationType": "in_gallery",
+        "location": "11",
+        "participants": 10,
+        "duration": 2,
+        "notes": null,
+        "createdAt": "2025-05-26T04:03:50.128Z",
+        "updatedAt": "2025-05-26T04:03:50.128Z",
+        "activityId": null,
+        "activityType": "jewelry_enameling",
+        "baseType": "jewelry",
+        "channelId": null,
+        "customerId": 1,
+        "depositAmount": 0,
+        "managerId": 1,
+        "paymentMethod": null,
+        "paymentStatus": "fully_paid",
+        "status": "completed",
+        "totalAmount": 110
+      }
+    ],
+    "pieceWorks": [],
+    "coffeeShopSales": [],
+    "systemSettings": [],
+    "warehouses": [
+      {
+        "id": 1,
+        "name": "1111",
+        "type": "physical",
+        "location": null,
+        "description": null,
+        "isActive": true,
+        "createdAt": "2025-05-25T09:53:45.364Z",
+        "updatedAt": "2025-05-25T09:53:45.364Z",
+        "code": null,
+        "isDefault": false,
+        "productionBaseId": null
+      }
+    ],
+    "inventoryItems": [],
+    "inventoryTransactions": [],
+    "customers": [
+      {
+        "id": 1,
+        "name": "测试客户",
+        "phone": null,
+        "email": null,
+        "address": null,
+        "type": "individual",
+        "notes": null,
+        "isActive": true,
+        "createdAt": "2025-05-24T07:00:17.654Z",
+        "updatedAt": "2025-05-24T07:00:17.654Z"
+      }
+    ],
+    "orders": [],
+    "channels": [
+      {
+        "id": 1,
+        "name": "测试",
+        "code": "01",
+        "description": "",
+        "contactName": "",
+        "contactPhone": "",
+        "contactEmail": "",
+        "address": "",
+        "isActive": true,
+        "createdAt": "2025-05-25T03:37:30.960Z",
+        "updatedAt": "2025-05-25T03:37:30.960Z",
+        "bankAccount": "",
+        "bankName": "",
+        "cooperationStart": null,
+        "settlementCycle": 1,
+        "status": "active",
+        "prices": [
+          {
+            "id": 1,
+            "channelId": 1,
+            "productId": 1,
+            "price": 1111,
+            "isActive": true,
+            "createdAt": "2025-05-25T03:37:41.381Z",
+            "updatedAt": "2025-05-25T03:37:41.381Z"
+          }
+        ]
+      }
+    ],
+    "salaryRecords": [],
+    "salaryAdjustments": [],
+    "users": [
+      {
+        "id": "cmb4kz43d00006wx9qco0i3l0",
+        "name": "超级管理员",
+        "email": "admin@linghua.com",
+        "role": "admin",
+        "roles": [
+          1
+        ],
+        "employeeId": null,
+        "createdAt": "2025-05-26T04:21:51.097Z",
+        "updatedAt": "2025-05-26T04:25:08.947Z"
+      }
+    ]
+  }
+}

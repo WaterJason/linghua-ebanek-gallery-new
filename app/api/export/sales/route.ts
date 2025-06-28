@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import prisma from "@/lib/db"
 import ExcelJS from "exceljs"
 import { format } from "date-fns"
@@ -8,7 +7,7 @@ import { format } from "date-fns"
 export async function GET(request: NextRequest) {
   try {
     // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }

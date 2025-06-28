@@ -1,0 +1,15 @@
+428c8e027c5db644702256210efb287c  backup-product-module-20250529-114930/product-actions.test.ts
+ce8216b46ea77862c7a173f54d6b8667  backup-product-module-20250529-114930/products/batch-update/route.ts
+d7ad25b23a1f1d594173747aa1d635ed  backup-product-module-20250529-114930/products/route.ts
+fe69a87f9d59e00006d56b363d2f2ee6  backup-product-module-20250529-114930/products/layout.tsx
+a8f6abf551e1d1a5c50ca4007d79e15b  backup-product-module-20250529-114930/products/[id]/page.tsx
+4821bf77e1416f3481c43850e29e991c  backup-product-module-20250529-114930/products/page.tsx
+20855f6c599c3a36a7e3e6d6fe6e1a8c  backup-product-module-20250529-114930/products/stats/route.ts
+8e0e7960eb08adb24ccbccda76805aec  backup-product-module-20250529-114930/products/analytics/page.tsx
+eefcdb8b223d651ee4ad4dd18237f986  backup-product-module-20250529-114930/product.ts
+6db76d0e941873e61c289bea25e4e788  backup-product-module-20250529-114930/product-management.tsx
+0b224e77da22ddac557c11839926b7ba  backup-product-module-20250529-114930/product-actions.ts
+fcaec91bc2f89c74b1c9900ac9bf0d58  backup-product-module-20250529-114930/backup-checksums.md5
+c0e1138c8c4543818669bc4ff8377c69  backup-product-module-20250529-114930/use-products.ts
+e7f92e87a85a00117b46c4a23713f755  backup-product-module-20250529-114930/data-adapter.ts
+e8def51a06166313de4cf494e3a71237  backup-product-module-20250529-114930/prisma-models.ts

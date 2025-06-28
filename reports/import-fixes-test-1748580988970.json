@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-05-30T04:56:28.969Z",
+  "summary": {
+    "totalFiles": 808,
+    "filesWithIssues": 0,
+    "totalIssues": 0,
+    "commentedReferences": 0
+  },
+  "results": [],
+  "testFiles": [
+    {
+      "file": "components/channel/channel-sales-import-form.tsx",
+      "exists": true,
+      "hasProductActions": true,
+      "hasArtworkActions": false
+    },
+    {
+      "file": "components/mobile/mobile-products.tsx",
+      "exists": true,
+      "hasProductActions": true,
+      "hasArtworkActions": false
+    }
+  ]
+}

@@ -33,6 +33,18 @@ import {
   BarChart,
   LineChart,
   Minus,
+  Globe,
+  Bell,
+  ClipboardList,
+  Calendar,
+  DollarSign,
+  Languages,
+  Lock,
+  LogOut,
+  Home,
+  Search,
+  UserCog,
+  Palette,
 } from "lucide-react"
 
 export type IconProps = React.HTMLAttributes<SVGElement>
@@ -46,6 +58,7 @@ export const Icons = {
   trash: Trash,
   settings: Settings,
   user: User,
+  userCog: UserCog,
   arrowRight: ArrowRight,
   arrowUp: ArrowUp,
   arrowDown: ArrowDown,
@@ -62,6 +75,17 @@ export const Icons = {
   plus: Plus,
   minus: Minus,
   filter: Filter,
+  globe: Globe,
+  bell: Bell,
+  clipboard: ClipboardList,
+  calendar: Calendar,
+  dollar: DollarSign,
+  languages: Languages,
+  lock: Lock,
+  logout: LogOut,
+  home: Home,
+  search: Search,
+  palette: Palette,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-05-30T04:55:50.203Z",
+  "summary": {
+    "totalFiles": 808,
+    "filesWithIssues": 1,
+    "totalIssues": 1,
+    "commentedReferences": 1
+  },
+  "results": [
+    {
+      "filePath": "components/workshop-price-management.tsx",
+      "issues": [
+        {
+          "type": "artwork-actions-import",
+          "line": 27,
+          "match": "\"@/lib/actions/artwork-actions\"",
+          "suggestion": "Replace with @/lib/actions/product-actions"
+        },
+        {
+          "type": "commented-artwork-actions",
+          "line": 27,
+          "match": "// import { getArtworks } from \"@/lib/actions/artwork-actions",
+          "suggestion": "This is commented out, which is good"
+        }
+      ],
+      "hasIssues": true
+    }
+  ],
+  "testFiles": [
+    {
+      "file": "components/channel/channel-sales-import-form.tsx",
+      "exists": true,
+      "hasProductActions": true,
+      "hasArtworkActions": false
+    },
+    {
+      "file": "components/mobile/mobile-products.tsx",
+      "exists": true,
+      "hasProductActions": true,
+      "hasArtworkActions": false
+    }
+  ]
+}

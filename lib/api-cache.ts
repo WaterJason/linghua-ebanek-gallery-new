@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-
+import { getServerSession } from "@/lib/auth-helpers"
 // 缓存配置类型
 interface CacheConfig {
   maxAge: number // 缓存有效期（秒）
@@ -81,7 +79,7 @@ export async function withApiCache(
   }
   
   // 获取会话
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession()
   
   // 生成缓存键
   const cacheKey = generateCacheKey(request, session, cacheConfig)

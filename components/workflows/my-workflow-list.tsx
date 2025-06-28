@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DataTable } from "@/components/ui/data-table"
 import { ColumnDef } from "@tanstack/react-table"
-import { toast } from "@/components/ui/use-toast"
-import { 
-  SearchIcon, 
-  CheckCircleIcon, 
-  XCircleIcon, 
+import { toast } from "@/hooks/use-toast"
+import {
+  SearchIcon,
+  CheckCircleIcon,
+  XCircleIcon,
   ClockIcon,
   AlertCircleIcon,
   EyeIcon,
@@ -20,7 +20,7 @@ import {
 import { SimplePagination } from "@/components/ui/simple-pagination"
 import { getMyWorkflowInstances } from "@/lib/actions/workflow-actions"
 import { format } from "date-fns"
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -116,7 +116,7 @@ export function MyWorkflowList() {
   const [isLoading, setIsLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [statusFilter, setStatusFilter] = useState<string>("")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
   const pageSize = 10
 
   // 加载工作流实例
@@ -125,7 +125,7 @@ export function MyWorkflowList() {
       setIsLoading(true)
       try {
         // 从服务器获取工作流实例
-        const data = await getMyWorkflowInstances(statusFilter as any || undefined)
+        const data = await getMyWorkflowInstances(statusFilter === "all" ? undefined : statusFilter as any)
         setInstances(data)
         setFilteredInstances(data)
         setTotalPages(Math.ceil(data.length / pageSize))
@@ -195,11 +195,11 @@ export function MyWorkflowList() {
         if (instance.status !== "pending") {
           return <div className="text-center">-</div>
         }
-        
+
         const currentStep = instance.approvals.find(
           approval => approval.workflowStep.stepNumber === instance.currentStepNumber
         )
-        
+
         return (
           <div className="text-center">
             {currentStep ? currentStep.workflowStep.name : `步骤 ${instance.currentStepNumber}`}
@@ -221,7 +221,7 @@ export function MyWorkflowList() {
       header: "完成时间",
       cell: ({ row }) => (
         <div>
-          {row.original.completedAt 
+          {row.original.completedAt
             ? format(new Date(row.original.completedAt), "yyyy-MM-dd HH:mm")
             : "-"}
         </div>
@@ -264,7 +264,7 @@ export function MyWorkflowList() {
                 <SelectValue placeholder="所有状态" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">所有状态</SelectItem>
+                <SelectItem value="all">所有状态</SelectItem>
                 <SelectItem value="pending">审批中</SelectItem>
                 <SelectItem value="approved">已通过</SelectItem>
                 <SelectItem value="rejected">已拒绝</SelectItem>

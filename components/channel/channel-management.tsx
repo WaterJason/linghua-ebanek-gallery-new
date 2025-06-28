@@ -7,13 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { ResponsiveDataGrid } from "@/components/ui/responsive-data-grid"
+import { SmartTooltip } from "@/components/ui/tooltip"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { PlusIcon, EditIcon, TrashIcon, EyeIcon } from "lucide-react"
 import { ChannelForm } from "@/components/channel/channel-form"
 import { ChannelDetail } from "@/components/channel/channel-detail"
 import { getChannels, deleteChannel } from "@/lib/actions/channel-actions"
+import { useEnhancedOperations } from "@/lib/enhanced-operations-integration"
 
 export function ChannelManagement() {
   const { toast } = useToast()
+  const { executeOperation } = useEnhancedOperations()
   const [channels, setChannels] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -69,19 +73,25 @@ export function ChannelManagement() {
   // 确认删除渠道
   const confirmDeleteChannel = async () => {
     try {
-      await deleteChannel(selectedChannel.id)
-      toast({
-        title: "删除成功",
-        description: `渠道 ${selectedChannel.name} 已成功删除`,
-      })
+      await executeOperation(
+        async () => {
+          await deleteChannel(selectedChannel.id)
+          return selectedChannel
+        },
+        {
+          playSound: true,
+          soundType: 'warning',
+          feedbackMessage: `渠道 "${selectedChannel.name}" 已删除`,
+          enableUndo: true,
+          undoTags: ['delete', 'channel'],
+          undoPriority: 8
+        }
+      )
+
       loadChannels()
       setIsDeleteDialogOpen(false)
     } catch (error) {
-      toast({
-        title: "删除失败",
-        description: error.message || "无法删除渠道",
-        variant: "destructive",
-      })
+      // 错误已由增强操作系统处理
     }
   }
 
@@ -120,7 +130,7 @@ export function ChannelManagement() {
         const status = row.original.status
         let statusText = "未知"
         let statusClass = "bg-gray-100 text-gray-800"
-        
+
         if (status === "active") {
           statusText = "合作中"
           statusClass = "bg-green-100 text-green-800"
@@ -131,7 +141,7 @@ export function ChannelManagement() {
           statusText = "终止合作"
           statusClass = "bg-red-100 text-red-800"
         }
-        
+
         return (
           <div className={`px-2 py-1 rounded-full text-xs font-medium ${statusClass}`}>
             {statusText}
@@ -180,20 +190,27 @@ export function ChannelManagement() {
   ]
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>渠道商管理</CardTitle>
-              <CardDescription>管理所有渠道商的基本信息</CardDescription>
+    <TooltipProvider>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>渠道商管理</CardTitle>
+                <CardDescription>管理所有渠道商的基本信息</CardDescription>
+              </div>
+              <SmartTooltip
+                content="添加新的渠道商，包括基本信息、联系方式和合作条件"
+                type="help"
+                title="添加渠道商"
+              >
+                <Button onClick={handleAddChannel}>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  添加渠道商
+                </Button>
+              </SmartTooltip>
             </div>
-            <Button onClick={handleAddChannel}>
-              <PlusIcon className="mr-2 h-4 w-4" />
-              添加渠道商
-            </Button>
-          </div>
-        </CardHeader>
+          </CardHeader>
         <CardContent>
           <ResponsiveDataGrid
             data={channels}
@@ -249,6 +266,7 @@ export function ChannelManagement() {
         description={`确定要删除渠道 "${selectedChannel?.name}" 吗？此操作不可撤销。`}
         onConfirm={confirmDeleteChannel}
       />
-    </div>
+      </div>
+    </TooltipProvider>
   )
 }

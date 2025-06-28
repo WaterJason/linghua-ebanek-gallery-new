@@ -1,0 +1,881 @@
+import React, { useState, useEffect, useCallback } from 'react';
+
+// 确保 Tailwind CSS CDN 在 HTML 文件中加载，这里假设已加载
+// <script src="https://cdn.tailwindcss.com"></script>
+
+// Lucide React Icons (假设已通过CDN或npm安装并可用)
+// 请务必在您的HTML文件中，将以下脚本添加到 <head> 或 <body> 底部 (在您的React应用脚本之前):
+// <script type="module">
+//   // 确保这个 CDN 链接是可访问的
+//   import * as Lucide from 'https://cdn.jsdelivr.net/npm/lucide-react@0.368.0/dist/lucide-react.mjs';
+//   // 这一行至关重要，它将 Lucide 图标对象暴露给全局的 window 对象
+//   window.Lucide = Lucide;
+// </script>
+
+// 定义一个图标回退组件，以防Lucide图标未正确加载
+const IconFallback = ({ className }) => <span className={className} style={{ display: 'inline-block', width: '1em', height: '1em', border: '1px solid currentColor', borderRadius: '2px', textAlign: 'center', lineHeight: '1em' }}>?</span>;
+
+// 安全地获取 Lucide 图标对象，如果未定义则使用空对象
+const LucideIcons = window.Lucide || {};
+
+// 解构图标，并为每个图标提供回退组件，以避免在window.Lucide未定义时报错
+const Home = LucideIcons.Home || IconFallback;
+const Users = LucideIcons.Users || IconFallback;
+const ShoppingCart = LucideIcons.ShoppingCart || IconFallback;
+const Package = LucideIcons.Package || IconFallback;
+const DollarSign = LucideIcons.DollarSign || IconFallback;
+const Settings = LucideIcons.Settings || IconFallback;
+const Bell = LucideIcons.Bell || IconFallback;
+const Search = LucideIcons.Search || IconFallback;
+const Menu = LucideIcons.Menu || IconFallback;
+const ChevronRight = LucideIcons.ChevronRight || IconFallback;
+const ChevronDown = LucideIcons.ChevronDown || IconFallback;
+const Plus = LucideIcons.Plus || IconFallback;
+const LayoutDashboard = LucideIcons.LayoutDashboard || IconFallback;
+const Store = LucideIcons.Store || IconFallback;
+const Factory = LucideIcons.Factory || IconFallback;
+const Coffee = LucideIcons.Coffee || IconFallback;
+const BookOpen = LucideIcons.BookOpen || IconFallback;
+const BarChart = LucideIcons.BarChart || IconFallback;
+const CreditCard = LucideIcons.CreditCard || IconFallback;
+const CalendarDays = LucideIcons.CalendarDays || IconFallback;
+
+
+// --- Toast 通知组件 ---
+const Toast = ({ message, type, onClose }) => {
+  const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+  const icon = type === 'success' ? '✔' : type === 'error' ? '✖' : 'ℹ';
+
+  return (
+    <div className={`fixed bottom-6 right-6 p-4 rounded-lg shadow-lg text-white flex items-center space-x-3 transition-opacity duration-300 z-50 ${bgColor}`}>
+      <span className="text-xl">{icon}</span>
+      <span>{message}</span>
+      <button onClick={onClose} className="ml-4 text-white opacity-75 hover:opacity-100 text-lg leading-none">&times;</button>
+    </div>
+  );
+};
+
+
+// 模拟数据 (部分数据可为空，用于演示空状态)
+const mockCustomers = [
+  { id: 'C001', name: '张三', phone: '138****1234', source: 'POS销售', type: '个人客户', status: '活跃' },
+  { id: 'C002', name: '李四工艺坊', phone: '139****5678', source: '定制作品', type: '企业客户', status: '合作中' },
+  // { id: 'C003', name: '王五', phone: '137****9012', source: '手作团建', type: '个人客户', status: '活跃' },
+];
+
+const mockSalesOrders = [
+  { id: 'SO001', customer: '张三', amount: '1200.00', status: '待发货', date: '2025-05-20' },
+  { id: 'SO002', customer: '李四工艺坊', amount: '8500.00', status: '制作中', date: '2025-05-18' },
+  // { id: 'SO003', customer: '王五', amount: '350.00', status: '已完成', date: '2025-05-15' },
+];
+
+const mockProducts = [
+  { id: 'P001', name: '祥云如意掐丝珐琅盘', category: '珐琅盘', stock: 50, price: '880.00' },
+  { id: 'P002', name: '莲花香炉', category: '香炉', stock: 20, price: '1200.00' },
+  // { id: 'P003', name: '掐丝珐琅手镯', category: '配饰', stock: 150, price: '350.00' },
+];
+
+// 仪表盘数据
+const mockDashboardData = {
+  todaySales: '¥ 5,230.00',
+  monthlySales: '¥ 125,800.00',
+  pendingOrders: 12,
+  lowStockAlerts: 5,
+  overdueReceivables: '¥ 15,000.00',
+};
+
+// 侧边栏导航配置
+const navConfig = [
+  {
+    name: '概览与客户',
+    icon: LayoutDashboard,
+    children: [
+      { name: '仪表盘', path: 'dashboard', icon: Home },
+      { name: '客户管理', path: 'customers', icon: Users },
+    ],
+  },
+  {
+    name: '销售与渠道',
+    icon: ShoppingCart,
+    children: [
+      { name: '销售管理', path: 'sales', icon: Store },
+      { name: '渠道管理', path: 'channels', icon: Users }, // Reusing Users icon for channels
+    ],
+  },
+  {
+    name: '运营与服务',
+    icon: Factory, // Using Factory for production/service related
+    children: [
+      { name: '手作团建', path: 'workshops', icon: BookOpen },
+      { name: '咖啡店', path: 'coffee-shop', icon: Coffee },
+    ],
+  },
+  {
+    name: '供应链与生产',
+    icon: Package,
+    children: [
+      { name: '产品管理', path: 'products', icon: Package },
+      { name: '采购管理', path: 'purchase', icon: ShoppingCart },
+      { name: '库存管理', path: 'inventory', icon: Store }, // Reusing Store for inventory
+      { name: '制作管理', path: 'production', icon: Factory }, // Reusing Factory for production
+    ],
+  },
+  {
+    name: '财务与人事',
+    icon: DollarSign,
+    children: [
+      { name: '财务管理', path: 'finance', icon: CreditCard },
+      { name: '薪酬管理', path: 'payroll', icon: DollarSign },
+      { name: '员工管理', path: 'employees', icon: Users },
+      { name: '排班管理', path: 'schedules', icon: CalendarDays },
+    ],
+  },
+  {
+    name: '报表中心',
+    icon: BarChart,
+    children: [
+      { name: '综合报表', path: 'reports-overall', icon: BarChart },
+      { name: '销售报表', path: 'reports-sales', icon: BarChart },
+      // ... more report types
+    ],
+  },
+  {
+    name: '系统管理',
+    icon: Settings,
+    children: [
+      { name: '系统设置', path: 'settings', icon: Settings },
+      { name: '用户管理', path: 'settings-users', icon: Users },
+      // ... more system settings
+    ],
+  },
+];
+
+// --- 页面组件 ---
+
+const DashboardPage = ({ onQuickAction }) => (
+  <div className="p-6 bg-white rounded-xl shadow-md transition-colors duration-300 dark:bg-gray-800">
+    <h2 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-100">仪表盘概览</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="bg-blue-50 p-6 rounded-xl shadow-sm border border-blue-200 dark:bg-blue-900 dark:border-blue-700">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium text-blue-700 dark:text-blue-200">今日销售额</h3>
+          <DollarSign className="w-6 h-6 text-blue-500 dark:text-blue-400" />
+        </div>
+        <p className="text-3xl font-bold text-blue-800 dark:text-blue-100">{mockDashboardData.todaySales}</p>
+      </div>
+      <div className="bg-green-50 p-6 rounded-xl shadow-sm border border-green-200 dark:bg-green-900 dark:border-green-700">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium text-green-700 dark:text-green-200">本月销售额</h3>
+          <BarChart className="w-6 h-6 text-green-500 dark:text-green-400" />
+        </div>
+        <p className="text-3xl font-bold text-green-800 dark:text-green-100">{mockDashboardData.monthlySales}</p>
+      </div>
+      <div className="bg-yellow-50 p-6 rounded-xl shadow-sm border border-yellow-200 dark:bg-yellow-900 dark:border-yellow-700">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium text-yellow-700 dark:text-yellow-200">待处理订单</h3>
+          <ShoppingCart className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
+        </div>
+        <p className="text-3xl font-bold text-yellow-800 dark:text-yellow-100">{mockDashboardData.pendingOrders}</p>
+      </div>
+      <div className="bg-red-50 p-6 rounded-xl shadow-sm border border-red-200 dark:bg-red-900 dark:border-red-700">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium text-red-700 dark:text-red-200">低库存预警</h3>
+          <Package className="w-6 h-6 text-red-500 dark:text-red-400" />
+        </div>
+        <p className="text-3xl font-bold text-red-800 dark:text-red-100">{mockDashboardData.lowStockAlerts}</p>
+      </div>
+      <div className="bg-purple-50 p-6 rounded-xl shadow-sm border border-purple-200 dark:bg-purple-900 dark:border-purple-700">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium text-purple-700 dark:text-purple-200">逾期应收款</h3>
+          <CreditCard className="w-6 h-6 text-purple-500 dark:text-purple-400" />
+        </div>
+        <p className="text-3xl font-bold text-purple-800 dark:text-purple-100">{mockDashboardData.overdueReceivables}</p>
+      </div>
+    </div>
+
+    <div className="mt-8">
+      <h3 className="text-xl font-semibold text-gray-800 mb-4 dark:text-gray-100">快速操作 / 日常录入</h3>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <button
+          onClick={() => onQuickAction('new-sales-order')}
+          className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl shadow-sm border border-gray-200 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600"
+        >
+          <ShoppingCart className="w-8 h-8 text-indigo-500 mb-2 dark:text-indigo-300" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">新建销售订单</span>
+        </button>
+        <button
+          onClick={() => onQuickAction('record-income')}
+          className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl shadow-sm border border-gray-200 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600"
+        >
+          <DollarSign className="w-8 h-8 text-green-500 mb-2 dark:text-green-300" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">录入收款</span>
+        </button>
+        <button
+          onClick={() => onQuickAction('add-customer')}
+          className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl shadow-sm border border-gray-200 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600"
+        >
+          <Users className="w-8 h-8 text-blue-500 mb-2 dark:text-blue-300" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">新增客户</span>
+        </button>
+        <button
+          onClick={() => onQuickAction('quick-pos')}
+          className="flex flex-col items-center justify-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl shadow-sm border border-gray-200 transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600"
+        >
+          <Store className="w-8 h-8 text-purple-500 mb-2 dark:text-purple-300" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">POS快速销售</span>
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+const CustomersPage = () => (
+  <div className="p-6 bg-white rounded-xl shadow-md transition-colors duration-300 dark:bg-gray-800">
+    <h2 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-100">客户管理</h2>
+    <div className="mb-4 flex justify-between items-center">
+      <input
+        type="text"
+        placeholder="搜索客户姓名/电话..."
+        className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-1/3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+      />
+      <button className="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center shadow-sm">
+        <Plus className="w-4 h-4 mr-2" /> 新增客户
+      </button>
+    </div>
+    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm dark:border-gray-700">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">客户ID</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">姓名/名称</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">联系电话</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">来源</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">类型</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">状态</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">操作</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+          {mockCustomers.length > 0 ? (
+            mockCustomers.map((customer) => (
+              <tr key={customer.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{customer.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{customer.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{customer.phone}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{customer.source}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{customer.type}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{customer.status}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <a href="#" className="text-indigo-600 hover:text-indigo-800 mr-4 dark:text-indigo-400 dark:hover:text-indigo-300">编辑</a>
+                  <a href="#" className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">删除</a>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="7" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                <Users className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+                <p className="text-lg font-medium mb-2">暂无客户数据</p>
+                <p className="text-sm">点击“新增客户”按钮，开始记录您的客户信息吧！</p>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+const SalesPage = () => (
+  <div className="p-6 bg-white rounded-xl shadow-md transition-colors duration-300 dark:bg-gray-800">
+    <h2 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-100">销售管理</h2>
+    <div className="mb-4 flex justify-between items-center">
+      <input
+        type="text"
+        placeholder="搜索订单号/客户..."
+        className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-1/3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+      />
+      <button className="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center shadow-sm">
+        <Plus className="w-4 h-4 mr-2" /> 新建销售订单
+      </button>
+    </div>
+    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm dark:border-gray-700">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">订单号</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">客户</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">金额</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">状态</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">日期</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">操作</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+          {mockSalesOrders.length > 0 ? (
+            mockSalesOrders.map((order) => (
+              <tr key={order.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{order.id}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{order.customer}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">¥ {order.amount}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    order.status === '待发货' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                    order.status === '制作中' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  }`}>
+                    {order.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{order.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <a href="#" className="text-indigo-600 hover:text-indigo-800 mr-4 dark:text-indigo-400 dark:hover:text-indigo-300">详情</a>
+                  <a href="#" className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">删除</a>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+                <p className="text-lg font-medium mb-2">暂无销售订单</p>
+                <p className="text-sm">点击“新建销售订单”按钮，开始记录您的销售吧！</p>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+const ProductsPage = ({ showToast }) => {
+  const [productName, setProductName] = useState('');
+  const [productCategory, setProductCategory] = useState('');
+  const [productKeywords, setProductKeywords] = useState('');
+  const [generatedDescription, setGeneratedDescription] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleCopyDescription = () => {
+    if (generatedDescription) {
+      // document.execCommand('copy') is deprecated but used for iframe compatibility
+      const textarea = document.createElement('textarea');
+      textarea.value = generatedDescription;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('产品描述已复制！', 'success');
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+        showToast('复制失败，请手动复制', 'error');
+      }
+      document.body.removeChild(textarea);
+    }
+  };
+
+  const generateDescription = async () => {
+    setIsLoading(true);
+    setError('');
+    setGeneratedDescription('');
+
+    const prompt = `为以下掐丝珐琅产品生成一份富有吸引力的营销描述：
+产品名称: ${productName}
+产品类别: ${productCategory}
+关键词/特点: ${productKeywords || '无'}
+请突出其非遗工艺、艺术价值和独特之处。描述应简洁、引人入胜，适合电商平台或宣传材料。`;
+
+    let chatHistory = [];
+    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+    const payload = { contents: chatHistory };
+    const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+
+      if (result.candidates && result.candidates.length > 0 &&
+          result.candidates[0].content && result.candidates[0].content.parts &&
+          result.candidates[0].content.parts.length > 0) {
+        const text = result.candidates[0].content.parts[0].text;
+        setGeneratedDescription(text);
+        showToast('产品描述生成成功！', 'success');
+      } else {
+        setError('生成描述失败：未收到有效响应。');
+        showToast('生成描述失败！', 'error');
+        console.error('生成描述失败：', result);
+      }
+    } catch (err) {
+      setError(`生成描述时发生错误: ${err.message}`);
+      showToast('生成描述时发生错误！', 'error');
+      console.error('API调用错误:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-6 bg-white rounded-xl shadow-md transition-colors duration-300 dark:bg-gray-800">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-100">产品管理</h2>
+
+      {/* 现有产品列表 */}
+      <h3 className="text-xl font-semibold text-gray-800 mb-4 dark:text-gray-100">现有产品列表</h3>
+      <div className="mb-4 flex justify-between items-center">
+        <input
+          type="text"
+          placeholder="搜索产品名称/编码..."
+          className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 w-1/3 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+        />
+        <button className="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center shadow-sm">
+          <Plus className="w-4 h-4 mr-2" /> 新增产品
+        </button>
+      </div>
+      <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm mb-8 dark:border-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">产品ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">产品名称</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">分类</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">库存</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">价格</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">操作</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+            {mockProducts.length > 0 ? (
+              mockProducts.map((product) => (
+                <tr key={product.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{product.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{product.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{product.category}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{product.stock}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">¥ {product.price}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a href="#" className="text-indigo-600 hover:text-indigo-800 mr-4 dark:text-indigo-400 dark:hover:text-indigo-300">编辑</a>
+                    <a href="#" className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">删除</a>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                  <Package className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+                  <p className="text-lg font-medium mb-2">暂无产品数据</p>
+                  <p className="text-sm">点击“新增产品”按钮，开始管理您的掐丝珐琅作品吧！</p>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ✨智能产品描述生成✨ 功能区域 */}
+      <div className="mt-8 p-6 bg-blue-50 rounded-xl shadow-sm border border-blue-200 dark:bg-blue-900 dark:border-blue-700">
+        <h3 className="text-xl font-semibold text-blue-800 mb-4 flex items-center dark:text-blue-200">
+          <span className="mr-2">✨</span> 智能产品描述生成
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label htmlFor="productName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">产品名称</label>
+            <input
+              type="text"
+              id="productName"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+              placeholder="如：祥云如意掐丝珐琅盘"
+            />
+          </div>
+          <div>
+            <label htmlFor="productCategory" className="block text-sm font-medium text-gray-700 dark:text-gray-300">产品类别</label>
+            <input
+              type="text"
+              id="productCategory"
+              value={productCategory}
+              onChange={(e) => setProductCategory(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+              placeholder="如：珐琅盘、香炉、配饰"
+            />
+          </div>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="productKeywords" className="block text-sm font-medium text-gray-700 dark:text-gray-300">关键词/特点 (可选)</label>
+          <textarea
+            id="productKeywords"
+            value={productKeywords}
+            onChange={(e) => setProductKeywords(e.target.value)}
+            rows="3"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+            placeholder="如：非遗工艺、手工制作、独特纹样、收藏价值"
+          ></textarea>
+        </div>
+        <button
+          onClick={generateDescription}
+          disabled={isLoading || !productName || !productCategory}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-sm"
+        >
+          {isLoading ? (
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          ) : (
+            <span className="mr-2">✨</span>
+          )}
+          {isLoading ? '生成中...' : '生成产品描述'}
+        </button>
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg dark:bg-red-900 dark:border-red-700 dark:text-red-200" role="alert">
+            {error}
+          </div>
+        )}
+
+        {generatedDescription && (
+          <div className="mt-6 p-4 bg-white border border-gray-300 rounded-lg shadow-inner dark:bg-gray-700 dark:border-gray-600">
+            <h4 className="text-lg font-medium text-gray-800 mb-2 dark:text-gray-100">生成的产品描述：</h4>
+            <p className="text-gray-700 whitespace-pre-wrap dark:text-gray-200">{generatedDescription}</p>
+            <button
+              onClick={handleCopyDescription}
+              className="mt-3 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200 text-sm shadow-sm dark:bg-gray-600 dark:text-gray-100 dark:hover:bg-gray-500"
+            >
+              复制描述
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const FinancePage = () => (
+  <div className="p-6 bg-white rounded-xl shadow-md transition-colors duration-300 dark:bg-gray-800">
+    <h2 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-100">财务管理</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="bg-purple-50 p-6 rounded-xl shadow-sm border border-purple-200 dark:bg-purple-900 dark:border-purple-700">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium text-purple-700 dark:text-purple-200">总收入 (本月)</h3>
+          <DollarSign className="w-6 h-6 text-purple-500 dark:text-purple-400" />
+        </div>
+        <p className="text-3xl font-bold text-purple-800 dark:text-purple-100">¥ 130,500.00</p>
+      </div>
+      <div className="bg-orange-50 p-6 rounded-xl shadow-sm border border-orange-200 dark:bg-orange-900 dark:border-orange-700">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-medium text-orange-700 dark:text-orange-200">总支出 (本月)</h3>
+          <CreditCard className="w-6 h-6 text-orange-500 dark:text-orange-400" />
+        </div>
+        <p className="text-3xl font-bold text-orange-800 dark:text-orange-100">¥ 75,200.00</p>
+      </div>
+    </div>
+
+    <h3 className="text-xl font-semibold text-gray-800 mb-4 dark:text-gray-100">资金账户概览</h3>
+    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm dark:border-gray-700">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">账户名称</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">账户类型</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">当前余额</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">操作</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+          <tr>
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">招商银行主账户</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">银行存款</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">¥ 65,300.00</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <a href="#" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">查看流水</a>
+            </td>
+          </tr>
+          <tr>
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">支付宝收款账户</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">第三方支付</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">¥ 8,120.00</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <a href="#" className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">查看流水</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+const SettingsPage = () => (
+  <div className="p-6 bg-white rounded-xl shadow-md transition-colors duration-300 dark:bg-gray-800">
+    <h2 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-100">系统设置</h2>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-100 transition-colors duration-200 cursor-pointer dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600">
+        <Users className="w-8 h-8 text-indigo-500 mb-3 dark:text-indigo-300" />
+        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">用户管理</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">管理系统用户账号</p>
+      </div>
+      <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-100 transition-colors duration-200 cursor-pointer dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600">
+        <LayoutDashboard className="w-8 h-8 text-green-500 mb-3 dark:text-green-300" />
+        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">角色与权限</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">配置用户角色和访问权限</p>
+      </div>
+      <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-100 transition-colors duration-200 cursor-pointer dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600">
+        <Package className="w-8 h-8 text-blue-500 mb-3 dark:text-blue-300" />
+        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">数据导入导出</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">批量导入导出业务数据</p>
+      </div>
+      <div className="bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-100 transition-colors duration-200 cursor-pointer dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600">
+        <BookOpen className="w-8 h-8 text-yellow-500 mb-3 dark:text-yellow-300" />
+        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">系统日志</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">查看系统操作日志</p>
+      </div>
+    </div>
+  </div>
+);
+
+const QuickActionModal = ({ onClose, onAction }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 backdrop-blur-sm">
+      <div className="bg-white p-8 rounded-xl shadow-2xl w-96 transform transition-all duration-300 scale-100 opacity-100 dark:bg-gray-800">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">快速操作 / 日常录入</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-3xl leading-none font-light dark:text-gray-400 dark:hover:text-gray-200">&times;</button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <button onClick={() => onAction('new-sales-order')} className="flex flex-col items-center p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors duration-200 dark:bg-indigo-900 dark:hover:bg-indigo-800">
+            <ShoppingCart className="w-6 h-6 text-indigo-600 mb-2 dark:text-indigo-300" />
+            <span className="text-sm text-gray-700 dark:text-gray-200">新建销售订单</span>
+          </button>
+          <button onClick={() => onAction('record-income')} className="flex flex-col items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors duration-200 dark:bg-green-900 dark:hover:bg-green-800">
+            <DollarSign className="w-6 h-6 text-green-600 mb-2 dark:text-green-300" />
+            <span className="text-sm text-gray-700 dark:text-gray-200">录入收款</span>
+          </button>
+          <button onClick={() => onAction('add-customer')} className="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200 dark:bg-blue-900 dark:hover:bg-blue-800">
+            <Users className="w-6 h-6 text-blue-600 mb-2 dark:text-blue-300" />
+            <span className="text-sm text-gray-700 dark:text-gray-200">新增客户</span>
+          </button>
+          <button onClick={() => onAction('quick-pos')} className="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200 dark:bg-purple-900 dark:hover:bg-purple-800">
+            <Store className="w-6 h-6 text-purple-600 mb-2 dark:text-purple-300" />
+            <span className="text-sm text-gray-700 dark:text-gray-200">POS快速销售</span>
+          </button>
+          <button onClick={() => onAction('record-expense')} className="flex flex-col items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors duration-200 dark:bg-orange-900 dark:hover:bg-orange-800">
+            <CreditCard className="w-6 h-6 text-orange-600 mb-2 dark:text-orange-300" />
+            <span className="text-sm text-gray-700 dark:text-gray-200">录入支出</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// --- 主应用组件 ---
+
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    // 从 localStorage 读取侧边栏状态
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    return savedState ? JSON.parse(savedState) : false;
+  });
+  const [openGroups, setOpenGroups] = useState({});
+  const [isQuickActionModalOpen, setIsQuickActionModalOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    // 从 localStorage 读取主题偏好
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
+  const [toast, setToast] = useState(null); // { message, type }
+
+  // 显示 Toast 通知
+  const showToast = useCallback((message, type = 'info') => {
+    setToast({ message, type });
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 3000); // 3秒后自动关闭
+    return () => clearTimeout(timer);
+  }, []);
+
+
+  useEffect(() => {
+    // 应用主题到 body
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+    document.documentElement.style.fontFamily = 'Inter, sans-serif'; // 设置 Inter 字体
+    // 保存主题到 localStorage
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    // 保存侧边栏状态到 localStorage
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(isSidebarCollapsed));
+  }, [isSidebarCollapsed]);
+
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
+  const navigateTo = (path) => {
+    setCurrentPage(path);
+  };
+
+  const toggleGroup = (groupName) => {
+    setOpenGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
+
+  const handleQuickAction = (actionType) => {
+    console.log(`Quick action: ${actionType}`);
+    setIsQuickActionModalOpen(false);
+    showToast(`执行快捷操作: ${actionType}`, 'info');
+    // 在实际应用中，这里会导航到特定表单或打开另一个模态框
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return <DashboardPage onQuickAction={() => setIsQuickActionModalOpen(true)} />;
+      case 'customers':
+        return <CustomersPage />;
+      case 'sales':
+        return <SalesPage />;
+      case 'products':
+        return <ProductsPage showToast={showToast} />; // 传递 showToast
+      case 'finance':
+        return <FinancePage />;
+      case 'settings':
+      case 'settings-users': // For simplicity, direct to general settings page
+        return <SettingsPage />;
+      default:
+        return (
+          <div className="p-6 bg-white rounded-xl shadow-md dark:bg-gray-800">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 dark:text-gray-100">页面建设中...</h2>
+            <p className="text-gray-600 dark:text-gray-300">当前页面：{currentPage}</p>
+            <p className="mt-4 text-gray-500 dark:text-gray-400">请点击左侧导航栏其他选项。</p>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className={`flex h-screen ${theme}`}>
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm flex items-center justify-between px-6 z-40 dark:bg-gray-800 dark:text-gray-100 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center">
+          <button onClick={toggleSidebar} className="mr-4 p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200">
+            <Menu className="w-6 h-6" />
+          </button>
+          <div className="flex items-center text-xl font-bold text-gray-800 dark:text-gray-100">
+            {/* Image of Linhua Cloisonne Logo */}
+            <img src="https://placehold.co/32x32/6366F1/FFFFFF?text=LH" alt="聆花Logo" className="mr-2 rounded-full" />
+            <span className="hidden md:block">聆花掐丝珐琅馆ERP</span>
+          </div>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="relative hidden md:block">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="全局搜索..."
+              className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 shadow-sm"
+            />
+          </div>
+          <button className="relative p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200">
+            <Bell className="w-6 h-6" />
+            <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">3</span>
+          </button>
+          <button onClick={() => setIsQuickActionModalOpen(true)} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200">
+            <Plus className="w-6 h-6" />
+          </button>
+          <div className="relative group">
+            <button className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+              <img src="https://placehold.co/32x32/6366F1/FFFFFF?text=U" alt="用户头像" className="w-8 h-8 rounded-full border border-indigo-500" />
+              <span className="font-medium text-gray-800 hidden md:block dark:text-gray-100">管理员</span>
+            </button>
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 opacity-0 group-hover:opacity-100 group-hover:visible transition-all duration-200 invisible dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-600 rounded-md mx-1 my-0.5" onClick={() => navigateTo('settings-users')}>个人设置</a>
+              <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-600 rounded-md mx-1 my-0.5">
+                切换主题 ({theme === 'light' ? '暗色' : '亮色'})
+              </button>
+              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-600 rounded-md mx-1 my-0.5">退出登录</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Sidebar */}
+      <aside className={`fixed top-16 left-0 bottom-0 bg-white shadow-lg z-30 transition-all duration-300 ${isSidebarCollapsed ? 'w-20' : 'w-64'} dark:bg-gray-900 border-r border-gray-100 dark:border-gray-700`}>
+        <nav className="flex flex-col p-4 overflow-y-auto h-[calc(100vh-64px)]">
+          {navConfig.map((group) => (
+            <div key={group.name} className="mb-2">
+              <button
+                onClick={() => toggleGroup(group.name)}
+                className={`w-full flex items-center justify-between p-3 rounded-lg text-left font-semibold text-gray-700 hover:bg-gray-100 transition-colors duration-200 ${isSidebarCollapsed ? 'justify-center' : ''} dark:text-gray-200 dark:hover:bg-gray-800`}
+              >
+                <div className="flex items-center">
+                  {React.createElement(group.icon, { className: `w-5 h-5 ${!isSidebarCollapsed ? 'mr-3' : ''}` })}
+                  {!isSidebarCollapsed && <span>{group.name}</span>}
+                </div>
+                {!isSidebarCollapsed && (openGroups[group.name] ? <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />)}
+              </button>
+              {(!isSidebarCollapsed && openGroups[group.name]) && (
+                <div className="mt-1 ml-4 border-l border-gray-200 dark:border-gray-700">
+                  {group.children.map((item) => (
+                    <a
+                      key={item.name}
+                      href="#"
+                      onClick={() => navigateTo(item.path)}
+                      className={`flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200 ${currentPage === item.path ? 'bg-indigo-100 text-indigo-700 font-medium dark:bg-indigo-900 dark:text-indigo-300' : 'dark:text-gray-300 dark:hover:bg-gray-800'}`}
+                    >
+                      {React.createElement(item.icon, { className: "w-4 h-4 mr-2" })}
+                      {item.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+               {isSidebarCollapsed && (
+                <div className="absolute left-full top-0 ml-2 w-40 bg-white rounded-lg shadow-lg py-1 hidden group-hover:block dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                  {group.children.map((item) => (
+                    <a
+                      key={item.name}
+                      href="#"
+                      onClick={() => navigateTo(item.path)}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-600 rounded-md mx-1 my-0.5"
+                    >
+                      {React.createElement(item.icon, { className: "w-4 h-4 mr-2" })}
+                      {item.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className={`flex-1 p-6 pt-20 transition-all duration-300 ${isSidebarCollapsed ? 'ml-20' : 'ml-64'} bg-gray-50 dark:bg-gray-950`}>
+        {renderPage()}
+      </main>
+
+      {isQuickActionModalOpen && <QuickActionModal onClose={() => setIsQuickActionModalOpen(false)} onAction={handleQuickAction} />}
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default App;

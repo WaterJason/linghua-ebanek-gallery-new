@@ -7,15 +7,15 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { 
-  getProducts, 
-  getProduct, 
-  createProduct, 
-  updateProduct, 
-  deleteProduct,
-  getProductCategories,
-  createProductCategory,
-  updateProductCategory,
-  deleteProductCategory,
+  getArtworks, 
+  getArtwork, 
+  createArtwork, 
+  updateArtwork, 
+  deleteArtwork,
+  getArtworkCategories,
+  createArtworkCategory,
+  updateArtworkCategory,
+  deleteArtworkCategory,
   getProductTags,
   createProductTag,
   updateProductTag,
@@ -121,7 +121,7 @@ describe('产品管理模块测试', () => {
     await prisma.$disconnect();
   });
   
-  describe('getProducts 函数', () => {
+  describe('getArtworks 函数', () => {
     it('应该正确获取产品列表', async () => {
       const mockProducts = [
         {
@@ -149,7 +149,7 @@ describe('产品管理模块测试', () => {
       
       (findRecords as any).mockResolvedValue(mockProducts);
       
-      const result = await getProducts();
+      const result = await getArtworks();
       
       expect(findRecords).toHaveBeenCalledWith('product', expect.any(Object));
       expect(result).toHaveLength(2);
@@ -160,7 +160,7 @@ describe('产品管理模块测试', () => {
     });
   });
   
-  describe('createProduct 函数', () => {
+  describe('createArtwork 函数', () => {
     it('应该正确创建产品', async () => {
       const mockProduct = {
         id: 3,
@@ -171,7 +171,7 @@ describe('产品管理模块测试', () => {
         categoryId: 1,
       };
       
-      (prisma.product.findFirst as any).mockResolvedValue(null);
+      (prisma.artwork.findFirst as any).mockResolvedValue(null);
       (createRecord as any).mockResolvedValue(mockProduct);
       
       const data = {
@@ -182,10 +182,10 @@ describe('产品管理模块测试', () => {
         categoryId: 1,
       };
       
-      const result = await createProduct(data);
+      const result = await createArtwork(data);
       
       expect(validateCreateProduct).toHaveBeenCalledWith(data);
-      expect(prisma.product.findFirst).toHaveBeenCalledWith({
+      expect(prisma.artwork.findFirst).toHaveBeenCalledWith({
         where: {
           OR: [
             { code: 'P003' },
@@ -207,7 +207,7 @@ describe('产品管理模块测试', () => {
         code: 'P003',
       };
       
-      (prisma.product.findFirst as any).mockResolvedValue(mockProduct);
+      (prisma.artwork.findFirst as any).mockResolvedValue(mockProduct);
       
       const data = {
         name: '产品3',
@@ -217,19 +217,19 @@ describe('产品管理模块测试', () => {
         categoryId: 1,
       };
       
-      await expect(createProduct(data)).rejects.toThrow('产品名称或编码已存在');
+      await expect(createArtwork(data)).rejects.toThrow('产品名称或编码已存在');
     });
   });
   
-  describe('deleteProduct 函数', () => {
+  describe('deleteArtwork 函数', () => {
     it('应该正确删除产品', async () => {
-      (prisma.product.findUnique as any).mockResolvedValue({ id: 1, name: '产品1' });
+      (prisma.artwork.findUnique as any).mockResolvedValue({ id: 1, name: '产品1' });
       (prisma.inventoryItem.findFirst as any).mockResolvedValue(null);
       (prisma.salesItem.findFirst as any).mockResolvedValue(null);
       
-      const result = await deleteProduct(1);
+      const result = await deleteArtwork(1);
       
-      expect(prisma.product.findUnique).toHaveBeenCalledWith({
+      expect(prisma.artwork.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
       });
       expect(prisma.inventoryItem.findFirst).toHaveBeenCalledWith({
@@ -241,17 +241,17 @@ describe('产品管理模块测试', () => {
       expect(prisma.productTagsOnProducts.deleteMany).toHaveBeenCalledWith({
         where: { productId: 1 },
       });
-      expect(prisma.product.delete).toHaveBeenCalledWith({
+      expect(prisma.artwork.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
       expect(result.success).toBe(true);
     });
     
     it('应该在产品有库存记录时抛出错误', async () => {
-      (prisma.product.findUnique as any).mockResolvedValue({ id: 1, name: '产品1' });
+      (prisma.artwork.findUnique as any).mockResolvedValue({ id: 1, name: '产品1' });
       (prisma.inventoryItem.findFirst as any).mockResolvedValue({ id: 1, productId: 1 });
       
-      await expect(deleteProduct(1)).rejects.toThrow('产品有库存记录，无法删除');
+      await expect(deleteArtwork(1)).rejects.toThrow('产品有库存记录，无法删除');
     });
   });
 });

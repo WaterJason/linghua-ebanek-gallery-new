@@ -52,7 +52,7 @@ export function ChannelPriceManagement() {
         setIsLoading(false)
       }
     }
-    
+
     loadData()
   }, [toast])
 
@@ -60,10 +60,10 @@ export function ChannelPriceManagement() {
   const loadPrices = async () => {
     try {
       setIsLoading(true)
-      
+
       const channelId = selectedChannel !== "all" ? parseInt(selectedChannel) : undefined
       const productId = selectedProduct !== "all" ? parseInt(selectedProduct) : undefined
-      
+
       const data = await getChannelPrices(channelId, productId)
       setPrices(data)
     } catch (error) {
@@ -126,12 +126,12 @@ export function ChannelPriceManagement() {
       accessorKey: "channel.name",
     },
     {
-      header: "产品",
-      accessorKey: "product.name",
+      header: "作品",
+      accessorKey: "artwork.name",
     },
     {
       header: "产品编码",
-      accessorKey: "product.code",
+      accessorKey: "artwork.code",
     },
     {
       header: "价格",
@@ -232,12 +232,12 @@ export function ChannelPriceManagement() {
               </div>
             </div>
           </div>
-          
+
           <ResponsiveDataGrid
             data={prices}
             columns={columns}
             searchable={true}
-            searchKeys={["channel.name", "product.name", "product.code"]}
+            searchKeys={["channel.name", "artwork.name", "artwork.code"]}
             loading={isLoading}
             emptyText="暂无价格数据"
           />

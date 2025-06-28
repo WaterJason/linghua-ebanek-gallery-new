@@ -29,6 +29,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { SmartTooltip } from "@/components/ui/tooltip"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { PlusIcon, SearchIcon, ArrowRightIcon, CalendarIcon, ChevronDownIcon, PencilIcon, Scissors } from "lucide-react"
 import { getOrders, updateOrder } from "@/lib/actions/sales-actions";
 import { getCustomers } from "@/lib/actions/customer-actions";
@@ -279,31 +281,38 @@ export function OrderManagement() {
   const totalPages = Math.ceil(totalOrders / limit)
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">订单管理</h3>
-        <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <PlusIcon className="mr-2 h-4 w-4" />
-                新建订单
-                <ChevronDownIcon className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleCreateOrder}>
-                <PlusIcon className="mr-2 h-4 w-4" />
-                普通订单
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleCreateCustomOrder}>
-                <Scissors className="mr-2 h-4 w-4" />
-                作品定制
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <TooltipProvider>
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium">订单管理</h3>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SmartTooltip
+                  content="创建新订单，可选择普通订单或定制作品订单"
+                  type="help"
+                  title="新建订单"
+                >
+                  <Button>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    新建订单
+                    <ChevronDownIcon className="ml-2 h-4 w-4" />
+                  </Button>
+                </SmartTooltip>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleCreateOrder}>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  普通订单
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleCreateCustomOrder}>
+                  <Scissors className="mr-2 h-4 w-4" />
+                  作品定制
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
         <div>
@@ -443,15 +452,33 @@ export function OrderManagement() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => handleViewOrder(order)}>
-                        查看
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleEditOrder(order)}>
-                        <PencilIcon className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(order)}>
-                        更新状态
-                      </Button>
+                      <SmartTooltip
+                        content="查看订单详细信息，包括商品清单和客户信息"
+                        type="info"
+                        title="查看订单"
+                      >
+                        <Button variant="ghost" size="sm" onClick={() => handleViewOrder(order)}>
+                          查看
+                        </Button>
+                      </SmartTooltip>
+                      <SmartTooltip
+                        content="编辑订单信息，修改商品、数量或客户信息"
+                        type="info"
+                        title="编辑订单"
+                      >
+                        <Button variant="ghost" size="sm" onClick={() => handleEditOrder(order)}>
+                          <PencilIcon className="h-4 w-4" />
+                        </Button>
+                      </SmartTooltip>
+                      <SmartTooltip
+                        content="更新订单状态和支付状态，管理订单流程"
+                        type="help"
+                        title="更新状态"
+                      >
+                        <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(order)}>
+                          更新状态
+                        </Button>
+                      </SmartTooltip>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -734,6 +761,7 @@ export function OrderManagement() {
         warehouses={warehouses}
         onOrderSaved={handleOrderSaved}
       />
-    </div>
+      </div>
+    </TooltipProvider>
   )
 }

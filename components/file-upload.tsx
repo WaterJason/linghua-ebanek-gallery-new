@@ -554,29 +554,29 @@ export function FileUpload({
         {...getRootProps()}
         ref={dropzoneRef}
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-          isDragActive ? "border-primary bg-primary/10" : "border-gray-300 hover:border-primary"
+          isDragActive ? "border-primary bg-primary/10" : "border-muted-foreground/30 hover:border-primary"
         }`}
       >
         <input {...getInputProps()} />
         <div className="flex flex-col items-center justify-center space-y-2">
-          <UploadIcon className="h-8 w-8 text-gray-400" />
+          <UploadIcon className="h-8 w-8 text-muted-foreground" />
           {isDragActive ? (
-            <p>拖放文件到这里...</p>
+            <p className="text-foreground font-medium">拖放文件到这里...</p>
           ) : (
             <>
-              <p className="text-sm font-medium">
+              <p className="text-sm font-medium text-foreground">
                 拖放文件到这里，或者 <span className="text-primary underline">点击浏览</span>
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 支持的文件类型: JPG, PNG, GIF, WEBP (最大 {maxSize / 1024 / 1024}MB)
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 最多可上传 {maxFiles} 张图片
               </p>
               {allowPaste && (
-                <div className="flex items-center mt-2 text-xs text-primary-foreground bg-primary/10 px-3 py-1.5 rounded-full">
-                  <ClipboardIcon className="h-3 w-3 mr-1" />
-                  <span>支持截图后直接粘贴 (Ctrl+V)</span>
+                <div className="flex items-center mt-2 text-xs text-foreground bg-muted border border-border px-3 py-1.5 rounded-full shadow-sm">
+                  <ClipboardIcon className="h-3 w-3 mr-1 text-muted-foreground" />
+                  <span className="font-medium">支持截图后直接粘贴 (Ctrl+V)</span>
                 </div>
               )}
             </>

@@ -29,12 +29,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { 
-  AlertCircleIcon, 
-  ArrowLeftIcon, 
-  CheckCircleIcon, 
-  KeyIcon, 
-  UserIcon 
+import {
+  AlertCircleIcon,
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  KeyIcon,
+  UserIcon
 } from "lucide-react"
 
 // 个人信息表单验证模式
@@ -220,8 +220,8 @@ export default function AccountPage() {
         </div>
 
         <div>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="md:hidden mb-4">
-            <TabsList className="grid grid-cols-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-2 md:hidden mb-4">
               <TabsTrigger value="profile">
                 <UserIcon className="h-4 w-4 mr-2" />
                 个人信息
@@ -231,9 +231,8 @@ export default function AccountPage() {
                 修改密码
               </TabsTrigger>
             </TabsList>
-          </Tabs>
 
-          <TabsContent value="profile" className="m-0">
+            <TabsContent value="profile" className="m-0">
             <Card>
               <CardHeader>
                 <CardTitle>个人信息</CardTitle>
@@ -401,6 +400,7 @@ export default function AccountPage() {
               </CardContent>
             </Card>
           </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@
  */
 
 import prisma from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth-utils";
+import { getCurrentUser } from "@/lib/actions/auth-actions";
 import { fuzzySearch } from "@/lib/fuzzy-search";
 import { logActivity } from "@/lib/user-activity-logger";
 

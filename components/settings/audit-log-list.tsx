@@ -13,7 +13,7 @@ import {
   FileIcon,
   UserIcon,
   PlusIcon,
-  Pencil2Icon,
+  PencilIcon,
   TrashIcon,
   EyeIcon,
   CheckIcon,
@@ -21,7 +21,8 @@ import {
   DownloadIcon,
   UploadIcon,
   LogInIcon,
-  LogOutIcon
+  LogOutIcon,
+  RefreshCwIcon
 } from "lucide-react"
 import { SimplePagination } from "@/components/ui/simple-pagination"
 import {
@@ -76,7 +77,7 @@ const getActionIcon = (action: string) => {
     case "create":
       return <PlusIcon className="h-4 w-4 text-green-500" />;
     case "update":
-      return <Pencil2Icon className="h-4 w-4 text-blue-500" />;
+      return <PencilIcon className="h-4 w-4 text-blue-500" />;
     case "delete":
       return <TrashIcon className="h-4 w-4 text-red-500" />;
     case "view":

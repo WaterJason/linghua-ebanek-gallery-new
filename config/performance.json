@@ -1,0 +1,12 @@
+{
+  "api": {
+    "timeout": 5000,
+    "retries": 3,
+    "caching": true
+  },
+  "frontend": {
+    "lazyLoading": true,
+    "memoization": true,
+    "virtualScrolling": false
+  }
+}

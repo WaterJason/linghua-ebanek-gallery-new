@@ -1,0 +1,527 @@
+{
+  "timestamp": "2025-06-06T00:06:33.400Z",
+  "critical": [],
+  "high": [
+    {
+      "type": "frontend",
+      "issue": "对象显示问题",
+      "description": "组件中可能存在对象直接显示的问题",
+      "file": "./components/product/product-list.tsx",
+      "fix": "检查对象属性访问，确保正确提取显示值"
+    }
+  ],
+  "medium": [
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/add-employee-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/add-production-base-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/add-user-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/artwork/artwork-list.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/artwork/unit-material-manager.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/artwork-management.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/backup-restore.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/channel/channel-invoice-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/channel/channel-settlement-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/coffee-shop/coffee-shop-inventory.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/coffee-shop/coffee-shop-sales.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/coffee-shop-import-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/customers/new-customer-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/dashboard/quick-actions.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/data-import-export.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/employees/mobile-employees-page.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/examples/error-handling-example.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/export-import-buttons.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/account-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/account-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/accounts-table.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/categories-table.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/category-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/category-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/finance-accounts-management.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/finance-categories-management.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/finance/transaction-filter-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/header/help-center.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/inventory/inventory-help-guide.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/inventory/inventory-transfer-management.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/mobile/mobile-quick-actions.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/mobile-dashboard-card.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/mobile-nav.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/mode-toggle.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/modern-header.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/modern-quick-actions.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/modern-table.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/personalization/dashboard-layout-manager.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/personalization/favorites-manager.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/product/product-category-list.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/product/product-import-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/product/product-import-export.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/product-management.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/production/create-production-order-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/production/production-filters.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/purchase/excel-import-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/purchase-receive-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/quick-action-modals.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/salary-detail-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/schedule-list.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/schedule-stats.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/schedule-template-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/add-user-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/audit-log-detail.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/audit-log-filter.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/company-settings.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/create-backup-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/general-settings.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/mobile-settings-page.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/notification-settings.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/permission-list.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/restore-backup-dialog.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/settings-page.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/system-settings.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/settings/users-page.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/sidebar.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/sortable-image-grid.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/todos/new-todo-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/ui/date-picker.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/user/role-form.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/user/user-list.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/workflows/workflow-instance-detail.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    },
+    {
+      "type": "frontend",
+      "issue": "可能的状态同步问题",
+      "description": "组件使用了useState但没有useEffect，可能存在状态同步问题",
+      "file": "./components/workflows/workflow-step-list.tsx",
+      "fix": "检查是否需要添加useEffect来处理状态同步"
+    }
+  ],
+  "suggestions": []
+}

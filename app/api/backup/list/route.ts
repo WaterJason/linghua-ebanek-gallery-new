@@ -1,19 +1,17 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession, isAdmin } from "@/lib/auth-helpers"
 import { getBackupsList } from "@/lib/backup"
 
 export async function GET() {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== "admin") {
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
 
     // 获取备份列表
     const backups = getBackupsList()
-    
+
     return NextResponse.json(backups)
   } catch (error) {
     console.error("Error fetching backup list:", error)

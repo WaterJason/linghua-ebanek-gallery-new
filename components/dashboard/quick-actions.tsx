@@ -20,21 +20,21 @@ interface QuickAction {
 
 const defaultQuickActions: QuickAction[] = [
   {
-    title: "新建销售订单",
-    href: "/sales/new",
+    title: "POS销售",
+    href: "/sales/pos/new",
     icon: <ShoppingCartIcon className="h-5 w-5" />,
     color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    description: "创建新的销售订单"
-  },
-  {
-    title: "录入POS销售",
-    href: "/sales/pos/new",
-    icon: <DollarSignIcon className="h-5 w-5" />,
-    color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
     description: "录入新的POS销售记录"
   },
   {
-    title: "查看库存",
+    title: "数据录入",
+    href: "/daily-log",
+    icon: <ClipboardListIcon className="h-5 w-5" />,
+    color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+    description: "录入销售、团建、计件等数据"
+  },
+  {
+    title: "库存查询",
     href: "/inventory",
     icon: <PackageIcon className="h-5 w-5" />,
     color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
@@ -48,8 +48,8 @@ const defaultQuickActions: QuickAction[] = [
     description: "管理员工排班"
   },
   {
-    title: "手作团建",
-    href: "/workshop/new",
+    title: "团建预约",
+    href: "/workshops/new",
     icon: <ClipboardListIcon className="h-5 w-5" />,
     color: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
     description: "创建新的手作团建活动"
@@ -60,6 +60,20 @@ const defaultQuickActions: QuickAction[] = [
     icon: <UsersIcon className="h-5 w-5" />,
     color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400",
     description: "管理员工信息"
+  },
+  {
+    title: "财务管理",
+    href: "/finance",
+    icon: <DollarSignIcon className="h-5 w-5" />,
+    color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+    description: "管理财务收支和账户"
+  },
+  {
+    title: "采购管理",
+    href: "/purchase/new",
+    icon: <ShoppingCartIcon className="h-5 w-5" />,
+    color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+    description: "创建新的采购订单"
   }
 ]
 
@@ -88,8 +102,8 @@ export function QuickActions({
       <CardContent className="pb-3">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {displayActions.map((action, index) => (
-            <Link 
-              key={index} 
+            <Link
+              key={index}
               href={action.href}
               className="no-underline"
             >
@@ -105,12 +119,12 @@ export function QuickActions({
             </Link>
           ))}
         </div>
-        
+
         {showMore && defaultQuickActions.length > limit && (
           <div className="flex justify-center mt-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setExpanded(!expanded)}
             >
               {expanded ? "显示更少" : "显示更多"}

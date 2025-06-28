@@ -5,13 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/use-toast"
-import { 
-  SearchIcon, 
-  FileIcon, 
-  UserIcon, 
-  PlusIcon, 
-  Pencil2Icon, 
-  TrashIcon, 
+import {
+  SearchIcon,
+  FileIcon,
+  UserIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
   EyeIcon,
   CheckIcon,
   XIcon,
@@ -26,7 +26,7 @@ import { format } from "date-fns"
 import { zhCN } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { getEntityAuditLogs } from "@/lib/actions/audit-actions"
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -59,7 +59,7 @@ const getActionIcon = (action: string) => {
     case "create":
       return <PlusIcon className="h-4 w-4 text-green-500" />;
     case "update":
-      return <Pencil2Icon className="h-4 w-4 text-blue-500" />;
+      return <PencilIcon className="h-4 w-4 text-blue-500" />;
     case "delete":
       return <TrashIcon className="h-4 w-4 text-red-500" />;
     case "view":
@@ -253,7 +253,7 @@ export function EntityAuditLog({
                   </div>
                 </div>
               ))}
-              
+
               {logs.length >= limit && (
                 <Button
                   variant="ghost"
@@ -279,7 +279,7 @@ export function EntityAuditLog({
                 查看操作详细信息
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="mt-4 space-y-6">
               {/* 基本信息 */}
               <div className="grid grid-cols-2 gap-4">
@@ -289,7 +289,7 @@ export function EntityAuditLog({
                     {getActionLabel(selectedLog.action)}
                   </Badge>
                 </div>
-                
+
                 <div className="space-y-1">
                   <div className="text-sm font-medium text-muted-foreground">操作时间</div>
                   <div className="text-sm flex items-center">
@@ -297,7 +297,7 @@ export function EntityAuditLog({
                     {format(new Date(selectedLog.timestamp), "yyyy-MM-dd HH:mm:ss", { locale: zhCN })}
                   </div>
                 </div>
-                
+
                 <div className="space-y-1">
                   <div className="text-sm font-medium text-muted-foreground">操作人</div>
                   <div className="text-sm flex items-center">
@@ -306,7 +306,7 @@ export function EntityAuditLog({
                   </div>
                 </div>
               </div>
-              
+
               {/* 详情 */}
               {selectedLog.details && (
                 <div className="space-y-1">
@@ -316,7 +316,7 @@ export function EntityAuditLog({
                   </div>
                 </div>
               )}
-              
+
               {/* 数据变更 */}
               <Tabs defaultValue="changes" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
@@ -324,7 +324,7 @@ export function EntityAuditLog({
                   <TabsTrigger value="old">变更前</TabsTrigger>
                   <TabsTrigger value="new">变更后</TabsTrigger>
                 </TabsList>
-                
+
                 {/* 数据变更对比 */}
                 <TabsContent value="changes">
                   {(selectedLog.oldValues || selectedLog.newValues) ? (
@@ -339,11 +339,11 @@ export function EntityAuditLog({
                                 "text-sm p-1 rounded",
                                 parseJsonSafely(selectedLog.oldValues)[key] !== parseJsonSafely(selectedLog.newValues)[key] && "bg-red-50 dark:bg-red-900/20"
                               )}>
-                                {parseJsonSafely(selectedLog.oldValues)[key] !== undefined ? 
-                                  (typeof parseJsonSafely(selectedLog.oldValues)[key] === 'object' ? 
-                                    JSON.stringify(parseJsonSafely(selectedLog.oldValues)[key]) : 
+                                {parseJsonSafely(selectedLog.oldValues)[key] !== undefined ?
+                                  (typeof parseJsonSafely(selectedLog.oldValues)[key] === 'object' ?
+                                    JSON.stringify(parseJsonSafely(selectedLog.oldValues)[key]) :
                                     String(parseJsonSafely(selectedLog.oldValues)[key])
-                                  ) : 
+                                  ) :
                                   "-"
                                 }
                               </div>
@@ -351,11 +351,11 @@ export function EntityAuditLog({
                                 "text-sm p-1 rounded",
                                 parseJsonSafely(selectedLog.oldValues)[key] !== parseJsonSafely(selectedLog.newValues)[key] && "bg-green-50 dark:bg-green-900/20"
                               )}>
-                                {parseJsonSafely(selectedLog.newValues)[key] !== undefined ? 
-                                  (typeof parseJsonSafely(selectedLog.newValues)[key] === 'object' ? 
-                                    JSON.stringify(parseJsonSafely(selectedLog.newValues)[key]) : 
+                                {parseJsonSafely(selectedLog.newValues)[key] !== undefined ?
+                                  (typeof parseJsonSafely(selectedLog.newValues)[key] === 'object' ?
+                                    JSON.stringify(parseJsonSafely(selectedLog.newValues)[key]) :
                                     String(parseJsonSafely(selectedLog.newValues)[key])
-                                  ) : 
+                                  ) :
                                   "-"
                                 }
                               </div>
@@ -380,14 +380,14 @@ export function EntityAuditLog({
                     </div>
                   )}
                 </TabsContent>
-                
+
                 {/* 变更前数据 */}
                 <TabsContent value="old">
                   {selectedLog.oldValues ? (
                     <ScrollArea className="h-[200px] rounded-md border p-4">
                       <pre className="text-xs">
-                        {typeof parseJsonSafely(selectedLog.oldValues) === 'object' ? 
-                          JSON.stringify(parseJsonSafely(selectedLog.oldValues), null, 2) : 
+                        {typeof parseJsonSafely(selectedLog.oldValues) === 'object' ?
+                          JSON.stringify(parseJsonSafely(selectedLog.oldValues), null, 2) :
                           selectedLog.oldValues
                         }
                       </pre>
@@ -398,14 +398,14 @@ export function EntityAuditLog({
                     </div>
                   )}
                 </TabsContent>
-                
+
                 {/* 变更后数据 */}
                 <TabsContent value="new">
                   {selectedLog.newValues ? (
                     <ScrollArea className="h-[200px] rounded-md border p-4">
                       <pre className="text-xs">
-                        {typeof parseJsonSafely(selectedLog.newValues) === 'object' ? 
-                          JSON.stringify(parseJsonSafely(selectedLog.newValues), null, 2) : 
+                        {typeof parseJsonSafely(selectedLog.newValues) === 'object' ?
+                          JSON.stringify(parseJsonSafely(selectedLog.newValues), null, 2) :
                           selectedLog.newValues
                         }
                       </pre>

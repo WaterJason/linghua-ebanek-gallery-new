@@ -1,21 +1,18 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { NextResponse } from "next/server"
 import prisma from "@/lib/db"
-import { withApiCache } from "@/lib/api-cache"
-import { withApiRateLimit } from "@/lib/api-rate-limit"
 
-// 获取产品统计信息
-async function getProductStats(request: NextRequest) {
+/**
+ * GET /api/products/stats - 获取产品统计信息
+ * 提供产品数量、分类分布、价格分析等统计数据
+ */
+export async function GET(request: Request) {
+  const startTime = Date.now()
+  
   try {
-    // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json({ error: "未授权" }, { status: 403 })
-    }
+    console.log("🔄 [GET /api/products/stats] 获取产品统计信息...")
 
-    // 获取查询参数
-    const searchParams = request.nextUrl.searchParams
+    // 解析查询参数
+    const { searchParams } = new URL(request.url)
     const period = searchParams.get("period") || "all"
     
     // 构建日期过滤条件
@@ -25,31 +22,22 @@ async function getProductStats(request: NextRequest) {
     if (period === "today") {
       const startOfDay = new Date(now)
       startOfDay.setHours(0, 0, 0, 0)
-      
       dateFilter = {
-        createdAt: {
-          gte: startOfDay
-        }
+        createdAt: { gte: startOfDay }
       }
     } else if (period === "week") {
       const startOfWeek = new Date(now)
       startOfWeek.setDate(now.getDate() - now.getDay())
       startOfWeek.setHours(0, 0, 0, 0)
-      
       dateFilter = {
-        createdAt: {
-          gte: startOfWeek
-        }
+        createdAt: { gte: startOfWeek }
       }
     } else if (period === "month") {
       const startOfMonth = new Date(now)
       startOfMonth.setDate(1)
       startOfMonth.setHours(0, 0, 0, 0)
-      
       dateFilter = {
-        createdAt: {
-          gte: startOfMonth
-        }
+        createdAt: { gte: startOfMonth }
       }
     }
     
@@ -60,51 +48,64 @@ async function getProductStats(request: NextRequest) {
       productsByCategory,
       productsByPrice,
       productsWithoutImage,
-      productsWithoutInventory,
-      recentlyCreated,
-      recentlyUpdated
+      lowInventoryProducts,
+      recentlyCreated
     ] = await Promise.all([
-      // 总产品数
+      // 总产品数（排除占位符）
       prisma.product.count({
-        where: dateFilter
+        where: {
+          ...dateFilter,
+          type: {
+            notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"]
+          }
+        }
       }),
       
       // 总分类数
-      prisma.productCategory.count(),
+      prisma.productCategory.count({
+        where: { isActive: true }
+      }),
       
       // 按分类统计产品数
       prisma.product.groupBy({
         by: ["categoryId"],
-        _count: {
-          id: true
-        },
-        where: dateFilter
+        _count: { id: true },
+        where: {
+          ...dateFilter,
+          type: {
+            notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"]
+          }
+        }
       }),
       
       // 按价格区间统计产品数
-      prisma.$transaction([
+      Promise.all([
         prisma.product.count({
           where: {
             ...dateFilter,
-            price: { lt: 100 }
+            price: { lt: 100 },
+            type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
           }
         }),
         prisma.product.count({
           where: {
             ...dateFilter,
-            price: { gte: 100, lt: 500 }
+            price: { gte: 100, lt: 500 },
+            type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
           }
         }),
         prisma.product.count({
           where: {
             ...dateFilter,
-            price: { gte: 500, lt: 1000 }
+            price: { gte: 500, lt: 1000 },
+            type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
           }
         }),
         prisma.product.count({
           where: {
             ...dateFilter,
-            price: { gte: 1000 }
+            price: { gte: 1000 },
+            type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
           }
         })
       ]),
@@ -113,15 +114,17 @@ async function getProductStats(request: NextRequest) {
       prisma.product.count({
         where: {
           ...dateFilter,
-          imageUrl: null
+          imageUrl: null,
+          type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
         }
       }),
       
-      // 无库存产品数
+      // 低库存产品数（库存小于10）
       prisma.product.count({
         where: {
           ...dateFilter,
-          inventory: 0
+          inventory: { lt: 10 },
+          type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
         }
       }),
       
@@ -131,35 +134,23 @@ async function getProductStats(request: NextRequest) {
           id: true,
           name: true,
           price: true,
-          createdAt: true
+          createdAt: true,
+          productCategory: {
+            select: { name: true }
+          }
         },
-        orderBy: {
-          createdAt: "desc"
+        where: {
+          type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
         },
-        take: 5
-      }),
-      
-      // 最近更新的产品
-      prisma.product.findMany({
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          updatedAt: true
-        },
-        orderBy: {
-          updatedAt: "desc"
-        },
+        orderBy: { createdAt: "desc" },
         take: 5
       })
     ])
     
-    // 获取分类名称
+    // 获取分类信息
     const categories = await prisma.productCategory.findMany({
-      select: {
-        id: true,
-        name: true
-      }
+      select: { id: true, name: true },
+      where: { isActive: true }
     })
     
     // 构建分类映射
@@ -168,58 +159,79 @@ async function getProductStats(request: NextRequest) {
     // 格式化按分类统计结果
     const formattedProductsByCategory = productsByCategory.map(item => ({
       categoryId: item.categoryId,
-      categoryName: categoryMap.get(item.categoryId) || "未分类",
+      categoryName: item.categoryId ? categoryMap.get(item.categoryId) || "未知分类" : "未分类",
       count: item._count.id
     }))
     
     // 格式化按价格区间统计结果
     const formattedProductsByPrice = [
-      { range: "0-100", count: productsByPrice[0] },
-      { range: "100-500", count: productsByPrice[1] },
-      { range: "500-1000", count: productsByPrice[2] },
-      { range: "1000+", count: productsByPrice[3] }
+      { range: "0-100元", count: productsByPrice[0] },
+      { range: "100-500元", count: productsByPrice[1] },
+      { range: "500-1000元", count: productsByPrice[2] },
+      { range: "1000元以上", count: productsByPrice[3] }
     ]
+
+    // 计算总价值
+    const totalValue = await prisma.product.aggregate({
+      _sum: { price: true },
+      where: {
+        type: { notIn: ["category_placeholder", "unit_placeholder", "material_placeholder"] }
+      }
+    })
+
+    // 计算平均价格
+    const avgPrice = totalProducts > 0 ? (totalValue._sum.price || 0) / totalProducts : 0
+
+    const responseTime = Date.now() - startTime
+    console.log(`✅ [GET /api/products/stats] 统计完成, 响应时间: ${responseTime}ms`)
     
     // 返回统计结果
     return NextResponse.json({
-      totalProducts,
-      totalCategories,
-      productsByCategory: formattedProductsByCategory,
-      productsByPrice: formattedProductsByPrice,
-      productsWithoutImage,
-      productsWithoutInventory,
-      recentlyCreated,
-      recentlyUpdated,
-      timestamp: new Date().toISOString()
+      success: true,
+      stats: {
+        overview: {
+          totalProducts,
+          totalCategories,
+          totalValue: totalValue._sum.price || 0,
+          averagePrice: Math.round(avgPrice * 100) / 100
+        },
+        distribution: {
+          byCategory: formattedProductsByCategory,
+          byPrice: formattedProductsByPrice
+        },
+        quality: {
+          productsWithoutImage,
+          lowInventoryProducts,
+          completionRate: totalProducts > 0 ? 
+            Math.round(((totalProducts - productsWithoutImage) / totalProducts) * 100) : 0
+        },
+        recent: {
+          recentlyCreated: recentlyCreated.map(product => ({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            categoryName: product.productCategory?.name || '未分类',
+            createdAt: product.createdAt
+          }))
+        }
+      },
+      metadata: {
+        period,
+        generatedAt: new Date().toISOString(),
+        responseTime
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'public, max-age=300', // 缓存5分钟
+      }
     })
   } catch (error) {
-    console.error("获取产品统计信息失败:", error)
-    return NextResponse.json(
-      { error: "获取产品统计信息失败" },
-      { status: 500 }
-    )
+    const responseTime = Date.now() - startTime
+    console.error("❌ [GET /api/products/stats] 获取统计信息失败:", error)
+    return NextResponse.json({
+      error: "Failed to get product statistics",
+      details: error instanceof Error ? error.message : "Unknown error",
+      performance: { responseTime }
+    }, { status: 500 })
   }
-}
-
-// 导出GET处理程序
-export async function GET(request: NextRequest) {
-  // 应用限流中间件
-  return withApiRateLimit(
-    request,
-    // 应用缓存中间件
-    () => withApiCache(
-      request,
-      () => getProductStats(request),
-      {
-        maxAge: 300, // 缓存5分钟
-        staleWhileRevalidate: 3600, // 过期后可使用1小时
-        varyByQuery: true, // 按查询参数缓存
-        varyByUser: false // 不按用户缓存
-      }
-    ),
-    {
-      limit: 60, // 每分钟60个请求
-      windowMs: 60 * 1000 // 1分钟窗口
-    }
-  )
 }

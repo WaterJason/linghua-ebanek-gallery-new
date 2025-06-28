@@ -81,3 +81,6 @@ export function DateRangePicker({
     </div>
   )
 }
+
+// 别名导出以保持兼容性
+export const DatePickerWithRange = DateRangePicker

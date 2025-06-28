@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import prisma from "@/lib/db"
 
 // 获取员工关联的用户
@@ -10,8 +9,7 @@ export async function GET(
 ) {
   try {
     // 检查权限
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== "admin") {
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
 
@@ -61,8 +59,7 @@ export async function POST(
 ) {
   try {
     // 检查权限
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== "admin") {
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
 
@@ -139,8 +136,7 @@ export async function DELETE(
 ) {
   try {
     // 检查权限
-    const session = await getServerSession(authOptions)
-    if (!session || session.user.role !== "admin") {
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }
 

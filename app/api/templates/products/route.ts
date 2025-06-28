@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import ExcelJS from "exceljs"
 
 export async function GET() {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       console.log("模板下载未授权: 用户未登录")
       return NextResponse.json({

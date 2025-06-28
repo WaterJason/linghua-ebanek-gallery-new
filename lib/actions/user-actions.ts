@@ -773,3 +773,53 @@ export async function updateUserSettings(userId: string, data: any) {
     throw new Error(error instanceof Error ? error.message : "更新用户设置失败");
   }
 }
+
+/**
+ * 获取用户登录历史
+ * @param userId 用户ID
+ * @param limit 限制数量
+ * @returns 登录历史记录
+ */
+export async function getUserLoginHistory(userId?: string, limit = 50) {
+  try {
+    const where: any = {}
+
+    if (userId) {
+      where.userId = userId
+    }
+
+    const loginHistory = await prisma.auditLog.findMany({
+      where: {
+        ...where,
+        action: 'login'
+      },
+      orderBy: {
+        timestamp: 'desc'
+      },
+      take: limit,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    })
+
+    return loginHistory.map(log => ({
+      id: log.id,
+      userId: log.userId,
+      userName: log.user?.name || 'Unknown',
+      userEmail: log.user?.email || 'Unknown',
+      timestamp: log.timestamp,
+      ipAddress: log.ipAddress,
+      userAgent: log.userAgent,
+      details: log.details
+    }))
+  } catch (error) {
+    console.error("Error getting user login history:", error)
+    return []
+  }
+}

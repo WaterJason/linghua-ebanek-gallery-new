@@ -21,6 +21,9 @@ import { EmployeeSelector } from "@/components/employee-selector"
 import { createWorkshop } from "@/lib/actions/workshop-order-actions"
 import { getProducts } from "@/lib/actions/product-actions"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 // 活动类型枚举
 const activityTypeEnum = [
   "jewelry_enameling", // 饰品点蓝手作
@@ -91,6 +94,9 @@ export function WorkshopEntryForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('workshop')
+
   // 初始化表单
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -117,7 +123,7 @@ export function WorkshopEntryForm() {
     async function loadProducts() {
       setIsLoading(true)
       try {
-        const data = await getProducts()
+        const data = await getArtworks()
         setProducts(data)
       } catch (error) {
         console.error("Error loading products:", error)
@@ -172,7 +178,7 @@ export function WorkshopEntryForm() {
         totalAmount: values.serviceItems.reduce((sum, item) => sum + (item.quantity * item.price), 0),
         depositAmount: 0,
         serviceItems: values.serviceItems
-          .filter(item => item.productId && item.productId.trim() !== "") // 过滤掉没有选择产品的项目
+          .filter(item => item.productId && item.artworkId.trim() !== "") // 过滤掉没有选择产品的项目
           .map(item => ({
             ...item,
             productId: parseInt(item.productId)
@@ -187,11 +193,14 @@ export function WorkshopEntryForm() {
       }
 
       // 创建新活动
-      await createWorkshop(submitData)
-      toast({
-        title: "创建成功",
-        description: "手作团建记录已成功创建",
-      })
+      await enhancedOps.create('团建记录').form(
+        async () => {
+          return await createWorkshop(submitData)
+        },
+        null,
+        submitData,
+        { canUndo: true }
+      )
 
       // 重置表单
       form.reset({
@@ -545,9 +554,9 @@ export function WorkshopEntryForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {products.map((product) => (
-                              <SelectItem key={product.id} value={product.id.toString()}>
-                                {product.name}
+                            {artworks.map((product) => (
+                              <SelectItem key={artwork.id} value={artwork.id.toString()}>
+                                {artwork.name}
                               </SelectItem>
                             ))}
                           </SelectContent>

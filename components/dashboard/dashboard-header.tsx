@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { zhCN } from "date-fns/locale"
 import {
-  RefreshCwIcon, CalendarIcon, BarChart3Icon, 
+  RefreshCwIcon, CalendarIcon, BarChart3Icon,
   ShoppingCartIcon, PackageIcon
 } from "lucide-react"
 import Link from "next/link"
@@ -28,16 +28,16 @@ export function DashboardHeader({
   userName = "管理员"
 }: DashboardHeaderProps) {
   const [currentTime, setCurrentTime] = useState(new Date())
-  
+
   // 更新当前时间
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 60000) // 每分钟更新一次
-    
+
     return () => clearInterval(timer)
   }, [])
-  
+
   // 获取问候语
   const getGreeting = () => {
     const hour = currentTime.getHours()
@@ -49,7 +49,7 @@ export function DashboardHeader({
     if (hour < 22) return "晚上好"
     return "夜深了"
   }
-  
+
   return (
     <div className={cn("flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6", className)}>
       <div>
@@ -70,31 +70,12 @@ export function DashboardHeader({
             <SelectItem value="quarter">最近三个月</SelectItem>
           </SelectContent>
         </Select>
-        
+
         <Button variant="outline" size="icon" onClick={onRefresh} title="刷新数据">
           <RefreshCwIcon className="h-4 w-4" />
         </Button>
-        
-        <div className="hidden md:flex gap-2 ml-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/sales/reports">
-              <BarChart3Icon className="mr-2 h-4 w-4" />
-              销售报表
-            </Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/schedule">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              排班管理
-            </Link>
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/inventory">
-              <PackageIcon className="mr-2 h-4 w-4" />
-              库存管理
-            </Link>
-          </Button>
-        </div>
+
+
       </div>
     </div>
   )

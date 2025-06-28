@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,12 +30,14 @@ import {
   ArrowRightIcon,
   CalendarIcon,
   FileTextIcon,
+  FileSpreadsheet,
   PackageIcon,
   TruckIcon,
   TrashIcon,
   PencilIcon,
   EyeIcon,
-  CopyIcon
+  CopyIcon,
+  ExternalLinkIcon
 } from "lucide-react"
 import { getPurchaseOrders, getSuppliers, updatePurchaseOrder, deletePurchaseOrder, receivePurchaseOrder } from "@/lib/actions/purchase-actions";
 import { getEmployees } from "@/lib/actions/employee-actions";
@@ -47,8 +51,16 @@ import { PurchaseReceiveDialog } from "./purchase-receive-dialog"
 import { PurchaseOrderTemplates } from "./purchase-order-templates"
 import { PurchaseOrderWorkflow } from "./purchase/purchase-order-workflow"
 import { EntityAuditLog } from "./audit/entity-audit-log"
+import { useEnhancedOperations } from "@/lib/enhanced-operations-integration"
+import { ExcelImportDialog } from "./purchase/excel-import-dialog"
+import { ApprovalWorkflowPanel } from "./purchase/approval-workflow-panel"
+import { ReceivingDialog } from "./purchase/receiving-dialog"
+import { InventorySyncPanel } from "./purchase/inventory-sync-panel"
 
 export function PurchaseOrderManagement() {
+  const router = useRouter()
+  const { data: session } = useSession()
+  const { executeOperation } = useEnhancedOperations()
   const [purchaseOrders, setPurchaseOrders] = useState([])
   const [totalOrders, setTotalOrders] = useState(0)
   const [suppliers, setSuppliers] = useState([])
@@ -59,6 +71,7 @@ export function PurchaseOrderManagement() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false)
   const [isReceiveDialogOpen, setIsReceiveDialogOpen] = useState(false)
   const [isTemplatesVisible, setIsTemplatesVisible] = useState(false)
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -151,10 +164,29 @@ export function PurchaseOrderManagement() {
     setIsViewDialogOpen(true)
   }
 
+  const handleViewOrderDetail = (order) => {
+    router.push(`/purchase/orders/${order.id}`)
+  }
+
   const handleAddOrder = () => {
     setSelectedOrder(null)
     setIsEditing(false)
     setIsFormDialogOpen(true)
+  }
+
+  const handleImportOrders = () => {
+    setIsImportDialogOpen(true)
+  }
+
+  const handleImportComplete = (result) => {
+    console.log("导入完成:", result)
+    setIsImportDialogOpen(false)
+    loadPurchaseOrders() // 重新加载订单列表
+
+    toast({
+      title: "导入成功",
+      description: `成功导入 ${result.successCount} 个采购订单`,
+    })
   }
 
   const handleEditOrder = (order) => {
@@ -196,20 +228,28 @@ export function PurchaseOrderManagement() {
   const handleDeleteOrder = async (id) => {
     if (!confirm("确定要删除这个采购订单吗？")) return
 
+    const order = purchaseOrders.find(o => o.id === id)
+
     try {
-      await deletePurchaseOrder(id)
-      toast({
-        title: "成功",
-        description: "采购订单已删除",
-      })
+      await executeOperation(
+        async () => {
+          await deletePurchaseOrder(id)
+          return order
+        },
+        {
+          playSound: true,
+          soundType: 'warning',
+          feedbackMessage: `采购订单 "${order?.orderNumber || '未知'}" 已删除`,
+          enableUndo: true,
+          undoTags: ['delete', 'purchase-order'],
+          undoPriority: 8
+        }
+      )
+
       loadPurchaseOrders()
     } catch (error) {
       console.error("Error deleting purchase order:", error)
-      toast({
-        title: "错误",
-        description: error.message || "删除采购订单失败",
-        variant: "destructive",
-      })
+      // 错误已由增强操作系统处理
     }
   }
 
@@ -320,6 +360,10 @@ export function PurchaseOrderManagement() {
               <Button variant="outline" onClick={toggleTemplatesVisibility}>
                 <FileTextIcon className="mr-2 h-4 w-4" />
                 {isTemplatesVisible ? "隐藏模板" : "订单模板"}
+              </Button>
+              <Button variant="outline" onClick={handleImportOrders}>
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                批量导入
               </Button>
               <Button onClick={handleAddOrder}>
                 <PlusIcon className="mr-2 h-4 w-4" />
@@ -453,8 +497,17 @@ export function PurchaseOrderManagement() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleViewOrder(order)}
+                            onClick={() => handleViewOrderDetail(order)}
                             title="查看详情"
+                          >
+                            <ExternalLinkIcon className="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewOrder(order)}
+                            title="快速预览"
                           >
                             <EyeIcon className="h-4 w-4" />
                           </Button>
@@ -630,10 +683,41 @@ export function PurchaseOrderManagement() {
 
                 {/* 审批流程 */}
                 <div className="md:col-span-1 space-y-4">
-                  <PurchaseOrderWorkflow
-                    order={selectedOrder}
-                    onWorkflowUpdated={loadPurchaseOrders}
-                  />
+                  {session?.user && (
+                    <ApprovalWorkflowPanel
+                      purchaseOrder={selectedOrder}
+                      currentUserId={session.user.id}
+                      currentUserName={session.user.name || session.user.email || "未知用户"}
+                      onApprovalComplete={(updatedOrder) => {
+                        setSelectedOrder(updatedOrder)
+                        loadPurchaseOrders()
+                      }}
+                    />
+                  )}
+
+                  {/* 到货验收 */}
+                  {selectedOrder.approvalStatus === "approved" && (
+                    <ReceivingDialog
+                      purchaseOrder={selectedOrder}
+                      warehouses={warehouses}
+                      onReceivingComplete={(updatedOrder) => {
+                        setSelectedOrder(updatedOrder)
+                        loadPurchaseOrders()
+                      }}
+                    />
+                  )}
+
+                  {/* 库存同步 */}
+                  {selectedOrder.status === "received" && (
+                    <InventorySyncPanel
+                      purchaseOrder={selectedOrder}
+                      warehouses={warehouses}
+                      onSyncComplete={(updatedOrder) => {
+                        setSelectedOrder(updatedOrder)
+                        loadPurchaseOrders()
+                      }}
+                    />
+                  )}
 
                   <EntityAuditLog
                     entityType="purchase"
@@ -688,6 +772,15 @@ export function PurchaseOrderManagement() {
           onReceived={handleOrderReceived}
         />
       )}
+
+      {/* 批量导入对话框 */}
+      <ExcelImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        suppliers={suppliers}
+        employees={employees}
+        onImportComplete={handleImportComplete}
+      />
     </div>
   )
 }

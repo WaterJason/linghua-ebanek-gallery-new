@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 导入Inter字体 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -24,6 +27,10 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.75rem;
+
+    /* 新增背景色变量 */
+    --background-secondary: 250 250 250;
+    --background-tertiary: 248 250 252;
   }
 
   .dark {
@@ -46,6 +53,10 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
+
+    /* 深色模式背景色 */
+    --background-secondary: 217.2 32.6% 15%;
+    --background-tertiary: 217.2 32.6% 12%;
   }
 }
 
@@ -55,5 +66,107 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* 新增实用样式类 */
+@layer components {
+  .card-modern {
+    @apply bg-white rounded-xl shadow-md border border-gray-200 dark:bg-gray-800 dark:border-gray-700;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .stat-card {
+    @apply card-modern p-6 transition-colors duration-300;
+  }
+
+  .button-modern {
+    @apply px-5 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm;
+  }
+
+  .input-modern {
+    @apply p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100;
+  }
+
+  .table-modern {
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+  }
+
+  .table-header-modern {
+    @apply bg-gray-50 dark:bg-gray-700;
+  }
+
+  .table-cell-modern {
+    @apply px-6 py-4 whitespace-nowrap text-sm;
+  }
+
+  .sidebar-modern {
+    @apply bg-white shadow-lg dark:bg-gray-900 border-r border-gray-100 dark:border-gray-700;
+  }
+
+  .nav-item-modern {
+    @apply flex items-center p-3 rounded-lg text-left font-medium transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800;
+  }
+
+  .nav-item-active {
+    @apply bg-indigo-100 text-indigo-700 font-semibold dark:bg-indigo-900 dark:text-indigo-300;
+  }
+
+  /* 链接样式 - 深色主题优化 */
+  .link-primary {
+    @apply text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200;
+  }
+
+  .link-secondary {
+    @apply text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200;
+  }
+
+  .link-muted {
+    @apply text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200;
+  }
+
+  /* 自定义滚动条样式 */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(203 213 225) rgb(241 245 249);
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(241 245 249);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(203 213 225);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(148 163 184);
+  }
+
+  /* 深色模式滚动条 */
+  .dark .scrollbar-thin {
+    scrollbar-color: rgb(71 85 105) rgb(30 41 59);
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(30 41 59);
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(71 85 105);
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(100 116 139);
   }
 }

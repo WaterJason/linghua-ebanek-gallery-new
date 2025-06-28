@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { importChannelSalesFromExcel } from "@/lib/actions/channel-actions"
-import { getProducts } from "@/lib/actions/product-actions"
+import { getArtworks } from "@/lib/actions/product-actions"
 
 // 表单验证模式
 const formSchema = z.object({
@@ -67,7 +67,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
     const loadProducts = async () => {
       try {
         setIsLoadingProducts(true)
-        const data = await getProducts()
+        const data = await getArtworks()
         setProducts(data)
       } catch (error) {
         toast({
@@ -79,7 +79,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
         setIsLoadingProducts(false)
       }
     }
-    
+
     loadProducts()
   }, [toast])
 
@@ -87,17 +87,17 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
   const handleFileChange = async (e) => {
     const file = e.target.files[0]
     if (!file) return
-    
+
     setExcelFile(file)
     setIsParsingFile(true)
-    
+
     try {
       // 在实际应用中，这里应该使用Excel解析库（如SheetJS）解析Excel文件
       // 为了演示，我们模拟解析过程，生成一些示例数据
-      
+
       // 模拟解析延迟
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       // 模拟解析结果
       const mockParsedData = [
         {
@@ -113,12 +113,12 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
           price: 200,
         },
       ]
-      
+
       setParsedData(mockParsedData)
-      
+
       // 设置导入来源为文件名
       form.setValue("importSource", file.name)
-      
+
       toast({
         title: "解析成功",
         description: `成功解析 ${mockParsedData.length} 条销售记录`,
@@ -138,22 +138,22 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true)
-      
+
       if (parsedData.length === 0) {
         throw new Error("没有可导入的销售数据")
       }
-      
+
       // 导入销售数据
       await importChannelSalesFromExcel(parseInt(data.channelId), {
         ...data,
         items: parsedData,
       })
-      
+
       toast({
         title: "导入成功",
         description: "销售数据已成功导入",
       })
-      
+
       if (onSuccess) {
         onSuccess()
       }
@@ -199,7 +199,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="saleDate"
@@ -235,7 +235,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
             </FormItem>
           )}
         />
-        
+
         <FormItem>
           <FormLabel>Excel文件 *</FormLabel>
           <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
             请上传包含销售数据的Excel文件
           </FormDescription>
         </FormItem>
-        
+
         {parsedData.length > 0 && (
           <div className="border rounded-md p-4">
             <h3 className="text-sm font-medium mb-2">解析结果预览</h3>
@@ -269,7 +269,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
             </ul>
           </div>
         )}
-        
+
         <FormField
           control={form.control}
           name="importSource"
@@ -286,7 +286,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="notes"
@@ -304,7 +304,7 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
             </FormItem>
           )}
         />
-        
+
         <div className="flex justify-end space-x-2">
           <Button
             type="button"
@@ -313,8 +313,8 @@ export function ChannelSalesImportForm({ channels, selectedChannelId, onSuccess 
           >
             取消
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isSubmitting || parsedData.length === 0}
           >
             {isSubmitting ? "导入中..." : "导入"}

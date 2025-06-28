@@ -1,0 +1,59 @@
+{
+  "timestamp": "2025-05-28T06:46:31.794Z",
+  "status": "healthy",
+  "checks": [
+    {
+      "name": "docker_container",
+      "status": "healthy",
+      "details": "Up 11 minutes"
+    },
+    {
+      "name": "database_connection",
+      "status": "healthy",
+      "details": {
+        "connectionTime": "147ms"
+      }
+    },
+    {
+      "name": "core_tables",
+      "status": "healthy",
+      "details": {
+        "users": 1,
+        "employees": 2,
+        "customers": 2,
+        "products": 3,
+        "orders": 1,
+        "schedules": 1
+      }
+    },
+    {
+      "name": "key_functions",
+      "status": "healthy",
+      "details": {
+        "scheduleQuery": "1 records",
+        "customerQuery": "2 records"
+      }
+    },
+    {
+      "name": "performance_metrics",
+      "status": "healthy",
+      "details": {
+        "databaseSize": "14 MB",
+        "activeConnections": 1
+      }
+    },
+    {
+      "name": "backup_status",
+      "status": "healthy",
+      "details": {
+        "latestBackup": "data-backup-2025-05-28T06-43-21-577Z.sql",
+        "backupAge": "0 hours",
+        "totalBackups": 3
+      }
+    }
+  ],
+  "alerts": [],
+  "recommendations": [
+    "数据库运行状态良好，继续保持定期监控"
+  ]
+}

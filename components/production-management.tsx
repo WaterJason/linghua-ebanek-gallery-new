@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { SmartInput } from "@/components/ui/smart-input"
+import { SmartTooltip } from "@/components/ui/tooltip"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { toast } from "@/components/ui/use-toast"
 import {
   PlusIcon,
@@ -31,9 +34,10 @@ import {
 import { AddProductionDialog } from "./add-production-dialog"
 import { EditProductionDialog } from "./edit-production-dialog"
 import { ProductionDetailsDialog } from "./production-details-dialog"
-import { deletePieceWork, getPieceWorks } from "@/lib/actions/piece-work-actions";
+import { useEnhancedOperations } from "@/lib/enhanced-operations-integration"
 
 export function ProductionManagement() {
+  const { executeOperation } = useEnhancedOperations()
   const [pieceWorks, setPieceWorks] = useState([])
   const [filteredPieceWorks, setFilteredPieceWorks] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -75,9 +79,14 @@ export function ProductionManagement() {
   const loadPieceWorks = async () => {
     setIsLoading(true)
     try {
-      const data = await getPieceWorks()
-      setPieceWorks(data)
-      setFilteredPieceWorks(data)
+      const response = await fetch('/api/piece-works')
+      if (response.ok) {
+        const data = await response.json()
+        setPieceWorks(data)
+        setFilteredPieceWorks(data)
+      } else {
+        throw new Error('Failed to fetch piece works')
+      }
     } catch (error) {
       console.error("Error loading piece works:", error)
       toast({
@@ -124,19 +133,30 @@ export function ProductionManagement() {
 
     setIsDeleting(true)
     try {
-      await deletePieceWork(selectedPieceWork.id)
-      toast({
-        title: "删除成功",
-        description: "制作工单已成功删除",
-      })
+      await executeOperation(
+        async () => {
+          const response = await fetch(`/api/piece-works/${selectedPieceWork.id}`, {
+            method: 'DELETE'
+          })
+          if (!response.ok) {
+            throw new Error('Failed to delete piece work')
+          }
+          return selectedPieceWork
+        },
+        {
+          playSound: true,
+          soundType: 'warning',
+          feedbackMessage: `制作工单已删除`,
+          enableUndo: true,
+          undoTags: ['delete', 'production'],
+          undoPriority: 7
+        }
+      )
+
       loadPieceWorks()
     } catch (error) {
       console.error("Error deleting piece work:", error)
-      toast({
-        title: "删除失败",
-        description: "删除制作工单时出错",
-        variant: "destructive",
-      })
+      // 错误已由增强操作系统处理
     } finally {
       setIsDeleting(false)
       setIsDeleteDialogOpen(false)
@@ -155,32 +175,53 @@ export function ProductionManagement() {
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>制作工单管理</CardTitle>
-              <CardDescription>管理员工制作工单和计件工资</CardDescription>
+    <TooltipProvider>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>制作工单管理</CardTitle>
+                <CardDescription>管理员工制作工单和计件工资</CardDescription>
+              </div>
+              <SmartTooltip
+                content="创建新的制作工单，记录员工计件工作"
+                type="help"
+                title="新建工单"
+              >
+                <Button onClick={handleAddProduction}>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  新建工单
+                </Button>
+              </SmartTooltip>
             </div>
-            <Button onClick={handleAddProduction}>
-              <PlusIcon className="mr-2 h-4 w-4" />
-              新建工单
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex justify-between mb-4">
-            <div className="relative w-72">
-              <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="搜索员工或备注..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between mb-4">
+              <div className="relative w-72">
+                <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <SmartTooltip
+                  content="搜索员工姓名或工单备注信息"
+                  type="help"
+                  title="工单搜索"
+                >
+                  <SmartInput
+                    suggestions={[
+                      { id: '1', value: '配饰制作', label: '配饰制作', category: '工作类型', frequency: 10 },
+                      { id: '2', value: '点蓝制作', label: '点蓝制作', category: '工作类型', frequency: 8 },
+                    ]}
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    onSuggestionSelect={(suggestion) => {
+                      setSearchQuery(suggestion.value)
+                    }}
+                    placeholder="搜索员工或备注..."
+                    showHistory={true}
+                    showFrequent={true}
+                    className="pl-8"
+                  />
+                </SmartTooltip>
+              </div>
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-auto">
               <TabsList>
                 <TabsTrigger value="all">全部</TabsTrigger>
@@ -286,6 +327,7 @@ export function ProductionManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </TooltipProvider>
   )
 }

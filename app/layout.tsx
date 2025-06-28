@@ -2,19 +2,25 @@ import type React from "react"
 import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import CollapsibleSidebar from "@/components/collapsible-sidebar"
 import { SessionProvider } from "@/components/session-provider"
 import PermissionChecker from "@/components/auth/permission-checker"
+import { FeedbackProvider } from "@/components/providers/feedback-provider"
+import ChunkErrorBoundary from "@/components/ui/chunk-error-boundary"
 
-// 导入服务器端初始化脚本 (这是服务器组件，可以安全地导入服务器操作)
-import "@/lib/server-init"
-// 导入客户端安全的初始化脚本
-import "@/lib/init-app"
+// 导入优化的初始化管理器
+import { ensureSystemInitialized } from "@/lib/init-manager"
+
+// 确保系统初始化（仅在服务器端执行一次，构建时跳过）
+if (typeof window === "undefined" && process.env.NEXT_PHASE !== "phase-production-build") {
+  ensureSystemInitialized().catch(error => {
+    console.error("系统初始化失败:", error)
+  })
+}
 
 export const metadata: Metadata = {
   title: "聆花掐丝珐琅馆管理系统",
   description: "销售提成与排班系统",
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -25,15 +31,16 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="font-sans">
-        <SessionProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-            <PermissionChecker />
-            <div className="flex h-screen">
-              <CollapsibleSidebar />
-              <main className="flex-1 overflow-auto p-6 bg-gray-50 dark:bg-gray-900 lg:ml-64">{children}</main>
-            </div>
-          </ThemeProvider>
-        </SessionProvider>
+        <ChunkErrorBoundary>
+          <SessionProvider>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+              <FeedbackProvider>
+                <PermissionChecker />
+                {children}
+              </FeedbackProvider>
+            </ThemeProvider>
+          </SessionProvider>
+        </ChunkErrorBoundary>
       </body>
     </html>
   )

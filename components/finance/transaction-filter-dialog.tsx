@@ -95,7 +95,7 @@ export function TransactionFilterDialog({
 
       // 应用筛选条件
       onApplyFilters(formattedFilters)
-      
+
       // 关闭对话框
       onOpenChange(false)
     } catch (error) {
@@ -118,7 +118,7 @@ export function TransactionFilterDialog({
       startDate: undefined,
       endDate: undefined,
     })
-    
+
     // 应用空筛选条件
     onApplyFilters({
       accountId: undefined,
@@ -127,7 +127,7 @@ export function TransactionFilterDialog({
       startDate: undefined,
       endDate: undefined,
     })
-    
+
     // 关闭对话框
     onOpenChange(false)
   }
@@ -150,8 +150,8 @@ export function TransactionFilterDialog({
                 <FormItem>
                   <FormLabel>账户</FormLabel>
                   <Select
-                    onValueChange={(value) => field.onChange(value === "" ? undefined : parseInt(value))}
-                    value={field.value?.toString() || ""}
+                    onValueChange={(value) => field.onChange(value === "all" ? undefined : parseInt(value))}
+                    value={field.value?.toString() || "all"}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -159,7 +159,7 @@ export function TransactionFilterDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">全部账户</SelectItem>
+                      <SelectItem value="all">全部账户</SelectItem>
                       {accounts.map((account) => (
                         <SelectItem key={account.id} value={account.id.toString()}>
                           {account.name}
@@ -178,8 +178,8 @@ export function TransactionFilterDialog({
                 <FormItem>
                   <FormLabel>分类</FormLabel>
                   <Select
-                    onValueChange={(value) => field.onChange(value === "" ? undefined : parseInt(value))}
-                    value={field.value?.toString() || ""}
+                    onValueChange={(value) => field.onChange(value === "all" ? undefined : parseInt(value))}
+                    value={field.value?.toString() || "all"}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -187,7 +187,7 @@ export function TransactionFilterDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">全部分类</SelectItem>
+                      <SelectItem value="all">全部分类</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id.toString()}>
                           {category.name}
@@ -206,8 +206,8 @@ export function TransactionFilterDialog({
                 <FormItem>
                   <FormLabel>交易类型</FormLabel>
                   <Select
-                    onValueChange={(value) => field.onChange(value === "" ? undefined : value)}
-                    value={field.value || ""}
+                    onValueChange={(value) => field.onChange(value === "all" ? undefined : value)}
+                    value={field.value || "all"}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -215,7 +215,7 @@ export function TransactionFilterDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">全部类型</SelectItem>
+                      <SelectItem value="all">全部类型</SelectItem>
                       <SelectItem value="income">收入</SelectItem>
                       <SelectItem value="expense">支出</SelectItem>
                       <SelectItem value="transfer">转账</SelectItem>

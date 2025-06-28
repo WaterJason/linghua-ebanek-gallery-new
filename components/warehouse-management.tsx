@@ -161,7 +161,11 @@ export function WarehouseManagement() {
               warehouses.map((warehouse) => (
                 <TableRow key={warehouse.id}>
                   <TableCell className="font-medium">{warehouse.name}</TableCell>
-                  <TableCell>{warehouse.type === "physical" ? "实体仓库" : "虚拟仓库"}</TableCell>
+                  <TableCell>
+                    {warehouse.type === "physical" ? "实体仓库" :
+                     warehouse.type === "virtual" ? "虚拟仓库" :
+                     warehouse.type === "production_base" ? "生产基地" : warehouse.type}
+                  </TableCell>
                   <TableCell>{warehouse.location || "-"}</TableCell>
                   <TableCell>
                     <span
@@ -224,6 +228,7 @@ export function WarehouseManagement() {
                 <SelectContent>
                   <SelectItem value="physical">实体仓库</SelectItem>
                   <SelectItem value="virtual">虚拟仓库</SelectItem>
+                  <SelectItem value="production_base">生产基地</SelectItem>
                 </SelectContent>
               </Select>
             </div>

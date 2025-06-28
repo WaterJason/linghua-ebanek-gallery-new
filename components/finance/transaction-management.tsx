@@ -22,6 +22,7 @@ import { TransactionFilterForm } from "@/components/finance/transaction-filter-f
 import { getFinancialTransactions, deleteFinancialTransaction } from "@/lib/actions/finance-actions"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { TransactionManagementMobile } from "@/components/finance/transaction-management-mobile"
+import { useEnhancedOperations } from "@/lib/enhanced-operations-integration"
 
 export function TransactionManagement() {
   const isMobile = useMediaQuery("(max-width: 768px)")
@@ -33,6 +34,7 @@ export function TransactionManagement() {
 
   // 桌面端版本
   const { toast } = useToast()
+  const { executeOperation } = useEnhancedOperations()
   const [transactions, setTransactions] = useState([])
   const [total, setTotal] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -117,25 +119,28 @@ export function TransactionManagement() {
     if (!selectedTransaction) return
 
     try {
-      await deleteFinancialTransaction(selectedTransaction.id)
+      await executeOperation(
+        async () => {
+          await deleteFinancialTransaction(selectedTransaction.id)
+          return selectedTransaction
+        },
+        {
+          playSound: true,
+          soundType: 'warning',
+          feedbackMessage: `交易记录 "${selectedTransaction.counterparty || '未知'}" 已删除`,
+          enableUndo: true,
+          undoTags: ['delete', 'transaction'],
+          undoPriority: 8
+        }
+      )
 
       setTransactions(transactions.filter(transaction => transaction.id !== selectedTransaction.id))
       setTotal(prev => prev - 1)
-
-      toast({
-        title: "删除成功",
-        description: "交易记录已删除",
-      })
-
       setIsDeleteDialogOpen(false)
       setSelectedTransaction(null)
     } catch (error) {
       console.error("删除交易记录失败:", error)
-      toast({
-        variant: "destructive",
-        title: "删除失败",
-        description: error.message || "无法删除交易记录",
-      })
+      // 错误已由增强操作系统处理
     }
   }
 

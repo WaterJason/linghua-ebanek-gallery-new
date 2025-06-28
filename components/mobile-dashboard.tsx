@@ -6,12 +6,13 @@ import { EnhancedChart } from "@/components/enhanced-chart"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns"
-import { 
-  BarChart3Icon, TrendingUpIcon, ShoppingCartIcon, 
-  UsersIcon, PackageIcon, CoffeeIcon, CalendarIcon 
+import {
+  BarChart3Icon, TrendingUpIcon, ShoppingCartIcon,
+  UsersIcon, PackageIcon, CoffeeIcon, CalendarIcon
 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts"
+import { getDashboardData } from "@/lib/actions/system-actions"
 
 export function MobileDashboard() {
   const [isLoading, setIsLoading] = useState(true)
@@ -30,60 +31,57 @@ export function MobileDashboard() {
     totalEmployees: 0,
     activeEmployees: 0
   })
-  
+
   // 加载仪表盘数据
   useEffect(() => {
     async function loadDashboardData() {
       setIsLoading(true)
       try {
-        // 这里应该从API获取数据
-        // 为了演示，我们使用模拟数据
-        
-        // 模拟销售数据
-        const mockSalesData = generateMockSalesData()
-        setSalesData(mockSalesData)
-        
-        // 模拟库存数据
-        const mockInventoryData = generateMockInventoryData()
-        setInventoryData(mockInventoryData)
-        
-        // 模拟生产数据
-        const mockProductionData = generateMockProductionData()
-        setProductionData(mockProductionData)
-        
-        // 模拟汇总数据
+        // 使用服务器端操作获取仪表盘数据
+        const data = await getDashboardData("month")
+
+        // 处理销售数据
+        setSalesData(data.gallerySales.data || [])
+
+        // 处理库存数据
+        setInventoryData(data.inventory.distribution || [])
+
+        // 处理生产数据
+        setProductionData(data.workshops.data || [])
+
+        // 处理汇总数据
         setSummaryData({
-          totalSales: 125680,
-          salesGrowth: 12.5,
-          totalOrders: 256,
+          totalSales: data.gallerySales.current + data.coffeeSales.current,
+          salesGrowth: data.gallerySales.growth,
+          totalOrders: data.recentSales.length,
           ordersGrowth: 8.3,
-          totalInventory: 1250,
-          lowStockCount: 15,
-          totalProduction: 850,
-          productionGrowth: 5.2,
-          totalEmployees: 24,
-          activeEmployees: 20
+          totalInventory: data.inventory.total,
+          lowStockCount: data.inventory.lowStock,
+          totalProduction: data.workshops.current,
+          productionGrowth: data.workshops.growth,
+          totalEmployees: data.employees.total,
+          activeEmployees: data.employees.active
         })
       } catch (error) {
         console.error("Error loading dashboard data:", error)
         toast({
           title: "加载失败",
-          description: "无法加载仪表盘数据",
+          description: "无法加载仪表盘数据，请稍后再试",
           variant: "destructive",
         })
       } finally {
         setIsLoading(false)
       }
     }
-    
+
     loadDashboardData()
   }, [])
-  
+
   // 生成模拟销售数据
   const generateMockSalesData = () => {
     const data = []
     const now = new Date()
-    
+
     for (let i = 30; i >= 0; i--) {
       const date = subDays(now, i)
       data.push({
@@ -93,10 +91,10 @@ export function MobileDashboard() {
         total: Math.floor(Math.random() * 7000) + 3000
       })
     }
-    
+
     return data
   }
-  
+
   // 生成模拟库存数据
   const generateMockInventoryData = () => {
     return [
@@ -107,12 +105,12 @@ export function MobileDashboard() {
       { name: "其他", value: 120 }
     ]
   }
-  
+
   // 生成模拟生产数据
   const generateMockProductionData = () => {
     const data = []
     const now = new Date()
-    
+
     for (let i = 14; i >= 0; i--) {
       const date = subDays(now, i)
       data.push({
@@ -121,10 +119,10 @@ export function MobileDashboard() {
         amount: Math.floor(Math.random() * 5000) + 2000
       })
     }
-    
+
     return data
   }
-  
+
   // 渲染迷你图表
   const renderMiniChart = (data: any[], dataKey: string) => {
     return (
@@ -139,18 +137,18 @@ export function MobileDashboard() {
           <XAxis dataKey="date" hide />
           <YAxis hide />
           <Tooltip content={<></>} />
-          <Area 
-            type="monotone" 
-            dataKey={dataKey} 
-            stroke="#0070f3" 
-            fillOpacity={1} 
-            fill="url(#colorSales)" 
+          <Area
+            type="monotone"
+            dataKey={dataKey}
+            stroke="#0070f3"
+            fillOpacity={1}
+            fill="url(#colorSales)"
           />
         </AreaChart>
       </ResponsiveContainer>
     )
   }
-  
+
   return (
     <div className="space-y-4">
       <Tabs defaultValue="sales" className="w-full">
@@ -159,7 +157,7 @@ export function MobileDashboard() {
           <TabsTrigger value="inventory">库存</TabsTrigger>
           <TabsTrigger value="production">生产</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="sales" className="space-y-4 pt-2">
           <div className="grid grid-cols-2 gap-4">
             <MobileDashboardCard
@@ -176,7 +174,7 @@ export function MobileDashboard() {
               collapsible
               defaultCollapsed={false}
             />
-            
+
             <MobileDashboardCard
               title="订单数"
               icon={<ShoppingCartIcon className="h-4 w-4" />}
@@ -190,7 +188,7 @@ export function MobileDashboard() {
               collapsible
             />
           </div>
-          
+
           <EnhancedChart
             title="销售趋势"
             data={salesData}
@@ -205,13 +203,13 @@ export function MobileDashboard() {
             }}
             loading={isLoading}
           />
-          
+
           <Button variant="outline" className="w-full" size="sm">
             <CalendarIcon className="mr-2 h-4 w-4" />
             查看详细销售报表
           </Button>
         </TabsContent>
-        
+
         <TabsContent value="inventory" className="space-y-4 pt-2">
           <div className="grid grid-cols-2 gap-4">
             <MobileDashboardCard
@@ -222,7 +220,7 @@ export function MobileDashboard() {
               collapsible
               defaultCollapsed={false}
             />
-            
+
             <MobileDashboardCard
               title="低库存警告"
               icon={<PackageIcon className="h-4 w-4" />}
@@ -231,7 +229,7 @@ export function MobileDashboard() {
               collapsible
             />
           </div>
-          
+
           <EnhancedChart
             title="库存分布"
             data={inventoryData}
@@ -246,13 +244,13 @@ export function MobileDashboard() {
             }}
             loading={isLoading}
           />
-          
+
           <Button variant="outline" className="w-full" size="sm">
             <PackageIcon className="mr-2 h-4 w-4" />
             查看详细库存报表
           </Button>
         </TabsContent>
-        
+
         <TabsContent value="production" className="space-y-4 pt-2">
           <div className="grid grid-cols-2 gap-4">
             <MobileDashboardCard
@@ -269,7 +267,7 @@ export function MobileDashboard() {
               collapsible
               defaultCollapsed={false}
             />
-            
+
             <MobileDashboardCard
               title="员工数量"
               icon={<UsersIcon className="h-4 w-4" />}
@@ -278,7 +276,7 @@ export function MobileDashboard() {
               collapsible
             />
           </div>
-          
+
           <EnhancedChart
             title="生产趋势"
             data={productionData}
@@ -292,7 +290,7 @@ export function MobileDashboard() {
             }}
             loading={isLoading}
           />
-          
+
           <Button variant="outline" className="w-full" size="sm">
             <TrendingUpIcon className="mr-2 h-4 w-4" />
             查看详细生产报表

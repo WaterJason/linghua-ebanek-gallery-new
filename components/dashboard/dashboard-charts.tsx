@@ -11,7 +11,7 @@ interface DashboardChartsProps {
     coffeeSales: {
       data: any[]
     }
-    topProducts: any[]
+    topArtworks: any[]
     inventory?: {
       distribution: any[]
     }
@@ -72,9 +72,9 @@ export function DashboardCharts({
       />
 
       <EnhancedChart
-        title="热销产品"
-        description="按销售额排名的热销产品"
-        data={data.topProducts}
+        title="热销作品"
+        description="按销售额排名的热销作品"
+        data={data.topArtworks}
         type="bar"
         xAxisKey="name"
         yAxisKeys={["sales"]}

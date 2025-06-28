@@ -10,10 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "@/components/ui/use-toast"
 import { getInventory, getWarehouses, transferInventory } from "@/lib/actions/inventory-actions";
 import { getProducts } from "@/lib/actions/product-actions";
-import { 
-  ArrowRightIcon, 
-  PackageIcon, 
-  RefreshCwIcon, 
+import {
+  ArrowRightIcon,
+  PackageIcon,
+  RefreshCwIcon,
   ShoppingCartIcon,
   TruckIcon,
   ReceiptIcon,
@@ -65,70 +65,48 @@ export function InventoryIntegration() {
   async function loadData() {
     try {
       setIsLoading(true)
-      
+
       // 加载仓库数据
       const warehouses = await getWarehouses()
       setWarehouseData(warehouses)
-      
+
       // 加载库存数据
       const inventory = await getInventory()
       setInventoryData(inventory)
-      
+
       // 加载产品数据
       const products = await getProducts()
       setProductData(products)
-      
-      // 模拟加载采购订单数据
-      // 实际应该从采购模块获取数据
-      setPurchaseOrders([
-        {
-          id: 1,
-          orderNumber: "PO-2023-001",
-          supplier: "供应商A",
-          status: "pending",
-          createdAt: new Date().toISOString(),
-          items: [
-            { productId: products[0]?.id, quantity: 10 },
-            { productId: products[1]?.id, quantity: 5 }
-          ]
-        },
-        {
-          id: 2,
-          orderNumber: "PO-2023-002",
-          supplier: "供应商B",
-          status: "received",
-          createdAt: new Date().toISOString(),
-          items: [
-            { productId: products[2]?.id, quantity: 8 }
-          ]
+
+      // 加载采购订单数据
+      try {
+        const purchaseResponse = await fetch('/api/purchase-orders')
+        if (purchaseResponse.ok) {
+          const purchaseData = await purchaseResponse.json()
+          setPurchaseOrders(purchaseData)
+        } else {
+          console.warn('无法加载采购订单数据，使用空数组')
+          setPurchaseOrders([])
         }
-      ])
-      
-      // 模拟加载销售订单数据
-      // 实际应该从销售模块获取数据
-      setSalesOrders([
-        {
-          id: 1,
-          orderNumber: "SO-2023-001",
-          customer: "客户A",
-          status: "pending",
-          createdAt: new Date().toISOString(),
-          items: [
-            { productId: products[0]?.id, quantity: 2 },
-            { productId: products[1]?.id, quantity: 1 }
-          ]
-        },
-        {
-          id: 2,
-          orderNumber: "SO-2023-002",
-          customer: "客户B",
-          status: "shipped",
-          createdAt: new Date().toISOString(),
-          items: [
-            { productId: products[2]?.id, quantity: 3 }
-          ]
+      } catch (error) {
+        console.warn('加载采购订单失败:', error)
+        setPurchaseOrders([])
+      }
+
+      // 加载销售订单数据
+      try {
+        const salesResponse = await fetch('/api/orders')
+        if (salesResponse.ok) {
+          const salesData = await salesResponse.json()
+          setSalesOrders(salesData)
+        } else {
+          console.warn('无法加载销售订单数据，使用空数组')
+          setSalesOrders([])
         }
-      ])
+      } catch (error) {
+        console.warn('加载销售订单失败:', error)
+        setSalesOrders([])
+      }
     } catch (error) {
       console.error("Error loading data:", error)
       toast({
@@ -159,10 +137,10 @@ export function InventoryIntegration() {
   const handleReceivePurchase = async (order) => {
     try {
       setIsProcessing(true)
-      
+
       // 获取默认仓库（实际应该让用户选择）
       const defaultWarehouse = warehouseData[0]
-      
+
       if (!defaultWarehouse) {
         toast({
           title: "操作失败",
@@ -171,30 +149,32 @@ export function InventoryIntegration() {
         })
         return
       }
-      
+
       // 记录操作开始
       console.log(`开始处理采购入库: 订单[${order.orderNumber}]`)
-      
-      // 模拟入库操作
-      // 实际应该调用库存入库API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // 更新订单状态
-      const updatedOrders = purchaseOrders.map(po => {
-        if (po.id === order.id) {
-          return { ...po, status: "received" }
-        }
-        return po
+
+      // 调用采购入库API
+      const receiveResponse = await fetch(`/api/purchase-orders/${order.id}/receive`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          warehouseId: defaultWarehouse.id,
+          items: order.items
+        })
       })
-      
-      setPurchaseOrders(updatedOrders)
-      
+
+      if (!receiveResponse.ok) {
+        throw new Error('采购入库API调用失败')
+      }
+
       // 显示成功提示
       toast({
         title: "入库成功",
         description: `采购订单 ${order.orderNumber} 已成功入库`,
       })
-      
+
       // 重新加载数据
       await loadData()
     } catch (error) {
@@ -213,10 +193,10 @@ export function InventoryIntegration() {
   const handleShipSalesOrder = async (order) => {
     try {
       setIsProcessing(true)
-      
+
       // 获取默认仓库（实际应该让用户选择）
       const defaultWarehouse = warehouseData[0]
-      
+
       if (!defaultWarehouse) {
         toast({
           title: "操作失败",
@@ -225,7 +205,7 @@ export function InventoryIntegration() {
         })
         return
       }
-      
+
       // 检查库存是否足够
       for (const item of order.items) {
         const inventory = getProductInventory(item.productId)
@@ -238,30 +218,32 @@ export function InventoryIntegration() {
           return
         }
       }
-      
+
       // 记录操作开始
       console.log(`开始处理销售出库: 订单[${order.orderNumber}]`)
-      
-      // 模拟出库操作
-      // 实际应该调用库存出库API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // 更新订单状态
-      const updatedOrders = salesOrders.map(so => {
-        if (so.id === order.id) {
-          return { ...so, status: "shipped" }
-        }
-        return so
+
+      // 调用销售出库API
+      const shipResponse = await fetch(`/api/orders/${order.id}/ship`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          warehouseId: defaultWarehouse.id,
+          items: order.items
+        })
       })
-      
-      setSalesOrders(updatedOrders)
-      
+
+      if (!shipResponse.ok) {
+        throw new Error('销售出库API调用失败')
+      }
+
       // 显示成功提示
       toast({
         title: "出库成功",
         description: `销售订单 ${order.orderNumber} 已成功出库`,
       })
-      
+
       // 重新加载数据
       await loadData()
     } catch (error) {

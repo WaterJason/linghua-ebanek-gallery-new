@@ -51,8 +51,8 @@ export async function getChannel(id: number) {
 export async function createChannel(data: any) {
   try {
     // 验证必填字段
-    if (!data.name || !data.code) {
-      throw new Error("渠道名称和编码为必填项")
+    if (!data.name || !data.code || !data.type) {
+      throw new Error("渠道名称、编码和类型为必填项")
     }
 
     // 检查编码是否已存在
@@ -74,6 +74,7 @@ export async function createChannel(data: any) {
       data: {
         name: data.name,
         code: data.code,
+        type: data.type,
         description: data.description,
         contactName: data.contactName,
         contactPhone: data.contactPhone,
@@ -105,8 +106,8 @@ export async function createChannel(data: any) {
 export async function updateChannel(id: number, data: any) {
   try {
     // 验证必填字段
-    if (!data.name || !data.code) {
-      throw new Error("渠道名称和编码为必填项")
+    if (!data.name || !data.code || !data.type) {
+      throw new Error("渠道名称、编码和类型为必填项")
     }
 
     // 检查渠道是否存在
@@ -140,6 +141,7 @@ export async function updateChannel(id: number, data: any) {
       data: {
         name: data.name,
         code: data.code,
+        type: data.type,
         description: data.description,
         contactName: data.contactName,
         contactPhone: data.contactPhone,

@@ -15,13 +15,18 @@ globs: *
 - **SWR:** Already a dependency; utilized for managing API data and reducing redundant state code.  (Confirmed in new interactions)
 - **react-hook-form:** Already a dependency; utilized for simplifying form handling. (Confirmed in new interactions)
 - **Tailwind CSS:** Already in use; recommended to extend mobile media query breakpoints. (Confirmed in new interactions)
-
+- **BMAD (Breakthrough Method of Agile AI-driven Development):** An AI-driven agile development methodology and toolset. Key features include an AI orchestrator, specialized AI agents (Product Manager, Architect, Developer, Tester), task-driven workflows, standardized templates, and web/IDE integration. See "WORKFLOW & RELEASE RULES" and "BEST PRACTICES" for usage guidelines.
+- **Laravel 11:** Target framework for potential ERP system reconstruction.
+- **Bootstrap 5:** UI framework to be utilized for potential ERP system reconstruction in Laravel.
+- **Alpine.js:** JavaScript framework to be utilized for potential ERP system reconstruction in Laravel.
 
 ## PROJECT DOCUMENTATION & CONTEXT SYSTEM
 
 - All interactions should be documented. Consider using a system like the one exemplified in `2025-05-21_22-43-对话总结与记忆扩展.md`, `2025-05-21_23-44-通知模块错误讨论.md`, `2025-05-22_04-01-修复财务模块的bug讨论.md`, `2025-05-22_04-42-untitled.md`, `2025-05-22_04-42-react-component-export-error-troubleshooting.md`, `2025-05-22_05-35-untitled.md`, `2025-05-22_05-35-前端优化与移动端支持.md`, and any subsequent interaction logs.  A new UI refactoring document should be created and maintained, documenting the changes and rationale behind them.  A new UI refactoring document, `聆花掐丝珐琅馆 - 前端 UI 重构文档.md`, has been created and should be referenced.  This document is now marked up with completion status for each section.  Add documentation for GitHub repository interactions, including steps for initialization, remote repository configuration, adding files to the staging area, committing changes, setting the remote repository, and pushing code. Refer to the interaction log `2025-05-23_04-33-untitled.md` for a detailed example.
 - Version updates and changes should be documented in the relevant sections (e.g., TECH STACK, WORKFLOW & RELEASE RULES).
-
+- The document `聆花掐丝珐琅馆ERP系统开发规则` has been created, outlining key aspects of technical architecture, business logic, code quality, team collaboration, security/performance, and testing/quality assurance.
+- Interaction log `2025-06-06_05-29-研究bmad工具在erp系统中的应用.md` has been created to document research on BMAD tool integration into the ERP system.
+- Interaction logs `2025-06-06_05-49-分析next-js-erp系统重构需求.md` and `2025-06-06_06-26-untitled.md` have been created, outlining the request for ERP system refactoring documentation.
 
 ## WORKFLOW & RELEASE RULES
 
@@ -34,15 +39,42 @@ globs: *
 - **Finance Module Header/Footer Removal:** The header and footer should be removed from the finance module layout.  This has been implemented.
 - **Finance Module UI Style:** The UI style of the finance module should reference the style of the channel module. Further clarification needed on specific aspects to be referenced.
 - **Mobile-First Design:**  All new frontend development should prioritize mobile-first design principles.  Existing components should be reviewed and refactored as needed to ensure mobile compatibility.  Consider using Next.js App Router for efficient layout management across devices.
-- **Component Modularization:**  Organize code by business function (e.g., `features/finance`) rather than technical role (e.g., `components/finance`). (New rule from user interaction)
-- **Atomic Design:** Adopt the atomic design pattern (Atoms, Molecules, Organisms, Templates, Pages) to improve component reusability. (New rule from user interaction)
-- **Progressive Enhancement:** Prioritize core mobile features first, then gradually replace existing components. (New rule from user interaction)
-- **Data Pagination:** Implement virtual scrolling and data pagination to reduce initial load data. (New rule from user interaction)
-- **Component Lazy Loading:** Utilize dynamic imports for non-critical components to improve load times. (New rule from user interaction)
-- **Code Splitting Refinement:** Refine code splitting by route and functional module to reduce bundle size. (New rule from user interaction)
-- **RESTful API Design:** Follow RESTful principles when restructuring API routes. (New rule from user interaction)
+- **Component Modularization:**  Organize code by business function (e.g., `features/finance`) rather than technical role (e.g., `components/finance`).
+- **Atomic Design:** Adopt the atomic design pattern (Atoms, Molecules, Organisms, Templates, Pages) to improve component reusability.
+- **Progressive Enhancement:** Prioritize core mobile features first, then gradually replace existing components.
+- **Data Pagination:** Implement virtual scrolling and data pagination to reduce initial load data.
+- **Component Lazy Loading:** Utilize dynamic imports for non-critical components to improve load times.
+- **Code Splitting Refinement:** Refine code splitting by route and functional module to reduce bundle size.
+- **RESTful API Design:** Follow RESTful principles when restructuring API routes.
 - **GitHub Integration:** Before pushing code to the remote repository, ensure the local repository is properly initialized and configured.  The assistant will follow a standard process for pushing code to GitHub, outlined in interaction log `2025-05-23_04-33-untitled.md`.  Always confirm the remote repository is empty or allows overwriting before pushing.
-
+- **BMAD Integration:** Integrate BMAD (Breakthrough Method of Agile AI-driven Development) into the development workflow.
+    - **AI Agent Orchestration:** Utilize BMAD's AI orchestrator to assume different roles (Product Manager, Architect, Developer, Tester).
+    - **Standardized Workflows:** Adopt BMAD's task-driven approach and checklists.
+    - **Enhanced Documentation:** Integrate BMAD's template system.
+    - **Optimized Agile Practices:** Incorporate BMAD's AI-driven agile practices.
+    - **Web Agent Setup:** Configure a Gemini Gem or ChatGPT custom GPT using the `BMAD/web-build-sample` files. The `agent-prompt.txt` file provides the agent's instructions, and the remaining files serve as the knowledge base. Name the agent "聆花ERP BMAD代理".
+    - **IDE Integration:** Copy the `bmad-agent` folder to the project root. Use the `dev.ide.md` agent for code development and the `sm.ide.md` agent for project management.
+    - **ERP Integration:** To effectively integrate BMAD, configure the BMAD AI agent framework to assist with the ERP project's development and maintenance. This involves creating specialized AI roles (e.g., "聆花ERP Architect," "Inventory Module Expert"), building a project knowledge base (including design documents, coding standards like `聆花ERP系统开发规则.md`, and code structure), and defining specific development tasks (e.g., "Add a new financial report," "Refactor the product management page"). This approach allows for the creation of an AI development team tailored to the 聆花文化ERP system.
+        - BMAD can be used to optimize new feature development, existing module refactoring, and documentation.
+        - BMAD can be leveraged to enhance team collaboration by introducing Product Owner (PO) and Scrum Master (SM) roles into the workflow.
+    - **BMAD Tool Research:** Refer to `2025-06-06_05-29-研究bmad工具在erp系统中的应用.md` for initial research and application strategies of the BMAD tool within the ERP system.
+    - **BMAD for ERP System Reconstruction:** Utilize BMAD tools to assist with the ERP system reconstruction based on the "重构指导文档." This involves leveraging BMAD's AI agents, standardized workflows, and quality assurance mechanisms to ensure a systematic and high-quality reconstruction process.
+        - **AI Agent Specialization:** Utilize the BMAD AI agent ecosystem, including Architect, Developer, Product Manager, and Design Architect agents, for specialized tasks in the ERP reconstruction.
+        - **BMAD Web Agent Setup:** Create a Gemini Gem or ChatGPT custom GPT named "聆花ERP重构代理" using the `BMAD/web-build-sample` files.
+        - **Architect Agent Focus:** Use the Architect agent (`architect.md`) for technical architecture design, the Developer agent (`dev.ide.md`) for code implementation, the Product Manager agent (`pm.md`) for requirements management, and the Design Architect agent (`design-architect.md`) for UI/UX design.
+        - **Systematic Reconstruction Methodology:** Adopt BMAD's standardized reconstruction process, including architecture analysis, requirement analysis, and frontend architecture tasks.
+        - **Quality Assurance:** Enforce BMAD's quality assurance system with architecture verification checklists and templated outputs.
+        - **Immediate Actions:** Set up the BMAD web agent, initiate architecture analysis using the Architect agent with the existing Laravel reconstruction guide, and develop a detailed project plan with the Product Manager agent.
+        - **Continuous Integration:** Integrate BMAD into the IDE, use the dev agent for code reviews, and establish a BMAD-based testing process.
+- **ERP System Reconstruction Workflow:** The AI assistant is capable of analyzing a Next.js ERP system and generating a detailed reconstruction plan for Laravel 11, including:
+    - Functional module inventory with detailed operations and business rules.
+    - Database structure analysis, including table structures, field types, relationships, indexes, constraints, and Laravel migration file generation.
+    - Business process analysis, including order processing, inventory management, user permissions, validation rules, and calculation logic.
+    - UI design specifications, including page layouts, navigation structures, form designs, and list display methods.
+    - A complete Laravel 11 project reconstruction plan, including specific implementations for Models, Controllers, Views, and Routes, utilizing Bootstrap 5 and Alpine.js, optimized for a 4GB memory server. This includes generating Laravel migration files from the Prisma schema, creating a functional module checklist, and outlining a migration path from Next.js/Prisma to Laravel/Eloquent.
+- **ERP System Reconstruction Technical Stack:**
+    - **Backend:** Laravel 11.x, PHP 8.2+, MySQL 8.0 / PostgreSQL 14+, Redis, Supervisor
+    - **Frontend:** Bootstrap 5.3, Alpine.js 3.x, Chart.js, Select2
 
 ## DEBUGGING
 
@@ -53,11 +85,9 @@ globs: *
 - **Auth Function Errors:** If a `TypeError: ...auth... is not a function` error occurs, systematically check for missing or incorrectly imported authentication functions.  Utilize tools like `grep_search` and `codebase_search` to locate the function definition and ensure correct import paths. Check for outdated or incorrectly referenced files (e.g., `.old`, `.bak` extensions). Always follow the systematic diagnosis steps outlined in WORKFLOW & RELEASE RULES when encountering such errors.
 - **Undefined Component Errors:** If an "Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined" error occurs, systematically check for missing or incorrectly imported components in the render method of the affected component.  Utilize tools like `grep_search` and `codebase_search` to locate the component definition and ensure correct import paths. Check for outdated or incorrectly referenced files. Always follow the systematic diagnosis steps outlined in WORKFLOW & RELEASE RULES when encountering such errors.  Pay close attention to default vs. named imports.  This error often indicates a missing or incorrectly imported component in the JSX rendering structure. Check the import statements for the component and ensure that the component is correctly exported from its source file. Verify that the component name is spelled correctly and that there are no typos in the import path.  This error is frequently caused by forgetting to export a component from its defining file, or by mixing up default and named imports.  Also check for missing or incorrectly imported icons, and ensure they exist in the used version of `lucide-react`.
 
-
 ## CODING STANDARDS
 
 - Maintain consistent code style across the project. Adherence to linting rules is mandatory to avoid errors.
-
 
 ## BEST PRACTICES
 
@@ -69,19 +99,35 @@ globs: *
 - Maintain consistent versions of `lucide-react` across the project.  Ensure that all required icons exist within the used version.
 - Replace `Transfer` and `Chart` icons with `ArrowUpDown` and `BarChart` respectively in `lucide-react` for consistency and availability. Add `LineChart` as needed.
 - Adopt mobile-first design principles for all new and refactored components.  Prioritize responsive design and ensure optimal user experience across all devices.
-- Favor composition over inheritance when building complex UIs. (New Best Practice from user interaction)
-- Create custom hooks to abstract business logic, keeping components focused on presentation. (New Best Practice from user interaction)
-- Implement centralized error handling with a unified error boundary and error handling hook. (New Best Practice from user interaction)
-- Utilize TypeScript's strict mode to enhance type safety and reduce runtime errors. (New Best Practice from user interaction)
-- Create reusable, adaptive layout primitives to minimize redundant media queries. (New Best Practice from user interaction)
-- Separate tests into unit, integration, and end-to-end tests for comprehensive coverage. (New Best Practice from user interaction)
-- Use React Testing Library to isolate component behavior during testing. (New Best Practice from user interaction)
-- Integrate performance monitoring and component debugging tools for efficient development. (New Best Practice from user interaction)
-- Create a unified API client to streamline API calls and reduce repetitive code. (New Best Practice from user interaction)
-- Derive states instead of duplicating them to avoid state synchronization issues. (New Best Practice from user interaction)
-- Adopt Atomic Design principles (Atoms, Molecules, Organisms, Templates, Pages) for improved component reusability and maintainability. (New Best Practice from user interaction)
-- Organize code by business function (e.g., `features/finance`) rather than technical role (e.g., `components/finance`). (New Best Practice from user interaction)
-- Implement data pagination and virtual scrolling for improved performance with large datasets. (New Best Practice from user interaction)
-- Implement lazy loading for non-critical components to reduce initial page load time. (New Best Practice from user interaction)
-- Implement data caching strategies to improve performance and reduce API calls. (New Best Practice from user interaction)
-- Use a consistent Git workflow for all code changes, including proper commit messages and branching strategies. (New Best Practice from user interaction)
+- Favor composition over inheritance when building complex UIs.
+- Create custom hooks to abstract business logic, keeping components focused on presentation.
+- Implement centralized error handling with a unified error boundary and error handling hook.
+- Utilize TypeScript's strict mode to enhance type safety and reduce runtime errors.
+- Create reusable, adaptive layout primitives to minimize redundant media queries.
+- Separate tests into unit, integration, and end-to-end tests for comprehensive coverage.
+- Use React Testing Library to isolate component behavior during testing.
+- Integrate performance monitoring and component debugging tools for efficient development.
+- Create a unified API client to streamline API calls and reduce repetitive code.
+- Derive states instead of duplicating them to avoid state synchronization issues.
+- Adopt Atomic Design principles (Atoms, Molecules, Organisms, Templates, Pages) for improved component reusability and maintainability.
+- Organize code by business function (e.g., `features/finance`) rather than technical role (e.g., `components/finance`).
+- Implement data pagination and virtual scrolling for improved performance with large datasets.
+- Implement lazy loading for non-critical components to reduce initial page load time.
+- Implement data caching strategies to improve performance and reduce API calls.
+- Use a consistent Git workflow for all code changes, including proper commit messages and branching strategies.
+- Utilize BMAD AI agents to optimize various development aspects:
+    - **Product Manager Agent:** For ERP module requirements analysis, PRD generation, and business process design.
+    - **Architect Agent:** For technical architecture review, new module design, and ensuring system scalability and performance.
+    - **Developer Agent:** For code review, quality checks, best practice guidance, and complex business logic implementation.
+    - **Test Engineer Agent:** For test strategy development, test case generation, and quality assurance process optimization.
+- Follow these steps for BMAD integration:
+    1. Deploy the BMAD AI orchestrator. This involves setting up the base coordinator agent using `agent-prompt.txt` and loading default configuration files (`personas.txt`, `tasks.txt`, etc.) in a platform such as Gemini Web or an IDE.
+    2. Customize the BMAD AI agents for the 聆花ERP project. This includes building an ERP-specific knowledge base (`data-linghua-erp.txt`) with project documentation, coding standards, and UI guidelines; creating ERP-specific AI roles (e.g., `erp-frontend-dev`, `erp-backend-dev`, `erp-db-admin`) with tailored expertise; and defining ERP-specific tasks (e.g., `task-create-api-endpoint`, `task-create-crud-page`, `task-run-module-test`) to automate repetitive development activities.
+    3. Integrate BMAD into the daily development process.
+    4. Train team members on BMAD usage.
+    5. Establish a standardized BMAD-based development process.
+- For ERP system reconstruction using BMAD:
+    - Utilize BMAD's AI agents (Architect, Developer, Product Manager, Design Architect) for specialized reconstruction tasks.
+    - Configure a BMAD web agent ("聆花ERP Laravel重构专家") using the `web-build-sample` files in Gemini or a similar platform.
+    - Start by using the Architect agent to validate and optimize the existing Laravel reconstruction guide.
+    - Then, use the Product Manager agent to create a detailed reconstruction project plan, including milestones, task breakdowns, and risk management strategies.

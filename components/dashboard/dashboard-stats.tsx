@@ -33,33 +33,42 @@ export function StatCard({
   className
 }: StatCardProps) {
   return (
-    <Card className={cn("", className)}>
+    <Card className={cn(
+      "stat-card card-hover border-0 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
+      className
+    )}>
       <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className={cn("p-2 rounded-full", iconColor)}>
+        <div className="flex items-center justify-between mb-4">
+          <div className={cn(
+            "flex items-center justify-center w-12 h-12 rounded-xl shadow-sm",
+            iconColor
+          )}>
             {icon}
           </div>
           {trend && (
-            <div className="flex items-center">
+            <div className={cn(
+              "flex items-center text-sm font-semibold px-2 py-1 rounded-full",
+              trend.isPositive
+                ? "text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/30"
+                : "text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/30"
+            )}>
               {trend.isPositive ? (
-                <ArrowUpIcon className="mr-1 h-3 w-3 text-green-500" />
+                <ArrowUpIcon className="w-3 h-3 mr-1" />
               ) : (
-                <ArrowDownIcon className="mr-1 h-3 w-3 text-red-500" />
+                <ArrowDownIcon className="w-3 h-3 mr-1" />
               )}
-              <p className={cn(
-                "text-xs",
-                trend.isPositive ? "text-green-500" : "text-red-500"
-              )}>
-                {Math.abs(trend.value)}% {trend.label}
-              </p>
+              {Math.abs(trend.value)}%
             </div>
           )}
         </div>
-        <div className="mt-3">
-          <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-          <p className="text-2xl font-bold mt-1">{value}</p>
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-1">{title}</h3>
+          <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
           {description && (
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
+            <p className="text-xs text-muted-foreground mt-2 flex items-center">
+              <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+              {description}
+            </p>
           )}
         </div>
       </CardContent>
@@ -105,11 +114,19 @@ export function DashboardStats({
   data,
   className
 }: DashboardStatsProps) {
+  // 确保数据存在，防止undefined错误
+  const gallerySales = data?.gallerySales || { current: 0, previous: 0, growth: 0 };
+  const coffeeSales = data?.coffeeSales || { current: 0, previous: 0, growth: 0 };
+  const workshops = data?.workshops || { current: 0, previous: 0, growth: 0 };
+  const inventory = data?.inventory || { total: 0, lowStock: 0 };
+  const employees = data?.employees || { total: 1, active: 0 }; // 避免除以零错误
+  const orders = data?.orders;
+
   // 计算总销售额
-  const totalSales = data.gallerySales.current + data.coffeeSales.current
-  const previousTotalSales = data.gallerySales.previous + data.coffeeSales.previous
-  const totalSalesGrowth = previousTotalSales === 0 ? 0 : 
-    ((totalSales - previousTotalSales) / previousTotalSales) * 100
+  const totalSales = gallerySales.current + coffeeSales.current;
+  const previousTotalSales = gallerySales.previous + coffeeSales.previous;
+  const totalSalesGrowth = previousTotalSales === 0 ? 0 :
+    ((totalSales - previousTotalSales) / previousTotalSales) * 100;
 
   return (
     <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4", className)}>
@@ -124,73 +141,73 @@ export function DashboardStats({
           isPositive: totalSalesGrowth > 0
         }}
       />
-      
+
       <StatCard
         title="珐琅馆销售"
-        value={`¥${data.gallerySales.current.toLocaleString()}`}
+        value={`¥${gallerySales.current.toLocaleString()}`}
         icon={<DollarSignIcon className="h-5 w-5" />}
         iconColor="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
         trend={{
-          value: parseFloat(data.gallerySales.growth.toFixed(1)),
+          value: parseFloat(gallerySales.growth.toFixed(1)),
           label: "同比",
-          isPositive: data.gallerySales.growth > 0
+          isPositive: gallerySales.growth > 0
         }}
       />
-      
+
       <StatCard
         title="咖啡店销售"
-        value={`¥${data.coffeeSales.current.toLocaleString()}`}
+        value={`¥${coffeeSales.current.toLocaleString()}`}
         icon={<CoffeeIcon className="h-5 w-5" />}
         iconColor="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
         trend={{
-          value: parseFloat(data.coffeeSales.growth.toFixed(1)),
+          value: parseFloat(coffeeSales.growth.toFixed(1)),
           label: "同比",
-          isPositive: data.coffeeSales.growth > 0
+          isPositive: coffeeSales.growth > 0
         }}
       />
-      
-      {data.orders ? (
+
+      {orders ? (
         <StatCard
           title="订单数量"
-          value={data.orders.total}
+          value={orders.total}
           icon={<ShoppingCartIcon className="h-5 w-5" />}
           iconColor="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
           trend={{
-            value: parseFloat(data.orders.growth.toFixed(1)),
+            value: parseFloat(orders.growth.toFixed(1)),
             label: "同比",
-            isPositive: data.orders.growth > 0
+            isPositive: orders.growth > 0
           }}
-          description={`待处理: ${data.orders.pending}`}
+          description={`待处理: ${orders.pending}`}
         />
       ) : (
         <StatCard
           title="手作团建"
-          value={data.workshops.current}
+          value={workshops.current}
           icon={<CalendarIcon className="h-5 w-5" />}
           iconColor="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400"
           trend={{
-            value: parseFloat(data.workshops.growth.toFixed(1)),
+            value: parseFloat(workshops.growth.toFixed(1)),
             label: "同比",
-            isPositive: data.workshops.growth > 0
+            isPositive: workshops.growth > 0
           }}
           description="近期场次"
         />
       )}
-      
+
       <StatCard
         title="库存总量"
-        value={data.inventory.total}
+        value={inventory.total}
         icon={<PackageIcon className="h-5 w-5" />}
         iconColor="bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400"
-        description={`低库存警告: ${data.inventory.lowStock}`}
+        description={`低库存警告: ${inventory.lowStock}`}
       />
-      
+
       <StatCard
         title="员工数量"
-        value={`${data.employees.active}/${data.employees.total}`}
+        value={`${employees.active}/${employees.total}`}
         icon={<UsersIcon className="h-5 w-5" />}
         iconColor="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-        description={`在职率: ${Math.round((data.employees.active / data.employees.total) * 100)}%`}
+        description={`在职率: ${Math.round((employees.active / employees.total) * 100)}%`}
       />
     </div>
   )

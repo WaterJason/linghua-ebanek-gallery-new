@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth-helpers"
 import prisma from "@/lib/db"
 import { revalidatePath } from "next/cache"
 
@@ -8,7 +7,7 @@ import { revalidatePath } from "next/cache"
 export async function POST(request: Request) {
   try {
     // 检查用户是否已登录且有权限
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "未授权" }, { status: 403 })
     }

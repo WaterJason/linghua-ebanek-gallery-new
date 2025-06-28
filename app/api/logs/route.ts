@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession, isAdmin } from "@/lib/auth-helpers"
 import prisma from "@/lib/db"
 import { ActivityData } from "@/lib/user-activity-logger"
 import fs from "fs"
@@ -75,7 +74,7 @@ const writeLogToDatabase = async (log: ActivityData) => {
 export async function POST(request: Request) {
   try {
     // 检查用户是否已登录
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
 
     // 获取请求数据
     const log: ActivityData = await request.json()
@@ -114,7 +113,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     // 检查用户是否已登录且是管理员
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
 
     if (!session?.user || session.user.role !== "admin") {
       // 如果不是管理员，返回模拟的系统日志数据

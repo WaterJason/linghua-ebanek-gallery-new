@@ -250,8 +250,11 @@ export async function getWorkshop(id: number) {
 export async function createWorkshop(data: any) {
   try {
     // 验证必填字段
+    if (!data.name) throw new Error("团建名称为必填项");
     if (!data.customerId) throw new Error("客户ID为必填项");
     if (!data.date) throw new Error("活动日期为必填项");
+    if (!data.startTime) throw new Error("开始时间为必填项");
+    if (!data.endTime) throw new Error("结束时间为必填项");
     if (!data.teacherId) throw new Error("讲师ID为必填项");
     if (!data.managerId) throw new Error("项目负责人ID为必填项");
     if (!data.activityType) throw new Error("活动类型为必填项");
@@ -270,8 +273,11 @@ export async function createWorkshop(data: any) {
     // 创建团建订单
     const workshop = await prisma.workshop.create({
       data: {
+        name: data.name,
         customerId: data.customerId,
         date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime,
         activityType: data.activityType,
         locationType: data.locationType,
         baseType: data.baseType,

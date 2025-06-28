@@ -1,13 +1,14 @@
 /**
  * 错误处理模块
- * 
+ *
  * 本模块提供统一的错误处理机制，包括错误类型定义、错误日志记录、错误响应格式化等。
- * 
+ *
  * @module 错误处理
  * @category 核心模块
  */
 
-import { createSystemLog } from './actions/system-actions';
+// 暂时注释掉，避免导入错误
+// import { createSystemLog } from './actions/system-actions';
 
 /**
  * 错误类型枚举
@@ -70,7 +71,7 @@ export class AppError extends Error {
   details?: any;
   module: string;
   timestamp: Date;
-  
+
   /**
    * 构造函数
    * @param message 错误消息
@@ -94,7 +95,7 @@ export class AppError extends Error {
     this.module = module;
     this.timestamp = new Date();
   }
-  
+
   /**
    * 获取错误的JSON表示
    */
@@ -195,10 +196,10 @@ export async function handleError(error: any, module: string = 'unknown', userId
     await logError(error, userId);
     return error;
   }
-  
+
   // 转换为 AppError
   let appError: AppError;
-  
+
   if (error.name === 'PrismaClientKnownRequestError' || error.name === 'PrismaClientUnknownRequestError') {
     appError = new DatabaseError(
       error.message || '数据库操作失败',
@@ -220,10 +221,10 @@ export async function handleError(error: any, module: string = 'unknown', userId
       module
     );
   }
-  
+
   // 记录错误日志
   await logError(appError, userId);
-  
+
   return appError;
 }
 
@@ -234,17 +235,13 @@ export async function handleError(error: any, module: string = 'unknown', userId
  */
 async function logError(error: AppError, userId?: string): Promise<void> {
   try {
-    // 记录到系统日志
-    await createSystemLog({
-      level: 'error',
-      module: error.module,
-      message: error.message,
-      details: JSON.stringify(error.toJSON()),
-      userId: userId,
-    });
-    
-    // 同时输出到控制台
+    // 暂时只输出到控制台，不记录到系统日志
     console.error(`[${error.timestamp.toISOString()}] [${error.type}] [${error.code}] [${error.module}] ${error.message}`, error.details);
+
+    // 记录用户ID（如果有）
+    if (userId) {
+      console.error(`User ID: ${userId}`);
+    }
   } catch (logError) {
     // 如果记录日志失败，只输出到控制台
     console.error('Failed to log error:', logError);
@@ -270,7 +267,7 @@ export function formatErrorResponse(error: any): { success: false; error: any } 
       },
     };
   }
-  
+
   // 否则，创建一个通用错误响应
   return {
     success: false,
@@ -282,3 +279,84 @@ export function formatErrorResponse(error: any): { success: false; error: any } 
     },
   };
 }
+
+/**
+ * 安全调用函数
+ *
+ * 安全地调用函数，如果函数不存在或调用失败，返回默认值。
+ *
+ * @param fn 要调用的函数
+ * @param args 函数参数
+ * @param defaultValue 默认返回值
+ * @param errorHandler 错误处理函数
+ * @returns 函数返回值或默认值
+ */
+export async function safeCall<T, A extends any[]>(
+  fn: ((...args: A) => Promise<T>) | undefined | null,
+  args: A,
+  defaultValue: T,
+  errorHandler?: (error: any) => void
+): Promise<T> {
+  try {
+    if (typeof fn !== 'function') {
+      console.warn(`尝试调用不存在的函数`);
+      return defaultValue;
+    }
+
+    return await fn(...args);
+  } catch (error) {
+    if (errorHandler) {
+      errorHandler(error);
+    } else {
+      console.error(`函数调用失败:`, error);
+
+      // 记录错误日志
+      try {
+        const appError = new AppError(
+          error instanceof Error ? error.message : String(error),
+          ErrorType.SYSTEM,
+          ErrorCode.SYSTEM_ERROR,
+          {
+            functionName: fn?.name || "unknown",
+            args: JSON.stringify(args),
+            error: error instanceof Error ? {
+              message: error.message,
+              stack: error.stack
+            } : String(error)
+          },
+          "function-call"
+        );
+
+        await logError(appError);
+      } catch (logError) {
+        console.error("记录错误日志失败:", logError);
+      }
+    }
+
+    return defaultValue;
+  }
+}
+
+/**
+ * 错误处理工具
+ */
+export const ErrorUtils = {
+  // 错误类型
+  ErrorType,
+  ErrorCode,
+
+  // 错误类
+  AppError,
+  ValidationError,
+  DatabaseError,
+  AuthenticationError,
+  AuthorizationError,
+  NotFoundError,
+  AlreadyExistsError,
+  BusinessLogicError,
+
+  // 错误处理函数
+  handleError,
+  formatErrorResponse,
+  safeCall,
+};

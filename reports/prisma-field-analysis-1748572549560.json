@@ -1,0 +1,607 @@
+{
+  "timestamp": "2025-05-30T02:35:49.555Z",
+  "summary": {
+    "totalFiles": 193,
+    "filesWithIssues": 7,
+    "totalIssues": 15,
+    "issueStats": {
+      "missing_required_fields": 15,
+      "incorrect_field_name": 0
+    }
+  },
+  "results": [
+    {
+      "filePath": "lib/actions/channel-actions.ts",
+      "issues": [
+        {
+          "type": "missing_required_fields",
+          "model": "Channel",
+          "operation": "create",
+          "missingFields": [
+            "type"
+          ],
+          "providedFields": [
+            "name",
+            "code",
+            "description",
+            "contactName",
+            "contactPhone",
+            "contactEmail",
+            "address",
+            "bankName",
+            "bankAccount",
+            "settlementCycle",
+            "status",
+            "isActive"
+          ],
+          "location": "Line 73",
+          "code": "prisma.channel.create({\n      data: {\n        name: data.name,\n        code: data.code,\n        description: data.description,\n        contactName: data.contactName,\n        contactPhone: data.contact..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "ChannelInventory",
+          "operation": "create",
+          "missingFields": [
+            "channelId"
+          ],
+          "providedFields": [
+            "productId",
+            "quantity"
+          ],
+          "location": "Line 472",
+          "code": "prisma.channelInventory.create({\n          data: {\n            channelId,\n            productId: parseInt(item.productId),\n            quantity: 0,\n          }..."
+        }
+      ],
+      "linesOfCode": 1633
+    },
+    {
+      "filePath": "lib/actions/inventory-actions.ts",
+      "issues": [
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryTransaction",
+          "operation": "create",
+          "missingFields": [
+            "productId"
+          ],
+          "providedFields": [
+            "quantity",
+            "type",
+            "notes",
+            "sourceWarehouseId"
+          ],
+          "location": "Line 171",
+          "code": "prisma.inventoryTransaction.create({\n        data: {\n          productId,\n          quantity: Number(product.inventory) - existingInventory.quantity,\n          type: \"adjustment\",\n          notes: `从产..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryItem",
+          "operation": "create",
+          "missingFields": [
+            "productId"
+          ],
+          "providedFields": [
+            "quantity",
+            "warehouseId"
+          ],
+          "location": "Line 202",
+          "code": "prisma.inventoryItem.create({\n          data: {\n            productId,\n            quantity: Number(product.inventory),\n            warehouseId: anyWarehouse.id,\n          }..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryTransaction",
+          "operation": "create",
+          "missingFields": [
+            "productId"
+          ],
+          "providedFields": [
+            "quantity",
+            "type",
+            "notes"
+          ],
+          "location": "Line 171",
+          "code": "prisma.inventoryTransaction.create({\n          data: {\n            productId,\n            quantity: Number(product.inventory),\n            type: \"initial\",\n            notes: `从产品管理模块初始化库存（使用仓库：${anyW..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryItem",
+          "operation": "create",
+          "missingFields": [
+            "productId"
+          ],
+          "providedFields": [
+            "quantity",
+            "warehouseId"
+          ],
+          "location": "Line 202",
+          "code": "prisma.inventoryItem.create({\n        data: {\n          productId,\n          quantity: Number(product.inventory),\n          warehouseId: defaultWarehouse.id,\n        }..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryTransaction",
+          "operation": "create",
+          "missingFields": [
+            "productId"
+          ],
+          "providedFields": [
+            "quantity",
+            "type",
+            "notes",
+            "targetWarehouseId"
+          ],
+          "location": "Line 171",
+          "code": "prisma.inventoryTransaction.create({\n        data: {\n          productId,\n          quantity: Number(product.inventory),\n          type: \"initial\",\n          notes: `从产品管理模块初始化库存`,\n          targetWar..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryTransaction",
+          "operation": "create",
+          "missingFields": [
+            "productId"
+          ],
+          "providedFields": [
+            "quantity",
+            "type",
+            "notes"
+          ],
+          "location": "Line 171",
+          "code": "prisma.inventoryTransaction.create({\n            data: {\n              productId,\n              quantity: newQuantity - existingInventory.quantity,\n              type: \"import\",\n              notes: `..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryItem",
+          "operation": "create",
+          "missingFields": [
+            "productId",
+            "quantity"
+          ],
+          "providedFields": [
+            "warehouseId",
+            "minQuantity"
+          ],
+          "location": "Line 202",
+          "code": "prisma.inventoryItem.create({\n            data: {\n              productId,\n              quantity,\n              warehouseId: itemWarehouseId,\n              minQuantity: item.minQuantity ? Number(item..."
+        },
+        {
+          "type": "missing_required_fields",
+          "model": "InventoryTransaction",
+          "operation": "create",
+          "missingFields": [
+            "productId",
+            "quantity"
+          ],
+          "providedFields": [
+            "type",
+            "notes"
+          ],
+          "location": "Line 171",
+          "code": "prisma.inventoryTransaction.create({\n            data: {\n              productId,\n              quantity,\n              type: \"import\",\n              notes: `${notes}..."
+        }
+      ],
+      "linesOfCode": 2120
+    },
+    {
+      "filePath": "lib/actions/production-actions.ts",
+      "issues": [
+        {
+          "type": "missing_required_fields",
+          "model": "ProductionOrder",
+          "operation": "create",
+          "missingFields": [
+            "orderNumber"
+          ],
+          "providedFields": [
+            "productionBaseId",
+            "employeeId",
+            "sourceOrderId",
+            "orderDate",
+            "expectedStartDate",
+            "expectedEndDate",
+            "priority",
+            "totalAmount",
+            "shippingMethod",
+            "notes",
+            "items",
+            "create",
+            "productId",
+            "quantity",
+            "specifications"
+          ],
+          "location": "Line 212",
+          "code": "prisma.productionOrder.create({\n      data: {\n        orderNumber,\n        productionBaseId: data.productionBaseId,\n        employeeId: data.employeeId,\n        sourceOrderId: data.sourceOrderId,\n    ..."
+        }
+      ],
+      "linesOfCode": 350
+    },
+    {
+      "filePath": "lib/actions/workshop-order-actions.ts",
+      "issues": [
+        {
+          "type": "missing_required_fields",
+          "model": "Workshop",
+          "operation": "create",
+          "missingFields": [
+            "name",
+            "startTime",
+            "endTime"
+          ],
+          "providedFields": [
+            "customerId",
+            "date",
+            "activityType",
+            "locationType",
+            "baseType",
+            "location",
+            "participants",
+            "duration",
+            "teacherId",
+            "assistantId",
+            "managerId",
+            "totalAmount",
+            "depositAmount",
+            "paymentStatus",
+            "paymentMethod",
+            "status",
+            "notes",
+            "role",
+            "serviceItems",
+            "create",
+            "item",
+            "productId",
+            "quantity",
+            "price",
+            "notes"
+          ],
+          "location": "Line 271",
+          "code": "prisma.workshop.create({\n      data: {\n        customerId: data.customerId,\n        date: data.date,\n        activityType: data.activityType,\n        locationType: data.locationType,\n        baseType:..."
+        }
+      ],
+      "linesOfCode": 480
+    },
+    {
+      "filePath": "app/api/products/materials/route.ts",
+      "issues": [
+        {
+          "type": "missing_required_fields",
+          "model": "Product",
+          "operation": "create",
+          "missingFields": [
+            "price"
+          ],
+          "providedFields": [
+            "name"
+          ],
+          "location": "Line 105",
+          "code": "prisma.product.create({\n      data: {\n        name: `材质占位符_${materialName}..."
+        }
+      ],
+      "linesOfCode": 197
+    },
+    {
+      "filePath": "app/api/products/units/route.ts",
+      "issues": [
+        {
+          "type": "missing_required_fields",
+          "model": "Product",
+          "operation": "create",
+          "missingFields": [
+            "price"
+          ],
+          "providedFields": [
+            "name"
+          ],
+          "location": "Line 105",
+          "code": "prisma.product.create({\n      data: {\n        name: `单位占位符_${unitName}..."
+        }
+      ],
+      "linesOfCode": 197
+    },
+    {
+      "filePath": "app/api/workshops/route.ts",
+      "issues": [
+        {
+          "type": "missing_required_fields",
+          "model": "Workshop",
+          "operation": "create",
+          "missingFields": [
+            "name",
+            "startTime",
+            "endTime"
+          ],
+          "providedFields": [
+            "employeeId",
+            "date",
+            "role",
+            "locationType",
+            "location",
+            "participants",
+            "duration",
+            "notes"
+          ],
+          "location": "Line 26",
+          "code": "prisma.workshop.create({\n      data: {\n        employeeId: Number.parseInt(data.employee),\n        date: new Date(data.date),\n        role: data.role,\n        locationType: data.locationType,\n        ..."
+        }
+      ],
+      "linesOfCode": 45
+    }
+  ],
+  "prioritizedIssues": {
+    "p0": [
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryTransaction",
+        "operation": "create",
+        "missingFields": [
+          "productId"
+        ],
+        "providedFields": [
+          "quantity",
+          "type",
+          "notes",
+          "sourceWarehouseId"
+        ],
+        "location": "Line 171",
+        "code": "prisma.inventoryTransaction.create({\n        data: {\n          productId,\n          quantity: Number(product.inventory) - existingInventory.quantity,\n          type: \"adjustment\",\n          notes: `从产..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryItem",
+        "operation": "create",
+        "missingFields": [
+          "productId"
+        ],
+        "providedFields": [
+          "quantity",
+          "warehouseId"
+        ],
+        "location": "Line 202",
+        "code": "prisma.inventoryItem.create({\n          data: {\n            productId,\n            quantity: Number(product.inventory),\n            warehouseId: anyWarehouse.id,\n          }..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryTransaction",
+        "operation": "create",
+        "missingFields": [
+          "productId"
+        ],
+        "providedFields": [
+          "quantity",
+          "type",
+          "notes"
+        ],
+        "location": "Line 171",
+        "code": "prisma.inventoryTransaction.create({\n          data: {\n            productId,\n            quantity: Number(product.inventory),\n            type: \"initial\",\n            notes: `从产品管理模块初始化库存（使用仓库：${anyW..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryItem",
+        "operation": "create",
+        "missingFields": [
+          "productId"
+        ],
+        "providedFields": [
+          "quantity",
+          "warehouseId"
+        ],
+        "location": "Line 202",
+        "code": "prisma.inventoryItem.create({\n        data: {\n          productId,\n          quantity: Number(product.inventory),\n          warehouseId: defaultWarehouse.id,\n        }..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryTransaction",
+        "operation": "create",
+        "missingFields": [
+          "productId"
+        ],
+        "providedFields": [
+          "quantity",
+          "type",
+          "notes",
+          "targetWarehouseId"
+        ],
+        "location": "Line 171",
+        "code": "prisma.inventoryTransaction.create({\n        data: {\n          productId,\n          quantity: Number(product.inventory),\n          type: \"initial\",\n          notes: `从产品管理模块初始化库存`,\n          targetWar..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryTransaction",
+        "operation": "create",
+        "missingFields": [
+          "productId"
+        ],
+        "providedFields": [
+          "quantity",
+          "type",
+          "notes"
+        ],
+        "location": "Line 171",
+        "code": "prisma.inventoryTransaction.create({\n            data: {\n              productId,\n              quantity: newQuantity - existingInventory.quantity,\n              type: \"import\",\n              notes: `..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryItem",
+        "operation": "create",
+        "missingFields": [
+          "productId",
+          "quantity"
+        ],
+        "providedFields": [
+          "warehouseId",
+          "minQuantity"
+        ],
+        "location": "Line 202",
+        "code": "prisma.inventoryItem.create({\n            data: {\n              productId,\n              quantity,\n              warehouseId: itemWarehouseId,\n              minQuantity: item.minQuantity ? Number(item..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "InventoryTransaction",
+        "operation": "create",
+        "missingFields": [
+          "productId",
+          "quantity"
+        ],
+        "providedFields": [
+          "type",
+          "notes"
+        ],
+        "location": "Line 171",
+        "code": "prisma.inventoryTransaction.create({\n            data: {\n              productId,\n              quantity,\n              type: \"import\",\n              notes: `${notes}..."
+      }
+    ],
+    "p1": [
+      {
+        "type": "missing_required_fields",
+        "model": "Channel",
+        "operation": "create",
+        "missingFields": [
+          "type"
+        ],
+        "providedFields": [
+          "name",
+          "code",
+          "description",
+          "contactName",
+          "contactPhone",
+          "contactEmail",
+          "address",
+          "bankName",
+          "bankAccount",
+          "settlementCycle",
+          "status",
+          "isActive"
+        ],
+        "location": "Line 73",
+        "code": "prisma.channel.create({\n      data: {\n        name: data.name,\n        code: data.code,\n        description: data.description,\n        contactName: data.contactName,\n        contactPhone: data.contact..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "ChannelInventory",
+        "operation": "create",
+        "missingFields": [
+          "channelId"
+        ],
+        "providedFields": [
+          "productId",
+          "quantity"
+        ],
+        "location": "Line 472",
+        "code": "prisma.channelInventory.create({\n          data: {\n            channelId,\n            productId: parseInt(item.productId),\n            quantity: 0,\n          }..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "ProductionOrder",
+        "operation": "create",
+        "missingFields": [
+          "orderNumber"
+        ],
+        "providedFields": [
+          "productionBaseId",
+          "employeeId",
+          "sourceOrderId",
+          "orderDate",
+          "expectedStartDate",
+          "expectedEndDate",
+          "priority",
+          "totalAmount",
+          "shippingMethod",
+          "notes",
+          "items",
+          "create",
+          "productId",
+          "quantity",
+          "specifications"
+        ],
+        "location": "Line 212",
+        "code": "prisma.productionOrder.create({\n      data: {\n        orderNumber,\n        productionBaseId: data.productionBaseId,\n        employeeId: data.employeeId,\n        sourceOrderId: data.sourceOrderId,\n    ..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "Workshop",
+        "operation": "create",
+        "missingFields": [
+          "name",
+          "startTime",
+          "endTime"
+        ],
+        "providedFields": [
+          "customerId",
+          "date",
+          "activityType",
+          "locationType",
+          "baseType",
+          "location",
+          "participants",
+          "duration",
+          "teacherId",
+          "assistantId",
+          "managerId",
+          "totalAmount",
+          "depositAmount",
+          "paymentStatus",
+          "paymentMethod",
+          "status",
+          "notes",
+          "role",
+          "serviceItems",
+          "create",
+          "item",
+          "productId",
+          "quantity",
+          "price",
+          "notes"
+        ],
+        "location": "Line 271",
+        "code": "prisma.workshop.create({\n      data: {\n        customerId: data.customerId,\n        date: data.date,\n        activityType: data.activityType,\n        locationType: data.locationType,\n        baseType:..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "Product",
+        "operation": "create",
+        "missingFields": [
+          "price"
+        ],
+        "providedFields": [
+          "name"
+        ],
+        "location": "Line 105",
+        "code": "prisma.product.create({\n      data: {\n        name: `材质占位符_${materialName}..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "Product",
+        "operation": "create",
+        "missingFields": [
+          "price"
+        ],
+        "providedFields": [
+          "name"
+        ],
+        "location": "Line 105",
+        "code": "prisma.product.create({\n      data: {\n        name: `单位占位符_${unitName}..."
+      },
+      {
+        "type": "missing_required_fields",
+        "model": "Workshop",
+        "operation": "create",
+        "missingFields": [
+          "name",
+          "startTime",
+          "endTime"
+        ],
+        "providedFields": [
+          "employeeId",
+          "date",
+          "role",
+          "locationType",
+          "location",
+          "participants",
+          "duration",
+          "notes"
+        ],
+        "location": "Line 26",
+        "code": "prisma.workshop.create({\n      data: {\n        employeeId: Number.parseInt(data.employee),\n        date: new Date(data.date),\n        role: data.role,\n        locationType: data.locationType,\n        ..."
+      }
+    ],
+    "p2": []
+  }
+}

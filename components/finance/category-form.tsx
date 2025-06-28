@@ -26,6 +26,9 @@ import {
 } from "@/components/ui/select"
 import { createFinancialCategory, updateFinancialCategory } from "@/lib/actions/finance-actions"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 // 表单验证模式
 const categoryFormSchema = z.object({
   name: z.string().min(1, "分类名称不能为空").max(100, "分类名称不能超过100个字符"),
@@ -44,6 +47,9 @@ export function CategoryForm({ category, isEditing = false, onSuccess, onCancel 
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('finance')
+
   // 初始化表单
   const form = useForm<z.infer<typeof categoryFormSchema>>({
     resolver: zodResolver(categoryFormSchema),
@@ -58,34 +64,42 @@ export function CategoryForm({ category, isEditing = false, onSuccess, onCancel 
   const onSubmit = async (values: z.infer<typeof categoryFormSchema>) => {
     setIsSubmitting(true)
     try {
+      const beforeData = isEditing && category ? {
+        name: category.name,
+        type: category.type,
+        description: category.description,
+      } : null
+
       let result
-      
+
       if (isEditing && category) {
         // 更新分类
-        result = await updateFinancialCategory(category.id, values)
-        toast({
-          title: "更新成功",
-          description: `分类 ${result.name} 已更新`,
-        })
+        result = await enhancedOps.update('财务分类').form(
+          async () => {
+            return await updateFinancialCategory(category.id, values)
+          },
+          beforeData,
+          values,
+          { canUndo: true }
+        )
       } else {
         // 创建分类
-        result = await createFinancialCategory(values)
-        toast({
-          title: "创建成功",
-          description: `分类 ${result.name} 已创建`,
-        })
+        result = await enhancedOps.create('财务分类').form(
+          async () => {
+            return await createFinancialCategory(values)
+          },
+          null,
+          values,
+          { canUndo: true }
+        )
       }
-      
+
       if (onSuccess) {
         onSuccess(result)
       }
     } catch (error) {
       console.error("保存分类失败:", error)
-      toast({
-        variant: "destructive",
-        title: "保存失败",
-        description: error.message || "无法保存分类信息",
-      })
+      // 错误已由增强操作系统处理
     } finally {
       setIsSubmitting(false)
     }
@@ -110,7 +124,7 @@ export function CategoryForm({ category, isEditing = false, onSuccess, onCancel 
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="type"
@@ -135,7 +149,7 @@ export function CategoryForm({ category, isEditing = false, onSuccess, onCancel 
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="description"
@@ -152,7 +166,7 @@ export function CategoryForm({ category, isEditing = false, onSuccess, onCancel 
             </FormItem>
           )}
         />
-        
+
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             取消

@@ -15,6 +15,9 @@ import { Loader2 } from "lucide-react"
 import { createWorkshopActivity, updateWorkshopActivity } from "@/lib/actions/workshop-actions"
 import { getProducts } from "@/lib/actions/product-actions"
 
+// 导入增强操作系统
+import { useEnhancedOperations } from "@/lib/enhanced-operations"
+
 // 活动类型枚举
 const activityTypeEnum = [
   "jewelry_enameling", // 饰品点蓝手作
@@ -64,6 +67,9 @@ export function WorkshopActivityForm({ activity, onSubmitted }) {
   const [products, setProducts] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // 增强操作系统
+  const enhancedOps = useEnhancedOperations('workshop')
 
   // 从描述中提取额外信息
   const extractExtraInfo = (description) => {
@@ -160,20 +166,40 @@ export function WorkshopActivityForm({ activity, onSubmitted }) {
         isActive: values.isActive
       };
 
+      const beforeData = activity ? {
+        name: activity.name,
+        description: activity.description,
+        productId: activity.productId,
+        duration: activity.duration,
+        minParticipants: activity.minParticipants,
+        maxParticipants: activity.maxParticipants,
+        price: activity.price,
+        materialFee: activity.materialFee,
+        teacherFee: activity.teacherFee,
+        assistantFee: activity.assistantFee,
+        isActive: activity.isActive
+      } : null
+
       if (activity) {
         // 更新现有活动
-        await updateWorkshopActivity(activity.id, submitData);
-        toast({
-          title: "更新成功",
-          description: "团建活动已成功更新",
-        })
+        await enhancedOps.update('团建活动').form(
+          async () => {
+            return await updateWorkshopActivity(activity.id, submitData)
+          },
+          beforeData,
+          submitData,
+          { canUndo: true }
+        )
       } else {
         // 创建新活动
-        await createWorkshopActivity(submitData);
-        toast({
-          title: "创建成功",
-          description: "团建活动已成功创建",
-        })
+        await enhancedOps.create('团建活动').form(
+          async () => {
+            return await createWorkshopActivity(submitData)
+          },
+          null,
+          submitData,
+          { canUndo: true }
+        )
       }
 
       if (onSubmitted) {
